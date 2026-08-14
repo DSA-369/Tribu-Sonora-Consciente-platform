@@ -1,0 +1,20 @@
+# Entornos virtuales de Python
+.venv/
+venv/
+env/
+
+# Compilados de Reflex y cachés
+.web/
+.states/
+__pycache__/
+*.py[cod]
+*.db
+
+# Archivos de configuración con claves secretas
+.env
+.env.local
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+uploaded_files/
