@@ -1,7 +1,9 @@
 # sound_healing_platform/pages/login.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
+
 
 def tarjeta_orden_usuario(ord_item: rx.Var) -> rx.Component:
     """Tarjeta individual de compra en el historial del cliente con desglose de ítems."""
@@ -155,7 +157,7 @@ def vista_perfil_logueado() -> rx.Component:
                     # 🎧 Botón Minimalista de Soporte Técnico (Ubicación Óvalo Naranja)
                     rx.button(
                         rx.hstack(
-                            rx.icon(tag="headphone", size=13, color="#8E6F54"),
+                            rx.icon(tag="headphones", size=13, color="#8E6F54"),
                             rx.text("Soporte Técnico", size="1", color="#8E6F54", font_weight="medium"),
                             spacing="1",
                             align="center"

@@ -1,0 +1,1131 @@
+BLE001 Do not catch blind exception: `Exception`
+   --> sound_healing_platform\state.py:246:16
+    |
+244 |                 server.sendmail(smtp_user, destinatario_email, msg.as_string())
+245 |             print(f"📧 Correo de Voucher enviado exitosamente a {destinatario_email}")
+246 |         except Exception as e:
+    |                ^^^^^^^^^
+247 |             print(f"Error enviando correo SMTP: {e}")
+    |
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:252:41
+    |
+250 |       # 1. LOGICA Y VARIABLES DEL HOME Y EQUIPO (DATA)
+251 |       # ==================================================================
+252 |       guias_tribu: list[dict[str, str]] = [
+    |  _________________________________________^
+253 | |         {
+254 | |             "id": "1", 
+255 | |             "nombre": "DANIBETH", 
+256 | |             "foto": "/guia_danibeth.png", 
+257 | |             "descripcion": "Mujer Medicina mensajera de la vibración y guardiana de los cuencos sagrados.", 
+258 | |             "biografia": "Biografía extendida de Danibeth..."
+259 | |         },
+260 | |         {
+261 | |             "id": "2", 
+262 | |             "nombre": "JESÚS BURAGLIA", 
+263 | |             "foto": "/guia_jesus.png", 
+264 | |             "descripcion": "Especialista de los Vientos y las medicinas de la tierra.", 
+265 | |             "biografia": "Biografía extendida de Jesús..."
+266 | |         },
+267 | |         {
+268 | |             "id": "3", 
+269 | |             "nombre": "JAROLD GONZÁLEZ", 
+270 | |             "foto": "/guia_jarol.png", 
+271 | |             "descripcion": "Tejedor de espacios de sanación acústica profunda y vibración.", 
+272 | |             "biografia": "Biografía extendida de Jarol..."
+273 | |         }
+274 | |     ]
+    | |_____^
+275 |
+276 |       selected_guide: dict[str, str] = {}
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:276:38
+    |
+274 |     ]
+275 |
+276 |     selected_guide: dict[str, str] = {}
+    |                                      ^^
+277 |
+278 |     eventos_destacados: list[dict[str, str]] = [
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:278:48
+    |
+276 |       selected_guide: dict[str, str] = {}
+277 |
+278 |       eventos_destacados: list[dict[str, str]] = [
+    |  ________________________________________________^
+279 | |         {"nombre": "SANTIAMEN WELLNESS\nHOUSE CLUB", "logo": "", "url": "https://www.instagram.com/reel/DX9teJFORp5/"},
+280 | |         {"nombre": "ONVA", "logo": "", "url": "https://www.instagram.com/reel/DCfdFAvORkp/"},
+281 | |         {"nombre": "CASA MORADA", "logo": "", "url": "https://www.instagram.com/reel/DLSUaMfOqUn/"},
+282 | |         {"nombre": "EL RESETEO\nSensorial & Holistic\nExperience", "logo": "", "url": "https://www.instagram.com/p/DV31fnUjgnH/"},
+283 | |         {"nombre": "PACHAMAMA PROYECTO", "logo": "", "url": "https://www.instagram.com/p/DZr4EnoDoTZ/"},
+284 | |         {"nombre": "SUKHA FESTIVAL", "logo": "", "url": "https://www.instagram.com/reel/DK7W1t2uBmp/"},
+285 | |         {"nombre": "LOS ASTROS\nVenevisión", "logo": "", "url": "https://www.instagram.com/reel/DXcp8KXlruy/"},
+286 | |     ]
+    | |_____^
+287 |
+288 |       imagenes_galeria: list[str] = [
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:288:35
+    |
+286 |       ]
+287 |
+288 |       imagenes_galeria: list[str] = [
+    |  ___________________________________^
+289 | |         "/Galeria_foto1.jpg", "/Galeria_foto2d.jpg", "/Galeria_foto3j.jpg",
+290 | |         "/Galeria_foto4.jpg", "/Galeria_foto5.jpg", "/Galeria_foto6.jpg",
+291 | |         "/Galeria_foto7.jpg", "/Galeria_foto8.jpg", "/Galeria_foto9.jpg"
+292 | |     ]
+    | |_____^
+293 |
+294 |       feed_instagram: list[dict[str, str]] = [
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:294:44
+    |
+292 |       ]
+293 |
+294 |       feed_instagram: list[dict[str, str]] = [
+    |  ____________________________________________^
+295 | |         {"foto": "/ig_post1.png", "url": "https://www.instagram.com/p/CUszqYKBxQT/"}, 
+296 | |         {"foto": "/ig_post2.png", "url": "https://www.instagram.com/reel/DKz3nEjupNb/"},
+297 | |         {"foto": "/ig_post3.png", "url": "https://www.instagram.com/reel/DTqbo7YkRCL/"},
+298 | |         {"foto": "/ig_post4.png", "url": "https://www.instagram.com/reel/DOEqBx2jqZO/"},
+299 | |         {"foto": "/ig_post5.png", "url": "https://www.instagram.com/reel/DA3tW1BRN3n/"},
+300 | |         {"foto": "/ig_post6.png", "url": "https://www.instagram.com/reel/C8azdQ1Nre9/"},
+301 | |         {"foto": "/ig_post7.png", "url": "https://www.instagram.com/reel/DLnK6ZNuzbK/"},
+302 | |         {"foto": "/ig_post8.png", "url": "https://www.instagram.com/p/DJpFV9FNlJI/"},
+303 | |         {"foto": "/ig_post9.png", "url": "https://www.instagram.com/reel/DNbpD5-ulhq/"},
+304 | |     ]
+    | |_____^
+305 |
+306 |       testimonios: list[dict[str, str]] = [
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:306:41
+    |
+304 |       ]
+305 |
+306 |       testimonios: list[dict[str, str]] = [
+    |  _________________________________________^
+307 | |         {
+308 | |             "texto": '"Después de vivir la experiencia de la Tribu Sonora Consciente, puedo decir que es una vivencia transformador…
+309 | |             "autor": "Mariana Kert", "ciudad": "Margarita, Venezuela"
+310 | |         },
+311 | |         {
+312 | |             "texto": '"Verlos trabajar fue para mí un gran regalo para mi alma y mi espíritu. Su entrega, su conexión y su profesio…
+313 | |             "autor": "Maria Luisa", "ciudad": "Caracas, Venezuela"
+314 | |         },
+315 | |         {
+316 | |             "texto": '"Fue mi primera vez en una terapia de sonido y logré dar un paso importante. El trabajo con el sonido y la mú…
+317 | |             "autor": "Maximiliano Catoni", "ciudad": "Caracas, Venezuela"
+318 | |         }
+319 | |     ]
+    | |_____^
+320 |
+321 |       # ==================================================================
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:324:45
+    |
+322 |     # VARIABLES REACTIVAS Y NAVEGACIÓN DE LA TIENDA
+323 |     # ==================================================================
+324 |     productos_tribu: list[dict[str, Any]] = []
+    |                                             ^^
+325 |     servicios_tribu: list[dict[str, Any]] = []
+326 |     talleres_tribu: list[dict[str, Any]] = []
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:325:45
+    |
+323 |     # ==================================================================
+324 |     productos_tribu: list[dict[str, Any]] = []
+325 |     servicios_tribu: list[dict[str, Any]] = []
+    |                                             ^^
+326 |     talleres_tribu: list[dict[str, Any]] = []
+327 |     sesiones_tribu: list[dict[str, Any]] = []
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:326:44
+    |
+324 |     productos_tribu: list[dict[str, Any]] = []
+325 |     servicios_tribu: list[dict[str, Any]] = []
+326 |     talleres_tribu: list[dict[str, Any]] = []
+    |                                            ^^
+327 |     sesiones_tribu: list[dict[str, Any]] = []
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:327:44
+    |
+325 |     servicios_tribu: list[dict[str, Any]] = []
+326 |     talleres_tribu: list[dict[str, Any]] = []
+327 |     sesiones_tribu: list[dict[str, Any]] = []
+    |                                            ^^
+328 |
+329 |     # 🔍 BÚSQUEDA GLOBAL OMNICANAL EN EL NAVBAR
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:465:51
+    |
+463 |     # Variables para el Modal de Reserva de Sesiones
+464 |     modal_reserva_sesion_abierto: bool = False
+465 |     sesion_seleccionada_reserva: dict[str, Any] = {}
+    |                                                   ^^
+466 |     reserva_nombre_cliente: str = ""
+467 |     reserva_email_cliente: str = ""
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:470:40
+    |
+468 |     reserva_whatsapp_cliente: str = ""
+469 |     reserva_cantidad_cupos: int = 1
+470 |     reserva_participantes: list[str] = [""]
+    |                                        ^^^^
+471 |     reserva_porcentaje_pago: float = 100.0
+472 |     reserva_cupon_input: str = ""
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+   --> sound_healing_platform\state.py:544:16
+    |
+542 |                 self.reserva_cupon_aplicado_codigo = ""
+543 |                 return rx.toast.error("Código de cupón o descuento inválido.")
+544 |         except Exception as e:
+    |                ^^^^^^^^^
+545 |             print(f"Error al aplicar cupón: {e}")
+546 |             return rx.toast.error("Error al verificar el cupón.")
+    |
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:577:46
+    |
+576 |     # Variables para el Documento / Checklist Digital de Asistencia por Token
+577 |     sesion_asistencia_info: dict[str, Any] = {}
+    |                                              ^^
+578 |     lista_asistentes_sesion: list[dict[str, Any]] = []
+579 |     busqueda_asistente: str = ""
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:578:53
+    |
+576 |     # Variables para el Documento / Checklist Digital de Asistencia por Token
+577 |     sesion_asistencia_info: dict[str, Any] = {}
+578 |     lista_asistentes_sesion: list[dict[str, Any]] = []
+    |                                                     ^^
+579 |     busqueda_asistente: str = ""
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+C414 Unnecessary `list()` call within `sorted()`
+   --> sound_healing_platform\state.py:674:34
+    |
+672 |     def opciones_facilitadores(self) -> list[str]:
+673 |         facs = {t.get("facilitador") for t in self.talleres_tribu if t.get("facilitador")}
+674 |         return ["FACILITADOR"] + sorted(list(facs))
+    |                                  ^^^^^^^^^^^^^^^^^^
+675 |
+676 |     @rx.var
+    |
+help: Remove the inner `list()` call
+
+C414 Unnecessary `list()` call within `sorted()`
+   --> sound_healing_platform\state.py:679:32
+    |
+677 |     def opciones_ubicaciones(self) -> list[str]:
+678 |         ubis = {t.get("ubicacion") for t in self.talleres_tribu if t.get("ubicacion")}
+679 |         return ["UBICACIÓN"] + sorted(list(ubis))
+    |                                ^^^^^^^^^^^^^^^^^^
+680 |
+681 |     @rx.var
+    |
+help: Remove the inner `list()` call
+
+C414 Unnecessary `list()` call within `sorted()`
+   --> sound_healing_platform\state.py:684:32
+    |
+682 |     def opciones_etiquetas(self) -> list[str]:
+683 |         etqs = {t.get("tipo") for t in self.talleres_tribu if t.get("tipo")}
+684 |         return ["CATEGORÍA"] + sorted(list(etqs))
+    |                                ^^^^^^^^^^^^^^^^^^
+685 |
+686 |     @rx.var
+    |
+help: Remove the inner `list()` call
+
+DTZ011 `datetime.date.today()` used
+   --> sound_healing_platform\state.py:689:15
+    |
+687 |     def dias_semana_actual(self) -> list[dict[str, Any]]:
+688 |         from datetime import date, timedelta
+689 |         hoy = date.today()
+    |               ^^^^^^^^^^^^
+690 |         base_date = hoy + timedelta(weeks=self.semana_offset)
+691 |         idx_domingo = (base_date.weekday() + 1) % 7
+    |
+help: Use `datetime.datetime.now(tz=...).date()` instead
+
+DTZ011 `datetime.date.today()` used
+   --> sound_healing_platform\state.py:713:15
+    |
+711 |     def meses_anio_actual(self) -> list[dict[str, Any]]:
+712 |         from datetime import date
+713 |         hoy = date.today()
+    |               ^^^^^^^^^^^^
+714 |         anio_base = hoy.year + self.anio_offset
+    |
+help: Use `datetime.datetime.now(tz=...).date()` instead
+
+DTZ011 `datetime.date.today()` used
+   --> sound_healing_platform\state.py:736:23
+    |
+734 |     def talleres_filtrados(self) -> list[dict[str, Any]]:
+735 |         from datetime import date
+736 |         hoy_str = str(date.today())
+    |                       ^^^^^^^^^^^^
+737 |         
+738 |         resultado = []
+    |
+help: Use `datetime.datetime.now(tz=...).date()` instead
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:785:45
+    |
+783 |     filtro_precio_min: str = ""
+784 |     filtro_precio_max: str = ""
+785 |     filtro_categorias_ver_todo: list[str] = []
+    |                                             ^^
+786 |     filtro_intenciones_ver_todo: list[str] = []
+787 |     filtro_ordenamiento: str = "Nombre: AZ"
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> sound_healing_platform\state.py:786:46
+    |
+784 |     filtro_precio_max: str = ""
+785 |     filtro_categorias_ver_todo: list[str] = []
+786 |     filtro_intenciones_ver_todo: list[str] = []
+    |                                              ^^
+787 |     filtro_ordenamiento: str = "Nombre: AZ"
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+C414 Unnecessary `list()` call within `sorted()`
+   --> sound_healing_platform\state.py:910:16
+    |
+908 |     def lista_categorias_unicas(self) -> list[str]:
+909 |         cats = {p.get("categoria") for p in self.productos_tribu if p.get("categoria")}
+910 |         return sorted(list(cats))
+    |                ^^^^^^^^^^^^^^^^^^
+911 |
+912 |     @rx.var
+    |
+help: Remove the inner `list()` call
+
+C414 Unnecessary `list()` call within `sorted()`
+   --> sound_healing_platform\state.py:915:16
+    |
+913 |     def lista_proveedores_unicos(self) -> list[str]:
+914 |         provs = {p.get("proveedor") for p in self.productos_tribu if p.get("proveedor")}
+915 |         return sorted(list(provs))
+    |                ^^^^^^^^^^^^^^^^^^^
+916 |     
+917 |     def navegar_revista_principal(self):
+    |
+help: Remove the inner `list()` call
+
+DTZ011 `datetime.date.today()` used
+    --> sound_healing_platform\state.py:1155:23
+     |
+1153 |             db_sessions = session.exec(sqlmodel.select(TribuSession).where(TribuSession.is_active == True)).all()
+1154 |             if db_sessions:
+1155 |                 hoy = date.today()
+     |                       ^^^^^^^^^^^^
+1156 |                 actualizo = False
+1157 |                 for s in db_sessions:
+     |
+help: Use `datetime.datetime.now(tz=...).date()` instead
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1224:20
+     |
+1222 |                         if fallback:
+1223 |                             self.selected_guide = fallback
+1224 |             except Exception as e:
+     |                    ^^^^^^^^^
+1225 |                 print(f"Error cargando biografía: {e}")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1230:30
+     |
+1228 |     # 5. LÓGICA DE PÁGINA DE DETALLE DE PRODUCTO (/product/[id])
+1229 |     # ==================================================================
+1230 |     producto_detalle: dict = {}
+     |                              ^^
+1231 |     fotos_producto: list[str] = []
+1232 |     foto_principal: str = ""
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1231:33
+     |
+1229 |     # ==================================================================
+1230 |     producto_detalle: dict = {}
+1231 |     fotos_producto: list[str] = []
+     |                                 ^^
+1232 |     foto_principal: str = ""
+1233 |     cantidad_producto: int = 1
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1234:42
+     |
+1232 |     foto_principal: str = ""
+1233 |     cantidad_producto: int = 1
+1234 |     productos_recomendados: list[dict] = []
+     |                                          ^^
+1235 |     
+1236 |     variantes_producto: list[dict] = []
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1236:38
+     |
+1234 |     productos_recomendados: list[dict] = []
+1235 |     
+1236 |     variantes_producto: list[dict] = []
+     |                                      ^^
+1237 |     variante_seleccionada: dict = {}
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1237:35
+     |
+1236 |     variantes_producto: list[dict] = []
+1237 |     variante_seleccionada: dict = {}
+     |                                   ^^
+1238 |
+1239 |     def seleccionar_foto_principal(self, url: str):
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1318:16
+     |
+1316 |                         for p in db_recs
+1317 |                     ]
+1318 |         except Exception as e:
+     |                ^^^^^^^^^
+1319 |             print(f"Error cargando detalle del producto: {e}")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1324:27
+     |
+1322 |     # 6. LÓGICA Y ESTADO DEL CARRITO DE COMPRAS Y NOTIFICACIONES
+1323 |     # ==================================================================
+1324 |     carrito: list[dict] = []
+     |                           ^^
+1325 |     mostrar_carrito: bool = False
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1327:42
+     |
+1325 |     mostrar_carrito: bool = False
+1326 |     
+1327 |     notificaciones_carrito: list[dict] = []
+     |                                          ^^
+1328 |     mostrar_notificaciones_carrito: bool = False
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF046 Value being cast to `int` is already an integer
+    --> sound_healing_platform\state.py:1345:20
+     |
+1344 |         if p_anterior and p_anterior > p_actual and p_actual > 0:
+1345 |             return int(round(((p_anterior - p_actual) / p_anterior) * 100))
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1346 |         return 0
+     |
+help: Remove unnecessary `int` call
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1428:16
+     |
+1426 |                 self.carrito = items_validados
+1427 |
+1428 |         except Exception as e:
+     |                ^^^^^^^^^
+1429 |             print(f"Error sincronizando carrito con Supabase: {e}")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1529:50
+     |
+1527 |     # 🔔 SISTEMA DE NOTIFICACIONES UNIFICADO Y REDIRECCIÓN INTELIGENTE
+1528 |     # =========================================================================
+1529 |     notificaciones_lista: list[dict[str, Any]] = []
+     |                                                  ^^
+1530 |     show_popover_notificaciones: bool = False
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1576:16
+     |
+1574 |                     for n in db_nots
+1575 |                 ]
+1576 |         except Exception as e:
+     |                ^^^^^^^^^
+1577 |             print(f"Error cargando notificaciones: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1588:16
+     |
+1586 |                     session.add(db_n)
+1587 |                     session.commit()
+1588 |         except Exception as e:
+     |                ^^^^^^^^^
+1589 |             print(f"Error actualizando leido: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1616:16
+     |
+1614 |                 session.add(nueva_n)
+1615 |                 session.commit()
+1616 |         except Exception as e:
+     |                ^^^^^^^^^
+1617 |             print(f"Error registrando notificación en BD: {e}")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1622:54
+     |
+1620 |       # 🎁 ESTADO Y LÓGICA DE TARJETAS DE REGALO / VOUCHERS DE EXPERIENCIAS
+1621 |       # =========================================================================
+1622 |       experiencias_disponibles: list[dict[str, Any]] = [
+     |  ______________________________________________________^
+1623 | |         {
+1624 | |             "id": "exp_1",
+1625 | |             "nombre": "Pase para Sesión Grupal de Sonoterapia",
+1626 | |             "descripcion": "Un viaje de inmersión acústica profunda con cuencos, didgeridoo y vientos en nuestras sesiones semanal…
+1627 | |             "precio": 20.0,
+1628 | |             "badge": "MÁS POPULAR"
+1629 | |         },
+1630 | |         {
+1631 | |             "id": "exp_2",
+1632 | |             "nombre": "Ritual & Taller Sonoro en Pareja",
+1633 | |             "descripcion": "Espacio sagrado de reconexión, armonización de chakras y sanación acústica compartida.",
+1634 | |             "precio": 45.0,
+1635 | |             "badge": "EXPERIENCIA EN DUO"
+1636 | |         },
+1637 | |         {
+1638 | |             "id": "exp_3",
+1639 | |             "nombre": "Pase Doble para Ceremónia / Concierto Holístico",
+1640 | |             "descripcion": "Entrada doble para nuestros conciertos vivenciales y ceremonias de sonido de la Tribu.",
+1641 | |             "precio": 60.0,
+1642 | |             "badge": "EVENTO ESPECIAL"
+1643 | |         },
+1644 | |         {
+1645 | |             "id": "exp_4",
+1646 | |             "nombre": "Sesión Individual Privada con Terapeuta Aliado",
+1647 | |             "descripcion": "Atención personalizada de 90 minutos enfocada en la restauración energética y vibracional.",
+1648 | |             "precio": 80.0,
+1649 | |             "badge": "VIP & PRIVADO"
+1650 | |         }
+1651 | |     ]
+     | |_____^
+1652 |
+1653 |       gc_experiencia_seleccionada: str = "Pase para Sesión Grupal de Sonoterapia"
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+ASYNC230 Async functions should not open files with blocking methods like `open`
+    --> sound_healing_platform\state.py:1756:18
+     |
+1754 |             file_path = upload_dir / file.filename
+1755 |             
+1756 |             with open(file_path, "wb") as f:
+     |                  ^^^^
+1757 |                 f.write(upload_data)
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1868:16
+     |
+1866 |                 self.checkout_cupon_aplicado_codigo = ""
+1867 |                 return rx.toast.error("Código de cupón o descuento inválido o inactivo.")
+1868 |         except Exception as e:
+     |                ^^^^^^^^^
+1869 |             print(f"Error al validar cupón en checkout: {e}")
+1870 |             self.descuento_cupon_monto = 0.0
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1895:16
+     |
+1893 |                     if db_user.ciudad: self.checkout_ciudad = db_user.ciudad
+1894 |                     if db_user.codigo_postal: self.checkout_codigo_postal = db_user.codigo_postal
+1895 |         except Exception as e:
+     |                ^^^^^^^^^
+1896 |             print(f"Error autocompletando datos de usuario: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1948:16
+     |
+1946 |         try:
+1947 |             return create_client(url, key)
+1948 |         except Exception as e:
+     |                ^^^^^^^^^
+1949 |             print(f"Error inicializando cliente de Supabase: {e}")
+1950 |             return None
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:1952:35
+     |
+1950 |               return None
+1951 |
+1952 |       metodos_pago_db: list[dict] = [
+     |  ___________________________________^
+1953 | |         {
+1954 | |             "id": 1,
+1955 | |             "tipo": "pago_movil",
+1956 | |             "titulo": "Pago Móvil (Bolívares)",
+1957 | |             "icono": "smartphone",
+1958 | |             "detalles_texto": "• Banco: Mercantil (0105)\n• Cédula: V-19.876.543\n• Teléfono: 0412-3690000\n• Tasa: Oficial BCV de…
+1959 | |         },
+1960 | |         {
+1961 | |             "id": 2,
+1962 | |             "tipo": "zelle",
+1963 | |             "titulo": "Zelle (USD)",
+1964 | |             "icono": "dollar_sign",
+1965 | |             "detalles_texto": "• Correo Zelle: pagos@tribusonoraconsciente.com\n• Titular: Tribu Sonora Consciente LLC"
+1966 | |         },
+1967 | |         {
+1968 | |             "id": 3,
+1969 | |             "tipo": "binance",
+1970 | |             "titulo": "Binance Pay (USDT)",
+1971 | |             "icono": "wallet",
+1972 | |             "detalles_texto": "• Binance Pay ID: 284910381\n• Email: binance@tribusonoraconsciente.com"
+1973 | |         },
+1974 | |         {
+1975 | |             "id": 4,
+1976 | |             "tipo": "paypal",
+1977 | |             "titulo": "PayPal",
+1978 | |             "icono": "globe",
+1979 | |             "detalles_texto": "• Cuenta: paypal@tribusonoraconsciente.com\n• Nota: Enviar monto neto."
+1980 | |         },
+1981 | |         {
+1982 | |             "id": 5,
+1983 | |             "tipo": "transferencia",
+1984 | |             "titulo": "Transferencia Bancaria",
+1985 | |             "icono": "building_2",
+1986 | |             "detalles_texto": "• Banco Mercantil - Cta. Corriente\n• Nro: 0105-0123-45-1234567890\n• RIF: J-50123456-0"
+1987 | |         }
+1988 | |     ]
+     | |_____^
+1989 |
+1990 |       def cargar_metodos_pago(self):
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:1997:16
+     |
+1995 |                 if res.data and len(res.data) > 0:
+1996 |                     self.metodos_pago_db = res.data
+1997 |         except Exception as e:
+     |                ^^^^^^^^^
+1998 |             print(f"Error cargando métodos de pago desde Supabase: {e}")
+     |
+
+ASYNC230 Async functions should not open files with blocking methods like `open`
+    --> sound_healing_platform\state.py:2038:22
+     |
+2036 |             file_bytes = b""
+2037 |             if temp_file_path and temp_file_path.exists():
+2038 |                 with open(temp_file_path, "rb") as f:
+     |                      ^^^^
+2039 |                     file_bytes = f.read()
+2040 |             elif files and len(files) > 0:
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2074:16
+     |
+2072 |                         # Generación de la URL Pública Oficial en la nube
+2073 |                         comprobante_url = client.storage.from_("comprobantes").get_public_url(storage_filename)
+2074 |         except Exception as e:
+     |                ^^^^^^^^^
+2075 |             print(f"Error subiendo comprobante a Supabase Storage: {e}")
+2076 |             comprobante_url = f"Referencia: {self.numero_referencia}"
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2192:16
+     |
+2190 |                 self.checkout_cupon_aplicado_codigo = ""
+2191 |                 self.descuento_cupon_monto = 0.0
+2192 |         except Exception as err:
+     |                ^^^^^^^^^
+2193 |             print(f"Aviso guardando en BD (Continuando a WhatsApp): {err}")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:2248:39
+     |
+2246 |     rastreo_contacto: str = ""
+2247 |     rastreo_referencia: str = ""
+2248 |     ordenes_encontradas: list[dict] = []
+     |                                       ^^
+2249 |     busqueda_realizada: bool = False
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2283:16
+     |
+2281 |                 if not self.ordenes_encontradas:
+2282 |                     rx.toast.info("No encontramos ninguna orden con esos datos exactos.")
+2283 |         except Exception as e:
+     |                ^^^^^^^^^
+2284 |             print(f"Error rastreando orden: {e}")
+2285 |             self.busqueda_realizada = True
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2423:16
+     |
+2421 |                 self.reserva_descuento_monto = 0.0
+2422 |
+2423 |         except Exception as e:
+     |                ^^^^^^^^^
+2424 |             print(f"Error registrando reserva en Supabase: {e}")
+2425 |             return rx.toast.error("Ocurrió un error al registrar tu solicitud.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2563:16
+     |
+2561 |                 self.lista_asistentes_sesion = asistentes_desglosados
+2562 |
+2563 |         except Exception as e:
+     |                ^^^^^^^^^
+2564 |             print(f"Error cargando lista de asistencia por token: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2614:16
+     |
+2612 |                     estado_txt = "marcado como presente 🟢" if nuevo_estado else "desmarcado ⚪"
+2613 |                     return rx.toast.info(f"{nombre_toast} {estado_txt}")
+2614 |         except Exception as e:
+     |                ^^^^^^^^^
+2615 |             print(f"Error actualizando asistencia individual en Supabase: {e}")
+2616 |             return rx.toast.error("Ocurrió un error al guardar la asistencia en el servidor.")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:2626:48
+     |
+2625 |     # 🎟️ Variables y Métodos CRUD de Cupones Administrables
+2626 |     cupones_admin_list: list[dict[str, Any]] = []
+     |                                                ^^
+2627 |     edit_cupon_codigo: str = ""
+2628 |     edit_cupon_tipo: str = "PORCENTAJE"  # 'PORCENTAJE' o 'FIJO'
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2671:16
+     |
+2669 |                 self.cargar_datos_admin()
+2670 |                 return rx.toast.success(f"¡Cupón {cod} creado exitosamente!")
+2671 |         except Exception as e:
+     |                ^^^^^^^^^
+2672 |             print(f"Error al crear cupón: {e}")
+2673 |             return rx.toast.error("El código ya existe o falló la conexión.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2686:16
+     |
+2684 |                     self.cargar_datos_admin()
+2685 |                     return rx.toast.info("Estado del cupón actualizado.")
+2686 |         except Exception as e:
+     |                ^^^^^^^^^
+2687 |             print(f"Error en toggle cupon: {e}")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:2725:34
+     |
+2723 |     edit_prod_intencion: str = ""
+2724 |     edit_prod_foto: str = ""
+2725 |     edit_prod_fotos: list[str] = []
+     |                                  ^^
+2726 |     edit_prod_is_best_seller: bool = False
+2727 |     edit_prod_is_favorite: bool = False
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:2841:49
+     |
+2840 |     # Listas registradas para el administrador
+2841 |     reservas_admin_list: list[dict[str, Any]] = []
+     |                                                 ^^
+2842 |     ordenes_admin_list: list[dict[str, Any]] = []
+2843 |     sesiones_admin_list: list[dict[str, Any]] = []
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:2842:48
+     |
+2840 |     # Listas registradas para el administrador
+2841 |     reservas_admin_list: list[dict[str, Any]] = []
+2842 |     ordenes_admin_list: list[dict[str, Any]] = []
+     |                                                ^^
+2843 |     sesiones_admin_list: list[dict[str, Any]] = []
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:2843:49
+     |
+2841 |     reservas_admin_list: list[dict[str, Any]] = []
+2842 |     ordenes_admin_list: list[dict[str, Any]] = []
+2843 |     sesiones_admin_list: list[dict[str, Any]] = []
+     |                                                 ^^
+2844 |
+2845 |     def set_admin_email(self, val: str):
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2965:16
+     |
+2963 |                     for c in cupones_db
+2964 |                 ]
+2965 |         except Exception as e:
+     |                ^^^^^^^^^
+2966 |             print(f"Error cargando datos admin: {e}")
+2967 |     def cambiar_porcentaje_reserva_admin(self, reserva_id: int, nuevo_pct: float):
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:2988:16
+     |
+2986 | …                 self.cargar_lista_asistencia_por_token()
+2987 | …                 return rx.toast.success(f"Reserva de {reserva.nombre_cliente} actualizada a {pct:.0f}% (Pendiente: ${m_pend:.2f} U…
+2988 | …     except Exception as e:
+     |              ^^^^^^^^^
+2989 | …         print(f"Error cambiando porcentaje de reserva admin: {e}")
+2990 | …         return rx.toast.error("Error al actualizar el porcentaje de la reserva.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3062:16
+     |
+3060 |                     yield rx.redirect(wa_url, is_external=True)
+3061 |
+3062 |         except Exception as e:
+     |                ^^^^^^^^^
+3063 |             print(f"Error aprobando reserva: {e}")
+3064 |             yield rx.toast.error("Error al procesar la aprobación.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3077:16
+     |
+3075 |                     self.cargar_datos_admin()
+3076 |                     return rx.toast.info(f"Reserva de {reserva.nombre_cliente} cancelada/rechazada.")
+3077 |         except Exception as e:
+     |                ^^^^^^^^^
+3078 |             print(f"Error rechazando reserva: {e}")
+3079 |             return rx.toast.error("Error al rechazar la reserva.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3160:16
+     |
+3158 |                 self.cargar_datos_db()
+3159 |                 return rx.toast.success("Pedido APROBADO: Stock descontado y Vouchers activados.")
+3160 |         except Exception as e:
+     |                ^^^^^^^^^
+3161 |             print(f"Error aprobando orden: {e}")
+3162 |             return rx.toast.error("Ocurrió un error al aprobar el pedido.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3187:16
+     |
+3185 |                     self.cargar_datos_admin()
+3186 |                     return rx.toast.info("Pedido marcado como RECHAZADO.")
+3187 |         except Exception as e:
+     |                ^^^^^^^^^
+3188 |             print(f"Error rechazando orden: {e}")
+3189 |             return rx.toast.error("Error al rechazar el pedido.")
+     |
+
+DTZ011 `datetime.date.today()` used
+    --> sound_healing_platform\state.py:3204:25
+     |
+3203 |         if fecha_ref is None:
+3204 |             fecha_ref = date.today()
+     |                         ^^^^^^^^^^^^
+3205 |
+3206 |         partes = patron.upper().split("_")
+     |
+help: Use `datetime.datetime.now(tz=...).date()` instead
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3352:16
+     |
+3350 |                 self.modal_editor_sesion_abierto = False
+3351 |                 self.cargar_datos_db()
+3352 |         except Exception as e:
+     |                ^^^^^^^^^
+3353 |             print(f"Error guardando sesión en Supabase: {e}")
+3354 |             return rx.toast.error("Ocurrió un error al guardar en la base de datos.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3369:16
+     |
+3367 |                     estado_txt = "activada (visible en la web)" if db_s.is_active else "ocultada/desactivada"
+3368 |                     return rx.toast.info(f"Sesión {estado_txt}.")
+3369 |         except Exception as e:
+     |                ^^^^^^^^^
+3370 |             print(f"Error cambiando estado de la sesión: {e}")
+3371 |             return rx.toast.error("Error al actualizar el estado de la sesión.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3387:16
+     |
+3385 |                     self.cargar_datos_db()
+3386 |                     return rx.toast.success("¡Nuevo token de asistencia generado con éxito!")
+3387 |         except Exception as e:
+     |                ^^^^^^^^^
+3388 |             print(f"Error generando token de asistencia: {e}")
+3389 |             return rx.toast.error("Error al generar el token.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3476:16
+     |
+3474 |                 self.modal_editor_producto_abierto = False
+3475 |                 self.cargar_datos_db()
+3476 |         except Exception as e:
+     |                ^^^^^^^^^
+3477 |             print(f"Error guardando producto en Supabase: {e}")
+3478 |             return rx.toast.error("Ocurrió un error al guardar en la base de datos.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3492:16
+     |
+3490 |                     estado_txt = "activado" if db_p.is_active else "ocultado"
+3491 |                     return rx.toast.info(f"Producto {estado_txt}.")
+3492 |         except Exception as e:
+     |                ^^^^^^^^^
+3493 |             print(f"Error cambiando estado del producto: {e}")
+3494 |             return rx.toast.error("Error al actualizar el producto.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3520:24
+     |
+3518 |                         self.edit_prod_fotos.append(public_url)
+3519 |                     subidas += 1
+3520 |                 except Exception as e:
+     |                        ^^^^^^^^^
+3521 |                     print(f"Error subiendo foto de producto: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3539:16
+     |
+3537 |                     self.cargar_datos_db()
+3538 |                     return rx.toast.info(f"Stock actualizado a {nuevo_stock} unid.")
+3539 |         except Exception as e:
+     |                ^^^^^^^^^
+3540 |             print(f"Error modificando inventario: {e}")
+3541 |             return rx.toast.error("Error al modificar el stock.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3633:16
+     |
+3631 |                 self.modal_editor_taller_abierto = False
+3632 |                 self.cargar_datos_db()
+3633 |         except Exception as e:
+     |                ^^^^^^^^^
+3634 |             print(f"Error guardando taller en Supabase: {e}")
+3635 |             return rx.toast.error("Ocurrió un error al guardar el taller en la base de datos.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3649:16
+     |
+3647 |                     estado_txt = "activado" if db_w.is_active else "ocultado"
+3648 |                     return rx.toast.info(f"Taller {estado_txt}.")
+3649 |         except Exception as e:
+     |                ^^^^^^^^^
+3650 |             print(f"Error conmutando estado del taller: {e}")
+3651 |             return rx.toast.error("Error al actualizar el taller.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3703:16
+     |
+3701 |                 self.modal_editor_servicio_abierto = False
+3702 |                 self.cargar_datos_db()
+3703 |         except Exception as e:
+     |                ^^^^^^^^^
+3704 |             print(f"Error guardando servicio en Supabase: {e}")
+3705 |             return rx.toast.error("Ocurrió un error al guardar el servicio en la base de datos.")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3719:16
+     |
+3717 |                     estado_txt = "activado" if db_s.is_active else "ocultado"
+3718 |                     return rx.toast.info(f"Servicio {estado_txt}.")
+3719 |         except Exception as e:
+     |                ^^^^^^^^^
+3720 |             print(f"Error conmutando estado del servicio: {e}")
+3721 |             return rx.toast.error("Error al actualizar el servicio.")
+     |
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:3728:37
+     |
+3726 |     auth_token: str = rx.Cookie(name="tribu_auth_token")
+3727 |     user_logged_in: bool = False
+3728 |     usuario_datos: dict[str, Any] = {}
+     |                                     ^^
+3729 |     
+3730 |     auth_email_input: str = ""
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:3738:55
+     |
+3737 |     # Historial de Usuario
+3738 |     historial_ordenes_usuario: list[dict[str, Any]] = []
+     |                                                       ^^
+3739 |     historial_reservas_usuario: list[dict[str, Any]] = []
+3740 |     perfil_tab_activa: str = "compras"  # 'compras' o 'reservas'
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+    --> sound_healing_platform\state.py:3739:56
+     |
+3737 |     # Historial de Usuario
+3738 |     historial_ordenes_usuario: list[dict[str, Any]] = []
+3739 |     historial_reservas_usuario: list[dict[str, Any]] = []
+     |                                                        ^^
+3740 |     perfil_tab_activa: str = "compras"  # 'compras' o 'reservas'
+     |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3793:16
+     |
+3791 |                     session.add(nuevo_cart)
+3792 |                 session.commit()
+3793 |         except Exception as e:
+     |                ^^^^^^^^^
+3794 |             print(f"Error guardando carrito en Supabase: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3819:16
+     |
+3817 |                     # Actualizar Supabase con la fusión final
+3818 |                     self.guardar_carrito_db()
+3819 |         except Exception as e:
+     |                ^^^^^^^^^
+3820 |             print(f"Error cargando y fusionando carrito desde Supabase: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3881:16
+     |
+3879 |                     for row in res_r
+3880 |                 ]
+3881 |         except Exception as e:
+     |                ^^^^^^^^^
+3882 |             print(f"Error cargando historial de usuario: {e}")
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:3923:20
+     |
+3921 |                     else:
+3922 |                         self.logout_user()
+3923 |             except Exception as e:
+     |                    ^^^^^^^^^
+3924 |                 print(f"Error verificando sesión en Supabase: {e}")
+3925 |         else:
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> sound_healing_platform\state.py:4025:16
+     |
+4023 |                 return rx.redirect("/")
+4024 |
+4025 |         except Exception as e:
+     |                ^^^^^^^^^
+4026 |             print(f"Error procesando autenticación en Supabase: {e}")
+4027 |             return rx.toast.error("Ocurrió un error al conectar con el servidor.")
+     |
+
+Found 90 errors.
+No fixes available (6 hidden fixes can be enabled with the `--unsafe-fixes` option).

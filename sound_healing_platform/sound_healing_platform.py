@@ -1,24 +1,24 @@
 # sound_healing_platform/sound_healing_platform.py
 import reflex as rx
-from sound_healing_platform.state import State, InstagramPost, FeaturedEvent, TribuGuide
+
 from sound_healing_platform.components.layout import plantilla_tribu
-from sound_healing_platform.pages.contacto import contacto_page
 from sound_healing_platform.pages.acerca_de import acerca_de_page
-from sound_healing_platform.pages.detalle_guia import detalle_guia_page
-from sound_healing_platform.pages.shop import shop_page
-from sound_healing_platform.pages.product import product_page
+from sound_healing_platform.pages.admin import admin_page
+from sound_healing_platform.pages.asistencia import asistencia_page
 from sound_healing_platform.pages.checkout import vista_checkout
+from sound_healing_platform.pages.contacto import contacto_page
+from sound_healing_platform.pages.detalle_guia import detalle_guia_page
+from sound_healing_platform.pages.gift_cards import gift_cards_page
+from sound_healing_platform.pages.horario_sesiones import horario_sesiones_page
+from sound_healing_platform.pages.login import login_page
+from sound_healing_platform.pages.paquetes_sesiones import paquetes_sesiones_page
+from sound_healing_platform.pages.privacidad import privacidad_page
 from sound_healing_platform.pages.rastreo import rastreo_page
 from sound_healing_platform.pages.servicios import servicios_page
+from sound_healing_platform.pages.shop import shop_page
 from sound_healing_platform.pages.talleres import talleres_page
-from sound_healing_platform.pages.horario_sesiones import horario_sesiones_page
-from sound_healing_platform.pages.paquetes_sesiones import paquetes_sesiones_page
-from sound_healing_platform.pages.asistencia import asistencia_page
-from sound_healing_platform.pages.admin import admin_page
-from sound_healing_platform.pages.login import login_page
-from sound_healing_platform.pages.privacidad import privacidad_page
 from sound_healing_platform.pages.terminos import terminos_page
-from sound_healing_platform.pages.gift_cards import gift_cards_page
+from sound_healing_platform.state import State
 
 
 def index() -> rx.Component:

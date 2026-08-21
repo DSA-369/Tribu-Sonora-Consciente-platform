@@ -1,7 +1,8 @@
 # sound_healing_platform/pages/checkout.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
 
 
 def render_icono_metodo(tipo_var: rx.Var, es_seleccionado: rx.Var) -> rx.Component:
@@ -114,20 +115,7 @@ def campo_formulario(label: str, placeholder: str, value: rx.Var, on_change, wid
 def formulario_izquierda() -> rx.Component:
     """Columna Izquierda: Formulario multi-pantalla con etiquetas claras y legibilidad garantizada."""
     return rx.vstack(
-        # 🧪 BOTÓN DE AUTOCOMPLETADO RÁPIDO PARA PRUEBAS
-        rx.button(
-            rx.hstack(
-                rx.icon(tag="sparkles", size=16),
-                rx.text("🧪 Autocompletar Datos de Prueba", font_weight="bold"),
-                spacing="2"
-            ),
-            on_click=State.llenar_datos_prueba_checkout,
-            size="2",
-            variant="soft",
-            color_scheme="amber",
-            cursor="pointer",
-            margin_bottom="15px"
-        ),
+        
 
         # 1. CONTACTO INTEGLIGENTE (ADAPTABLE SEGÚN SESIÓN)
         rx.vstack(

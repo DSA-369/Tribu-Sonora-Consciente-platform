@@ -1,7 +1,8 @@
 # sound_healing_platform/pages/rastreo.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
 
 
 def badge_estado_orden(estado: rx.Var) -> rx.Component:

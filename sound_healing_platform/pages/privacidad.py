@@ -1,5 +1,7 @@
 import reflex as rx
+
 from sound_healing_platform.components.layout import plantilla_tribu
+
 
 def privacidad_page() -> rx.Component:
     """Vista 'Política de Privacidad'."""

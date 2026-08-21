@@ -1,6 +1,8 @@
 # sound_healing_platform/components/layout.py
 import reflex as rx
+
 from sound_healing_platform.state import State
+
 
 def plantilla_tribu(contenido_central: rx.Component, pagina_activa: str) -> rx.Component:
     """

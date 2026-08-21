@@ -1,7 +1,8 @@
 # sound_healing_platform/pages/paquetes_sesiones.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+
 
 def tarjeta_paquete(titulo: str, precio: str, frecuencia: str, caracteristicas: list[str], popular: bool = False) -> rx.Component:
     """Tarjeta comparativa de tarifas y paquetes de sesiones."""
@@ -57,7 +58,7 @@ def tarjeta_paquete(titulo: str, precio: str, frecuencia: str, caracteristicas: 
                 cursor="pointer",
                 _hover={"opacity": "0.9"},
                 on_click=rx.redirect(
-                    f"https://wa.me/584243440461?text=¡Hola%20Tribu!%20✨%20Quiero%20solicitar%20información%20sobre%20el%20plan:%20*{titulo}*",
+                    f"https://wa.me/584241359530?text=¡Hola%20Tribu!%20✨%20Quiero%20solicitar%20información%20sobre%20el%20plan:%20*{titulo}*",
                     is_external=True
                 )
             ),

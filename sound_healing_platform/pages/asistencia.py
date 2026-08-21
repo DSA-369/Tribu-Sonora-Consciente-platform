@@ -1,6 +1,8 @@
 # sound_healing_platform/pages/asistencia.py
 import reflex as rx
+
 from sound_healing_platform.state import State
+
 
 def badge_estado_reserva(estado: rx.Var) -> rx.Component:
     """Badge de estado de pago de la reserva."""
@@ -13,24 +15,17 @@ def badge_estado_reserva(estado: rx.Var) -> rx.Component:
     )
 
 def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
-    """Tarjeta optimizada para pulsación táctil en celulares."""
+    """Tarjeta de asistencia minimalista adaptada exactamente al diseño de 25%.png (Sin íconos)."""
     es_presente = asistente["asistio"]
-    
+    monto_pend = asistente["monto_pendiente"].to(float)
+    pct_pago = asistente["porcentaje_pago"].to(float)
+    tiene_deuda = monto_pend > 0
+
     return rx.box(
         rx.flex(
-            # Información del Asistente
+            # Columna Izquierda: Badge Estado + Nombre + Teléfono + Cuadritos %
             rx.vstack(
-                rx.hstack(
-                    badge_estado_reserva(asistente["estado"]),
-                    rx.badge(
-                        asistente["cupos"].to_string() + " Cupo(s)",
-                        color_scheme="brown",
-                        variant="solid",
-                        size="1"
-                    ),
-                    spacing="2",
-                    align="center"
-                ),
+                badge_estado_reserva(asistente["estado"]),
                 rx.heading(
                     asistente["nombre_cliente"],
                     size="4",
@@ -38,7 +33,6 @@ def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
                     font_weight="bold"
                 ),
                 rx.hstack(
-                    rx.icon(tag="phone", size=14, color="#8E6F54"),
                     rx.link(
                         asistente["whatsapp_cliente"],
                         href="https://wa.me/" + asistente["whatsapp_cliente"].to_string(),
@@ -47,40 +41,99 @@ def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
                         size="2",
                         text_decoration="underline"
                     ),
+                    # Indicadores inline de % reservado (25%, 50%, 100%)
+                    rx.hstack(
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(pct_pago == 25.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("25%", size="1", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="2px 6px",
+                            border="1px solid #EAE5DF",
+                            border_radius="4px",
+                            background_color=rx.cond(pct_pago == 25.0, "#FAF6F0", "#FFFFFF")
+                        ),
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(pct_pago == 50.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("50%", size="1", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="2px 6px",
+                            border="1px solid #EAE5DF",
+                            border_radius="4px",
+                            background_color=rx.cond(pct_pago == 50.0, "#FAF6F0", "#FFFFFF")
+                        ),
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(pct_pago == 100.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("100%", size="1", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="2px 6px",
+                            border="1px solid #EAE5DF",
+                            border_radius="4px",
+                            background_color=rx.cond(pct_pago == 100.0, "#FAF6F0", "#FFFFFF")
+                        ),
+                        spacing="2",
+                        align="center",
+                        margin_left="10px"
+                    ),
                     spacing="2",
-                    align="center"
+                    align="center",
+                    flex_wrap="wrap"
                 ),
                 align="start",
                 spacing="1",
                 flex="1"
             ),
 
-            # Botón Grande de Check-in Táctil
-            rx.button(
-                rx.hstack(
-                    rx.icon(
-                        tag=rx.cond(es_presente, "circle_check", "circle"),
-                        size=20
-                    ),
+            # Columna Derecha: Botón INGRESAR + Píldora de Pendiente en Puerta
+            rx.vstack(
+                rx.button(
                     rx.text(
                         rx.cond(es_presente, "PRESENTE", "INGRESAR"),
                         font_weight="bold",
                         size="2"
                     ),
-                    spacing="2",
-                    align="center"
+                    size="3",
+                    background_color=rx.cond(es_presente, "#2E7D32", "#FAF6F0"),
+                    color=rx.cond(es_presente, "#FFFFFF", "#2C3639"),
+                    border=rx.cond(es_presente, "none", "1.5px solid #2C3639"),
+                    border_radius="10px",
+                    padding_x="22px",
+                    height="42px",
+                    cursor="pointer",
+                    width="100%",
+                    _hover={"opacity": "0.9"},
+                    on_click=lambda: State.toggle_asistencia_participante(asistente["id"])
                 ),
-                size="3",
-                background_color=rx.cond(es_presente, "#2E7D32", "#FAF6F0"),
-                color=rx.cond(es_presente, "#FFFFFF", "#2C3639"),
-                border=rx.cond(es_presente, "none", "1.5px solid #2C3639"),
-                border_radius="10px",
-                padding_x="20px",
-                height="48px",
-                cursor="pointer",
-                width=rx.breakpoints(initial="100%", sm="auto"),
-                _hover={"opacity": "0.9"},
-                on_click=lambda: State.toggle_asistencia_participante(asistente["id"])
+                rx.box(
+                    rx.text(
+                        rx.cond(
+                            tiene_deuda,
+                            "Pendiente: " + asistente["monto_pendiente"].to_string() + "$",
+                            "100% Pagado"
+                        ),
+                        size="1",
+                        font_weight="bold",
+                        color=rx.cond(tiene_deuda, "#DC2626", "#2E7D32"),
+                        text_align="center"
+                    ),
+                    padding="3px 12px",
+                    border_radius="15px",
+                    border=rx.cond(tiene_deuda, "1.5px solid #DC2626", "1.5px solid #2E7D32"),
+                    background_color="#FFFFFF",
+                    width="100%",
+                    text_align="center"
+                ),
+                align="center",
+                spacing="2",
+                min_width="140px"
             ),
 
             flex_direction=rx.breakpoints(initial="column", sm="row"),
@@ -89,13 +142,13 @@ def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
             gap="15px",
             width="100%"
         ),
-        background_color=rx.cond(es_presente, "#F0FDF4", "#FFFFFF"),
-        border=rx.cond(es_presente, "2px solid #2E7D32", "1px solid #EAE5DF"),
+        background_color="#FFFFFF",
+        border="1px solid #EAE5DF",
         border_radius="12px",
         padding="16px",
         box_shadow="0px 2px 8px rgba(0,0,0,0.03)",
         width="100%"
-    )
+    )      
 
 def asistencia_page() -> rx.Component:
     """Vista Documento Digital de Asistencia Accesible vía Token."""

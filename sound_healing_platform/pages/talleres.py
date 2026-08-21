@@ -1,7 +1,9 @@
 # sound_healing_platform/pages/talleres.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
+
 
 def tarjeta_taller(taller: rx.Var) -> rx.Component:
     """Tarjeta de taller/evento estilo editorial alineada con la referencia visual."""

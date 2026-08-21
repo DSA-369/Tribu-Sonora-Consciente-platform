@@ -1,6 +1,8 @@
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
+
 
 def vista_previa_voucher_experiencia() -> rx.Component:
     """Componente visual del Voucher de Experiencia para previsualización en vivo."""

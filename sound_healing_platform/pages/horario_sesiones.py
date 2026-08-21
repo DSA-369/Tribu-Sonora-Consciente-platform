@@ -1,7 +1,9 @@
 # sound_healing_platform/pages/horario_sesiones.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
+
 
 def badge_plazas(disponibles: rx.Var, totales: rx.Var) -> rx.Component:
     """Badge dinámico de disponibilidad con alertas por color e indicación explícita de enteros."""
@@ -88,6 +90,12 @@ def tarjeta_sesion(sesion: rx.Var) -> rx.Component:
                         spacing="2",
                         align="center"
                     ),
+                    rx.hstack(
+                        rx.icon(tag="clock", size=15, color="#2C3639"),
+                        rx.text("HORA DE RECEPCIÓN ", sesion["hora_recepcion_texto"], size="2", color="#2C3639"),
+                        spacing="2",
+                        align="center"
+                    ),
                     align="start",
                     spacing="1"
                 ),
@@ -106,7 +114,7 @@ def tarjeta_sesion(sesion: rx.Var) -> rx.Component:
                 rx.flex(
                     rx.link(
                         rx.hstack(
-                            rx.icon(tag="instagram", size=15, color="#8E6F54"),
+                            rx.icon(tag="camera", size=15, color="#8E6F54"),
                             rx.text("Ver publicación en Instagram", size="2", color="#8E6F54", text_decoration="underline"),
                             spacing="1",
                             align="center"
@@ -200,6 +208,126 @@ def modal_reserva_sesion() -> rx.Component:
                     align="center",
                     width="100%",
                     padding_y="5px"
+                ),
+
+                # Selector de Porcentaje de Pago / Abono Inicial
+                rx.vstack(
+                    rx.text("Porcentaje de Abono para Reservar*", size="1", font_weight="bold", color="#2C3639"),
+                    rx.hstack(
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(State.reserva_porcentaje_pago == 25.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("25%", size="2", font_weight="bold", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="8px 16px",
+                            border_radius="6px",
+                            border=rx.cond(State.reserva_porcentaje_pago == 25.0, "1.5px solid #2C3639", "1px solid #D1D5DB"),
+                            background_color=rx.cond(State.reserva_porcentaje_pago == 25.0, "#FAF6F0", "#FFFFFF"),
+                            cursor="pointer",
+                            on_click=lambda: State.set_reserva_porcentaje_pago(25.0)
+                        ),
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(State.reserva_porcentaje_pago == 50.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("50%", size="2", font_weight="bold", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="8px 16px",
+                            border_radius="6px",
+                            border=rx.cond(State.reserva_porcentaje_pago == 50.0, "1.5px solid #2C3639", "1px solid #D1D5DB"),
+                            background_color=rx.cond(State.reserva_porcentaje_pago == 50.0, "#FAF6F0", "#FFFFFF"),
+                            cursor="pointer",
+                            on_click=lambda: State.set_reserva_porcentaje_pago(50.0)
+                        ),
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(State.reserva_porcentaje_pago == 100.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("100%", size="2", font_weight="bold", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="8px 16px",
+                            border_radius="6px",
+                            border=rx.cond(State.reserva_porcentaje_pago == 100.0, "1.5px solid #2C3639", "1px solid #D1D5DB"),
+                            background_color=rx.cond(State.reserva_porcentaje_pago == 100.0, "#FAF6F0", "#FFFFFF"),
+                            cursor="pointer",
+                            on_click=lambda: State.set_reserva_porcentaje_pago(100.0)
+                        ),
+                        gap="2",
+                        width="100%"
+                    ),
+                    # 🎟️ CAMPO Y BOTÓN PARA APLICAR CUPÓN EN RESERVAS
+rx.vstack(
+    rx.text("¿Tienes un Cupón de Descuento o Especial?", size="1", font_weight="bold", color="#2C3639"),
+    rx.hstack(
+        rx.input(
+            placeholder="Ej. ESPECIAL15 o TRIBU10",
+            value=State.reserva_cupon_input,
+            on_change=State.set_reserva_cupon_input,
+            size="2",
+            border_radius="6px",
+            border="1px solid #A0AEC0",
+            background_color="#FFFFFF",
+            color="#2C3639",
+            width="70%"
+        ),
+        rx.button(
+            "Aplicar",
+            on_click=State.aplicar_cupon_reserva,
+            size="2",
+            background_color="#8E6F54",
+            color="#FFFFFF",
+            font_weight="bold",
+            border_radius="6px",
+            width="30%"
+        ),
+        width="100%",
+        spacing="2"
+    ),
+    rx.cond(
+        State.reserva_descuento_monto > 0,
+        rx.hstack(
+            rx.text("Descuento aplicado:", size="1", color="#2E7D32", font_weight="bold"),
+            rx.text("-$" + State.reserva_descuento_monto.to_string() + " USD", size="1", color="#2E7D32", font_weight="bold"),
+            justify="between",
+            width="100%"
+        )
+    ),
+    spacing="1",
+    width="100%",
+    padding_y="8px"
+),
+                    # Resumen financiero dinámico
+                    rx.box(
+                        rx.hstack(
+                            rx.vstack(
+                                rx.text("Abono Hoy (" + State.reserva_porcentaje_pago.to_string() + "%):", size="1", color="#7F7F7F"),
+                                rx.text("$" + State.reserva_monto_pagado_calculado.to_string() + " USD", size="3", font_weight="bold", color="#2E7D32"),
+                                align="start",
+                                spacing="0"
+                            ),
+                            rx.vstack(
+                                rx.text("Pendiente en Puerta:", size="1", color="#7F7F7F"),
+                                rx.text("$" + State.reserva_monto_pendiente_calculado.to_string() + " USD", size="3", font_weight="bold", color="#DC2626"),
+                                align="start",
+                                spacing="0"
+                            ),
+                            justify="between",
+                            width="100%"
+                        ),
+                        background_color="#FAF6F0",
+                        padding="10px 14px",
+                        border_radius="8px",
+                        border="1px solid #EAE5DF",
+                        width="100%",
+                        margin_top="4px"
+                    ),
+                    width="100%",
+                    spacing="2",
+                    align="start"
                 ),
 
                 # Campos Dinámicos para N Participantes

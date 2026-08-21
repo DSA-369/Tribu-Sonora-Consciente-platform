@@ -1,7 +1,9 @@
 # sound_healing_platform/pages/shop.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
+
 
 def tarjeta_producto_revista(producto: rx.Var) -> rx.Component:
     """Maqueta una tarjeta de producto con proporciones tipo revista en 4 columnas fluidas."""

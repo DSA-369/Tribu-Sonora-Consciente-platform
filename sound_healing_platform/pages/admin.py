@@ -1,7 +1,9 @@
 # sound_healing_platform/pages/admin.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
+
 
 def tarjeta_orden_admin(ord_item: rx.Var) -> rx.Component:
     """Tarjeta individual para la confirmación de compras y Vouchers en el Panel Admin."""
@@ -112,7 +114,11 @@ def tarjeta_orden_admin(ord_item: rx.Var) -> rx.Component:
     )
     
 def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
-    """Tarjeta individual de reserva para el panel administrador."""
+    """Tarjeta individual de reserva para el panel administrador adaptada a la vista de control."""
+    pct_pago = reserva["porcentaje_pago"].to(float)
+    monto_pend = reserva["monto_pendiente"].to(float)
+    tiene_deuda = monto_pend > 0
+
     return rx.box(
         rx.vstack(
             rx.hstack(
@@ -140,23 +146,84 @@ def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
             rx.divider(color_scheme="gray", margin_y="8px"),
 
             rx.vstack(
-                rx.hstack(
-                    rx.icon(tag="user", size=14, color="#2C3639"),
-                    rx.text("Cliente: ", reserva["nombre_cliente"], font_weight="bold", size="2", color="#2C3639"),
-                    spacing="1"
-                ),
-                rx.hstack(
-                    rx.icon(tag="phone", size=14, color="#2C3639"),
-                    rx.text("WhatsApp: ", reserva["whatsapp_cliente"], size="2", color="#4B5563"),
-                    spacing="1"
-                ),
-                rx.hstack(
-                    rx.icon(tag="ticket", size=14, color="#2C3639"),
-                    rx.text("Cupos: ", reserva["cupos"].to_string(), " | Total: $", reserva["monto_total"].to_string(), " USD", size="2", font_weight="bold", color="#2C3639"),
-                    spacing="1"
-                ),
+                rx.text("👤 Cliente: ", reserva["nombre_cliente"], font_weight="bold", size="2", color="#2C3639"),
+                rx.text("📞 WhatsApp: ", reserva["whatsapp_cliente"], size="2", color="#4B5563"),
+                rx.text("🎟️ Cupos: ", reserva["cupos"].to_string(), " | Total: $", reserva["monto_total"].to_string(), " USD", size="2", font_weight="bold", color="#2C3639"),
                 align="start",
                 spacing="1"
+            ),
+
+            # Fila de Selector de Porcentaje + Píldora de Pendiente (Fuente de Verdad)
+            rx.vstack(
+                rx.text("Reservó con:", size="1", font_weight="bold", color="#2C3639"),
+                rx.hstack(
+                    rx.hstack(
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(pct_pago == 25.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("25%", size="1", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="4px 8px",
+                            border="1px solid #D1D5DB",
+                            border_radius="4px",
+                            background_color=rx.cond(pct_pago == 25.0, "#FAF6F0", "#FFFFFF"),
+                            cursor="pointer",
+                            on_click=lambda: State.cambiar_porcentaje_reserva_admin(reserva["id"], 25.0)
+                        ),
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(pct_pago == 50.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("50%", size="1", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="4px 8px",
+                            border="1px solid #D1D5DB",
+                            border_radius="4px",
+                            background_color=rx.cond(pct_pago == 50.0, "#FAF6F0", "#FFFFFF"),
+                            cursor="pointer",
+                            on_click=lambda: State.cambiar_porcentaje_reserva_admin(reserva["id"], 50.0)
+                        ),
+                        rx.box(
+                            rx.hstack(
+                                rx.cond(pct_pago == 100.0, rx.text("✓", font_weight="bold", color="#2C3639"), rx.box(width="8px")),
+                                rx.text("100%", size="1", color="#2C3639"),
+                                spacing="1",
+                                align="center"
+                            ),
+                            padding="4px 8px",
+                            border="1px solid #D1D5DB",
+                            border_radius="4px",
+                            background_color=rx.cond(pct_pago == 100.0, "#FAF6F0", "#FFFFFF"),
+                            cursor="pointer",
+                            on_click=lambda: State.cambiar_porcentaje_reserva_admin(reserva["id"], 100.0)
+                        ),
+                        spacing="2",
+                        align="center"
+                    ),
+
+                    # Píldora de Saldo Restante
+                    rx.box(
+                        rx.text(
+                            rx.cond(tiene_deuda, "Pendiente: " + reserva["monto_pendiente"].to_string() + "$", "100% Pagado"),
+                            size="1",
+                            font_weight="bold",
+                            color=rx.cond(tiene_deuda, "#DC2626", "#2E7D32")
+                        ),
+                        padding="4px 12px",
+                        border_radius="15px",
+                        border=rx.cond(tiene_deuda, "1.5px solid #DC2626", "1.5px solid #2E7D32"),
+                        background_color="#FFFFFF"
+                    ),
+                    spacing="3",
+                    align="center",
+                    flex_wrap="wrap"
+                ),
+                align="start",
+                spacing="1",
+                padding_y="4px"
             ),
 
             rx.divider(color_scheme="gray", margin_y="8px"),
@@ -338,26 +405,38 @@ def modal_editor_sesion() -> rx.Component:
                         rx.vstack(
                             rx.text("Fecha Texto", size="1", font_weight="bold", color="#2C3639"),
                             rx.input(
-                                placeholder="Ej. Jueves 15 Oct",
+                                placeholder="Ej. 27/08/2026",
                                 value=State.edit_sesion_fecha,
                                 on_change=State.set_edit_sesion_fecha,
                                 width="100%",
                                 size="2",
                                 color="#1A1A1A"
                             ),
-                            width="50%"
+                            width="33%"
                         ),
                         rx.vstack(
-                            rx.text("Hora Texto", size="1", font_weight="bold", color="#2C3639"),
+                            rx.text("Hora Cita (Duración)", size="1", font_weight="bold", color="#2C3639"),
                             rx.input(
-                                placeholder="Ej. 7:00 PM",
+                                placeholder="Ej. 5:30 pm a 6:30 pm",
                                 value=State.edit_sesion_hora,
                                 on_change=State.set_edit_sesion_hora,
                                 width="100%",
                                 size="2",
                                 color="#1A1A1A"
                             ),
-                            width="50%"
+                            width="34%"
+                        ),
+                        rx.vstack(
+                            rx.text("Hora de Recepción", size="1", font_weight="bold", color="#2C3639"),
+                            rx.input(
+                                placeholder="Ej. 5:00 PM",
+                                value=State.edit_sesion_hora_recepcion,
+                                on_change=State.set_edit_sesion_hora_recepcion,
+                                width="100%",
+                                size="2",
+                                color="#1A1A1A"
+                            ),
+                            width="33%"
                         ),
                         width="100%"
                     ),
@@ -967,7 +1046,7 @@ def modal_editor_taller() -> rx.Component:
                         rx.vstack(
                             rx.text("WhatsApp de Contacto", size="1", font_weight="bold", color="#2C3639"),
                             rx.input(
-                                placeholder="Ej. 584243440461",
+                                placeholder="Ej. 584241359530",
                                 value=State.edit_taller_whatsapp,
                                 on_change=State.set_edit_taller_whatsapp,
                                 width="100%",
@@ -1259,6 +1338,14 @@ def panel_admin_logueado() -> rx.Component:
                 color=rx.cond(State.admin_tab_activa == "servicios", "#FFFFFF", "#2C3639"),
                 on_click=lambda: State.set_admin_tab("servicios")
             ),
+            rx.button(
+                "🎟️ Cupones",
+                size="2",
+                variant=rx.cond(State.admin_tab_activa == "cupones", "solid", "ghost"),
+                background_color=rx.cond(State.admin_tab_activa == "cupones", "#8E6F54", "transparent"),
+                color=rx.cond(State.admin_tab_activa == "cupones", "#FFFFFF", "#2C3639"),
+                on_click=lambda: State.set_admin_tab("cupones")
+            ),
             spacing="2",
             flex_wrap="wrap",
             width="100%"
@@ -1382,29 +1469,118 @@ def panel_admin_logueado() -> rx.Component:
                                 spacing="3"
                             ),
                             # Contenido Pestaña 6: Servicios (CRUD)
-                            rx.vstack(
-                                rx.hstack(
-                                    rx.heading("Catálogo de Servicios", size="4", color="#2C3639"),
-                                    rx.button(
-                                        "+ Crear Nuevo Servicio",
-                                        size="2",
-                                        background_color="#2C3639",
-                                        color="#FFFFFF",
-                                        font_weight="bold",
-                                        on_click=State.abrir_modal_nuevo_servicio
+                            rx.cond(
+                                State.admin_tab_activa == "servicios",
+                                rx.vstack(
+                                    rx.hstack(
+                                        rx.heading("Catálogo de Servicios", size="4", color="#2C3639"),
+                                        rx.button(
+                                            "+ Crear Nuevo Servicio",
+                                            size="2",
+                                            background_color="#2C3639",
+                                            color="#FFFFFF",
+                                            font_weight="bold",
+                                            on_click=State.abrir_modal_nuevo_servicio
+                                        ),
+                                        justify="between",
+                                        align="center",
+                                        width="100%"
                                     ),
-                                    justify="between",
-                                    align="center",
-                                    width="100%"
+                                    rx.cond(
+                                        State.servicios_tribu.length() == 0,
+                                        rx.text("No hay servicios registrados actualmente.", color="#7F7F7F"),
+                                        rx.foreach(State.servicios_tribu, tarjeta_servicio_admin)
+                                    ),
+                                    modal_editor_servicio(),
+                                    width="100%",
+                                    spacing="3"
                                 ),
-                                rx.cond(
-                                    State.servicios_tribu.length() == 0,
-                                    rx.text("No hay servicios registrados actualmente.", color="#7F7F7F"),
-                                    rx.foreach(State.servicios_tribu, tarjeta_servicio_admin)
-                                ),
-                                modal_editor_servicio(),
-                                width="100%",
-                                spacing="3"
+                                # Contenido Pestaña 7: Cupones y Descuentos
+                                rx.vstack(
+                                    rx.heading("Gestión de Cupones Especiales y Promociones", size="4", color="#2C3639"),
+                                    rx.hstack(
+                                        rx.input(
+                                            placeholder="Código (Ej. PROMO15)",
+                                            value=State.edit_cupon_codigo,
+                                            on_change=State.set_edit_cupon_codigo,
+                                            size="2",
+                                            width="30%"
+                                        ),
+                                        rx.select(
+                                            ["PORCENTAJE", "FIJO"],
+                                            value=State.edit_cupon_tipo,
+                                            on_change=State.set_edit_cupon_tipo,
+                                            size="2",
+                                            width="20%"
+                                        ),
+                                        rx.input(
+                                            placeholder="Valor (% o $)",
+                                            type="number",
+                                            value=State.edit_cupon_valor.to_string(),
+                                            on_change=State.set_edit_cupon_valor,
+                                            size="2",
+                                            width="20%"
+                                        ),
+                                        rx.input(
+                                            placeholder="Usos Máx.",
+                                            type="number",
+                                            value=State.edit_cupon_usos_maximos.to_string(),
+                                            on_change=State.set_edit_cupon_usos_maximos,
+                                            size="2",
+                                            width="15%"
+                                        ),
+                                        rx.button(
+                                            "Crear Cupón",
+                                            on_click=State.crear_cupon_especial_admin,
+                                            size="2",
+                                            background_color="#8E6F54",
+                                            color="#FFFFFF",
+                                            font_weight="bold",
+                                            width="15%"
+                                        ),
+                                        width="100%",
+                                        spacing="2"
+                                    ),
+                                    rx.divider(margin_y="10px"),
+                                    rx.text("Cupones Registrados", font_weight="bold", color="#2C3639"),
+                                    rx.cond(
+                                        State.cupones_admin_list.length() == 0,
+                                        rx.text("No hay cupones creados aún.", color="#7F7F7F"),
+                                        rx.foreach(
+                                            State.cupones_admin_list,
+                                            lambda c: rx.hstack(
+                                                rx.hstack(
+                                                    rx.text("🎟️ ", c["codigo"], font_weight="bold", size="2", color="#2C3639"),
+                                                    rx.badge(c["tipo"], color_scheme="bronze", size="1"),
+                                                    rx.badge(
+                                                        c["usos_actuales"].to_string() + " / " + c["usos_maximos"].to_string() + " usos",
+                                                        color_scheme=rx.cond(c["agotado"], "red", "green"),
+                                                        size="1"
+                                                    ),
+                                                    spacing="2",
+                                                    align="center"
+                                                ),
+                                                rx.text("Valor: ", c["valor"].to_string(), rx.cond(c["tipo"] == "PORCENTAJE", "%", " USD"), font_weight="bold", color="#8E6F54", size="2"),
+                                                rx.button(
+                                                    rx.cond(c["is_active"], "Inactivar", "Activar"),
+                                                    size="1",
+                                                    color_scheme=rx.cond(c["is_active"], "red", "green"),
+                                                    variant="soft",
+                                                    on_click=lambda: State.toggle_estado_cupon_admin(c["id"])
+                                                ),
+                                                justify="between",
+                                                align="center",
+                                                width="100%",
+                                                padding="10px 14px",
+                                                border="1px solid #EAE5DF",
+                                                border_radius="8px",
+                                                background_color="#FFFFFF"
+                                            )
+                                        )
+                                    ),
+                                    width="100%",
+                                    spacing="3"
+                                )
                             )
                         )
                     )

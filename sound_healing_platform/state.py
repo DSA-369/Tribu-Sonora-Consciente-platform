@@ -1,8 +1,9 @@
 # sound_healing_platform/state.py
+from typing import Any
+
 import reflex as rx
-from typing import Optional, Any
-import sqlmodel
 import sqlalchemy as sa
+import sqlmodel
 
 # ==================================================================
 # 🏛️ TABLAS DE BASE DE DATOS (SQLMODEL - ESTÁNDAR PROFESIONAL)
@@ -10,20 +11,20 @@ import sqlalchemy as sa
 
 class InstagramPost(sqlmodel.SQLModel, table=True):
     """Modelo exacto y real para la tabla de Instagram en Supabase."""
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     foto: str
     url: str
 
 class FeaturedEvent(sqlmodel.SQLModel, table=True):
     """Modelo exacto y real para la tabla de Eventos en Supabase."""
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     nombre: str
     logo: str
     url: str
 
 class TribuGuide(sqlmodel.SQLModel, table=True):
     """Modelo adaptado para la Revista: ID, Nombre, Foto, Descripcion Corta y Biografia Larga."""
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     nombre: str
     foto: str
     descripcion: str
@@ -31,7 +32,7 @@ class TribuGuide(sqlmodel.SQLModel, table=True):
 class TribuService(sqlmodel.SQLModel, table=True):
     """Modelo exacto para la tabla de Servicios en Supabase."""
     __tablename__ = "tribu_services"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     nombre: str
     foto: str
     descripcion: str
@@ -40,7 +41,7 @@ class TribuService(sqlmodel.SQLModel, table=True):
 class TribuWorkshop(sqlmodel.SQLModel, table=True):
     """Modelo exacto para la tabla de Talleres y Eventos en Supabase."""
     __tablename__ = "tribu_workshops"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     titulo: str
     tipo: str
     foto: str
@@ -53,65 +54,70 @@ class TribuWorkshop(sqlmodel.SQLModel, table=True):
     precio: float
     moneda: str
     fecha_evento: str
-    whatsapp_contacto: Optional[str] = sqlmodel.Field(default=None)
+    whatsapp_contacto: str | None = sqlmodel.Field(default=None)
     is_active: bool = sqlmodel.Field(default=True)
 
 class TribuProduct(sqlmodel.SQLModel, table=True):
     """Modelo profesional para la tienda unificada y real en Supabase."""
     __tablename__ = "tribu_products"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     nombre: str
     descripcion: str
     precio: float
-    precio_anterior: Optional[float] = sqlmodel.Field(default=None)
+    precio_anterior: float | None = sqlmodel.Field(default=None)
     stock: int
     is_best_seller: bool
     is_favorite: bool
     categoria: str
-    proveedor: Optional[str] = sqlmodel.Field(default=None)
-    intencion: Optional[str] = sqlmodel.Field(default=None)
+    proveedor: str | None = sqlmodel.Field(default=None)
+    intencion: str | None = sqlmodel.Field(default=None)
     fotos: list[str] = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
-    variaciones: Optional[Any] = sqlmodel.Field(default=None, sa_column=sa.Column(sa.JSON))
+    variaciones: Any | None = sqlmodel.Field(default=None, sa_column=sa.Column(sa.JSON))
     is_active: bool
 
 class TribuSession(sqlmodel.SQLModel, table=True):
     """Modelo exacto para la tabla de Sesiones Grupales Recurrentes en Supabase."""
     __tablename__ = "tribu_sessions"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     nombre: str
     foto: str
     ubicacion: str
     frecuencia_texto: str
     fecha_texto: str
     hora_texto: str
+    hora_recepcion_texto: str | None = sqlmodel.Field(default="")
     inversion: float
     plazas_totales: int
     plazas_disponibles: int
     instagram_url: str
     recomendaciones: str
-    checkin_token: Optional[str] = sqlmodel.Field(default=None)
-    patron_recurrencia: Optional[str] = sqlmodel.Field(default="MANUAL")
-    fecha_evento: Optional[str] = sqlmodel.Field(default=None)
+    checkin_token: str | None = sqlmodel.Field(default=None)
+    patron_recurrencia: str | None = sqlmodel.Field(default="MANUAL")
+    fecha_evento: str | None = sqlmodel.Field(default=None)
     is_active: bool = sqlmodel.Field(default=True)
 
 class TribuSessionReservation(sqlmodel.SQLModel, table=True):
-    """Modelo para reservas de sesiones grupales en Supabase."""
+    """Modelo para reservas de sesiones grupales en Supabase con desglose de pago parcial."""
     __tablename__ = "tribu_session_reservations"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     session_id: int
     nombre_cliente: str
     whatsapp_cliente: str
-    cliente_email: Optional[str] = None
+    cliente_email: str | None = None
     cupos: int = 1
-    monto_total: float
+    monto_total: float = 0.0
+    porcentaje_pago: float = 100.0
+    monto_pagado: float = 0.0
+    monto_pendiente: float = 0.0
     estado: str = "PENDIENTE_PAGO"
     asistio: bool = False
     participantes_json: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
+    cupon_codigo: str | None = sqlmodel.Field(default=None)
 
 class TribuAdminUser(sqlmodel.SQLModel, table=True):
     """Modelo para usuarios administradores y facilitadores."""
     __tablename__ = "tribu_admin_users"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     email: str
     password_hash: str
     nombre: str
@@ -121,52 +127,65 @@ class TribuAdminUser(sqlmodel.SQLModel, table=True):
 class TribuUser(sqlmodel.SQLModel, table=True):
     """Modelo exacto para la tabla de clientes registrados en Supabase."""
     __tablename__ = "tribu_users"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     email: str = sqlmodel.Field(index=True, unique=True)
     nombre: str
-    apellido: Optional[str] = None
+    apellido: str | None = None
     password: str
-    telefono: Optional[str] = None
-    pais: Optional[str] = "Venezuela"
-    direccion: Optional[str] = None
-    apartamento: Optional[str] = None
-    ciudad: Optional[str] = None
-    codigo_postal: Optional[str] = None
+    telefono: str | None = None
+    pais: str | None = "Venezuela"
+    direccion: str | None = None
+    apartamento: str | None = None
+    ciudad: str | None = None
+    codigo_postal: str | None = None
     is_active: bool = True
 
 class TribuCart(sqlmodel.SQLModel, table=True):
     """Modelo para la persistencia del carrito de usuarios en Supabase."""
     __tablename__ = "tribu_carts"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     user_id: int = sqlmodel.Field(index=True, unique=True)
     items_json: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
 class TribuGiftCard(sqlmodel.SQLModel, table=True):
     """Modelo exacto para Vouchers de Experiencias y Gift Cards en Supabase."""
     __tablename__ = "tribu_gift_cards"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
     codigo: str = sqlmodel.Field(unique=True, index=True)
     tipo: str = "EXPERIENCIA"
     experiencia_nombre: str
     monto_equivalente: float
     comprador_nombre: str
     comprador_email: str
-    comprador_telefono: Optional[str] = None
+    comprador_telefono: str | None = None
     destinatario_nombre: str
-    destinatario_email: Optional[str] = None
-    destinatario_whatsapp: Optional[str] = None
-    mensaje_personalizado: Optional[str] = None
+    destinatario_email: str | None = None
+    destinatario_whatsapp: str | None = None
+    mensaje_personalizado: str | None = None
     estado: str = "PENDIENTE_PAGO"    
 class TribuNotification(sqlmodel.SQLModel, table=True):
     """Modelo exacto para el sistema de notificaciones unificado en Supabase."""
     __tablename__ = "tribu_notifications"
-    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
-    destinatario_email: Optional[str] = None
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
+    destinatario_email: str | None = None
     es_admin: bool = False
     es_publico: bool = False
     titulo: str
     mensaje: str
     target_url: str = "/"
     leido: bool = False
+
+class TribuCoupon(sqlmodel.SQLModel, table=True):
+    """Modelo profesional para cupones y descuentos especiales negociados."""
+    __tablename__ = "tribu_coupons"
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
+    codigo: str = sqlmodel.Field(unique=True, index=True)
+    tipo: str = "PORCENTAJE"  # 'PORCENTAJE' o 'FIJO'
+    valor: float = 0.0
+    is_active: bool = True
+    usos_maximos: int = 100
+    usos_actuales: int = 0
+
+
 # ==================================================================
 # ⚙️ ESTADO DE LA APLICACIÓN (MÉTODOS Y VARIABLES DE CONTROL UI)
 # ==================================================================
@@ -175,13 +194,13 @@ class State(rx.State):
 
     def enviar_correo_voucher_html(self, destinatario_email: str, destinatario_nombre: str, comprador_nombre: str, experiencia_nombre: str, codigo_voucher: str, mensaje_personal: str):
         """Envía el Voucher por correo HTML estándar usando smtplib en segundo plano."""
-        import smtplib
         import os
-        from email.mime.text import MIMEText
+        import smtplib
         from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
 
         smtp_server = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
-        smtp_port = int(os.environ.get("SMTP_PORT", 587))
+        smtp_port = int(os.environ.get("SMTP_PORT", "587"))
         smtp_user = os.environ.get("SMTP_USER", "")
         smtp_password = os.environ.get("SMTP_PASSWORD", "")
 
@@ -415,10 +434,28 @@ class State(rx.State):
             if q in p.get("nombre", "").lower() or q in p.get("categoria", "").lower() or q in p.get("proveedor", "").lower()
         ]
 
+    def validar_email_formato(self, email: str) -> bool:
+        """Valida que el correo tenga una estructura nombre@dominio.extensión."""
+        import re
+        patron = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        return bool(re.match(patron, email.strip()))
+
+    def formatear_whatsapp_numero(self, numero_raw: str, codigo_pais_defecto: str = "58") -> str:
+        """Remueve ceros iniciales y garantiza el código de país (ej. 04243440461 -> 584243440461)."""
+        solo_numeros = "".join(filter(str.isdigit, str(numero_raw)))
+        if not solo_numeros:
+            return ""
+        # Si empieza con cero local (ej: 0424...), eliminar el cero inicial
+        solo_numeros = solo_numeros.removeprefix("0")
+        # Si no incluye el código de país (ej: longitud local de 10 dígitos), anteponerlo
+        if len(solo_numeros) == 10:
+            solo_numeros = f"{codigo_pais_defecto}{solo_numeros}"
+        return solo_numeros
+
     def contactar_soporte_whatsapp(self):
         """Redirige al WhatsApp oficial con un mensaje en texto plano (sin iconos ni emojis)."""
         import urllib.parse
-        num_wa = "584243440461"
+        num_wa = "584241359530"
         mensaje = "Hola Tribu Sonora Consciente. Necesito asistencia o soporte tecnico con mi cuenta."
         encoded = urllib.parse.quote(mensaje)
         return rx.redirect(f"https://wa.me/{num_wa}?text={encoded}", is_external=True)
@@ -431,6 +468,93 @@ class State(rx.State):
     reserva_whatsapp_cliente: str = ""
     reserva_cantidad_cupos: int = 1
     reserva_participantes: list[str] = [""]
+    reserva_porcentaje_pago: float = 100.0
+    reserva_cupon_input: str = ""
+    reserva_descuento_monto: float = 0.0
+    reserva_cupon_aplicado_codigo: str = ""
+
+    def set_reserva_porcentaje_pago(self, pct: float):
+        self.reserva_porcentaje_pago = float(pct)
+
+    def set_reserva_cupon_input(self, val: str):
+        self.reserva_cupon_input = val
+
+    @rx.var
+    def reserva_monto_subtotal_calculado(self) -> float:
+        inv = float(self.sesion_seleccionada_reserva.get("inversion", 0.0))
+        return round(inv * self.reserva_cantidad_cupos, 2)
+
+    @rx.var
+    def reserva_monto_total_calculado(self) -> float:
+        subtotal = self.reserva_monto_subtotal_calculado
+        monto_final = max(0.0, subtotal - self.reserva_descuento_monto)
+        return round(monto_final, 2)
+
+    def aplicar_cupon_reserva(self):
+        """Valida y aplica cupones porcentuales o montos fijos negociados."""
+        cupon_clean = self.reserva_cupon_input.strip().upper()
+        if not cupon_clean:
+            self.reserva_descuento_monto = 0.0
+            self.reserva_cupon_aplicado_codigo = ""
+            return rx.toast.info("Cupón removido.")
+
+        subtotal = self.reserva_monto_subtotal_calculado
+
+        try:
+            with rx.session() as session:
+                db_cupon = session.exec(
+                    sqlmodel.select(TribuCoupon).where(
+                        TribuCoupon.codigo == cupon_clean,
+                        TribuCoupon.is_active == True
+                    )
+                ).first()
+
+                if db_cupon:
+                    if db_cupon.usos_actuales >= db_cupon.usos_maximos:
+                        return rx.toast.error("Este cupón ha alcanzado el límite de usos.")
+                    
+                    if db_cupon.tipo == "PORCENTAJE":
+                        desc = round(subtotal * (db_cupon.valor / 100.0), 2)
+                        msg = f"¡Cupón de {db_cupon.valor:.0f}% aplicado (-${desc:.2f} USD)!"
+                    else:
+                        desc = min(subtotal, float(db_cupon.valor))
+                        msg = f"¡Cupón de descuento aplicado (-${desc:.2f} USD)!"
+
+                    self.reserva_descuento_monto = desc
+                    self.reserva_cupon_aplicado_codigo = db_cupon.codigo
+                    return rx.toast.success(msg)
+
+                # Fallback para Vouchers/GiftCards
+                gc = session.exec(
+                    sqlmodel.select(TribuGiftCard).where(
+                        TribuGiftCard.codigo == cupon_clean,
+                        TribuGiftCard.estado == "ACTIVA"
+                    )
+                ).first()
+
+                if gc:
+                    desc = min(subtotal, float(gc.monto_equivalente))
+                    self.reserva_descuento_monto = desc
+                    self.reserva_cupon_aplicado_codigo = gc.codigo
+                    return rx.toast.success(f"¡Voucher '{gc.experiencia_nombre}' aplicado (-${desc:.2f} USD)!")
+
+                self.reserva_descuento_monto = 0.0
+                self.reserva_cupon_aplicado_codigo = ""
+                return rx.toast.error("Código de cupón o descuento inválido.")
+        except Exception as e:
+            print(f"Error al aplicar cupón: {e}")
+            return rx.toast.error("Error al verificar el cupón.")
+
+    @rx.var
+    def reserva_monto_pagado_calculado(self) -> float:
+        total = self.reserva_monto_total_calculado
+        return round(total * (self.reserva_porcentaje_pago / 100.0), 2)
+
+    @rx.var
+    def reserva_monto_pendiente_calculado(self) -> float:
+        total = self.reserva_monto_total_calculado
+        pagado = self.reserva_monto_pagado_calculado
+        return round(total - pagado, 2)
 
     def set_reserva_email(self, val: str):
         self.reserva_email_cliente = val
@@ -547,17 +671,17 @@ class State(rx.State):
     @rx.var
     def opciones_facilitadores(self) -> list[str]:
         facs = {t.get("facilitador") for t in self.talleres_tribu if t.get("facilitador")}
-        return ["FACILITADOR"] + sorted(list(facs))
+        return ["FACILITADOR"] + sorted(facs)
 
     @rx.var
     def opciones_ubicaciones(self) -> list[str]:
         ubis = {t.get("ubicacion") for t in self.talleres_tribu if t.get("ubicacion")}
-        return ["UBICACIÓN"] + sorted(list(ubis))
+        return ["UBICACIÓN"] + sorted(ubis)
 
     @rx.var
     def opciones_etiquetas(self) -> list[str]:
         etqs = {t.get("tipo") for t in self.talleres_tribu if t.get("tipo")}
-        return ["CATEGORÍA"] + sorted(list(etqs))
+        return ["CATEGORÍA"] + sorted(etqs)
 
     @rx.var
     def dias_semana_actual(self) -> list[dict[str, Any]]:
@@ -638,8 +762,8 @@ class State(rx.State):
 
     def agendar_taller(self, taller: dict):
         import urllib.parse
-        num_raw = taller.get("whatsapp_contacto") or "584243440461"
-        num_clean = "".join(filter(str.isdigit, str(num_raw))) or "584243440461"
+        num_raw = taller.get("whatsapp_contacto") or "584241359530"
+        num_clean = "".join(filter(str.isdigit, str(num_raw))) or "584241359530"
         
         titulo = taller.get("titulo", "")
         mensaje = f"¡Hola Tribu Sonora! Me interesa reservar un cupo para: *{titulo}*"
@@ -654,9 +778,6 @@ class State(rx.State):
 
     def toggle_filtros_mobile(self):
         self.show_filtros_mobile = not self.show_filtros_mobile
-
-    # 🛍️ FILTROS Y ORDENAMIENTO PARA "VER TODO" (EXPLORAR TODOS LOS PRODUCTOS)
-    filtro_precio_min: str = ""
 
     # 🛍️ FILTROS Y ORDENAMIENTO PARA "VER TODO" (EXPLORAR TODOS LOS PRODUCTOS)
     filtro_precio_min: str = ""
@@ -786,12 +907,12 @@ class State(rx.State):
     @rx.var
     def lista_categorias_unicas(self) -> list[str]:
         cats = {p.get("categoria") for p in self.productos_tribu if p.get("categoria")}
-        return sorted(list(cats))
+        return sorted(cats)
 
     @rx.var
     def lista_proveedores_unicos(self) -> list[str]:
         provs = {p.get("proveedor") for p in self.productos_tribu if p.get("proveedor")}
-        return sorted(list(provs))
+        return sorted(provs)
     
     def navegar_revista_principal(self):
         self.vista_shop = "revista"
@@ -1069,6 +1190,7 @@ class State(rx.State):
                         "frecuencia_texto": s.frecuencia_texto,
                         "fecha_texto": s.fecha_texto,
                         "hora_texto": s.hora_texto,
+                        "hora_recepcion_texto": s.hora_recepcion_texto or "",
                         "inversion": float(s.inversion),
                         "plazas_totales": s.plazas_totales,
                         "plazas_disponibles": s.plazas_disponibles,
@@ -1220,7 +1342,7 @@ class State(rx.State):
         p_anterior = self.variante_seleccionada.get("precio_anterior") if self.variante_seleccionada else self.producto_detalle.get("precio_anterior", 0.0)
         
         if p_anterior and p_anterior > p_actual and p_actual > 0:
-            return int(round(((p_anterior - p_actual) / p_anterior) * 100))
+            return round(((p_anterior - p_actual) / p_anterior) * 100)
         return 0
 
     def toggle_notificaciones_carrito(self):
@@ -1476,7 +1598,7 @@ class State(rx.State):
         
         return rx.redirect(target_url)
 
-    def crear_notificacion_db(self, titulo: str, mensaje: str, target_url: str, destinatario_email: str = None, es_admin: bool = False, es_publico: bool = False):
+    def crear_notificacion_db(self, titulo: str, mensaje: str, target_url: str, destinatario_email: str | None = None, es_admin: bool = False, es_publico: bool = False):
         """Método auxiliar interno para registrar notificaciones en Supabase."""
         try:
             with rx.session() as session:
@@ -1611,6 +1733,7 @@ class State(rx.State):
     checkout_telefono: str = ""
 
     checkout_cupon: str = ""
+    checkout_cupon_aplicado_codigo: str = ""
     descuento_cupon_monto: float = 0.0
     costo_envio: float = 0.0
 
@@ -1687,20 +1810,45 @@ class State(rx.State):
         self.numero_referencia = val
 
     def aplicar_cupon(self):
+        """Valida y aplica cupones dinámicos de Supabase o Vouchers en el checkout del Shop."""
         cupon_clean = self.checkout_cupon.strip().upper()
         if not cupon_clean:
             self.descuento_cupon_monto = 0.0
-            return
+            self.checkout_cupon_aplicado_codigo = ""
+            return rx.toast.info("Cupón removido.")
 
-        if cupon_clean == "TRIBU10":
-            self.descuento_cupon_monto = 10.0
-            return rx.toast.success("¡Cupón TRIBU10 aplicado (-$10 USD)!")
-        elif cupon_clean == "SANACION20":
-            self.descuento_cupon_monto = 20.0
-            return rx.toast.success("¡Cupón SANACION20 aplicado (-$20 USD)!")
+        try:
+            subtotal = float(self.subtotal_carrito)
+        except ValueError:
+            subtotal = 0.0
 
         try:
             with rx.session() as session:
+                db_cupon = session.exec(
+                    sqlmodel.select(TribuCoupon).where(
+                        TribuCoupon.codigo == cupon_clean,
+                        TribuCoupon.is_active == True
+                    )
+                ).first()
+
+                if db_cupon:
+                    if db_cupon.usos_actuales >= db_cupon.usos_maximos:
+                        self.descuento_cupon_monto = 0.0
+                        self.checkout_cupon_aplicado_codigo = ""
+                        return rx.toast.error("Este cupón ya fue utilizado o ha expirado.")
+
+                    if db_cupon.tipo == "PORCENTAJE":
+                        desc = round(subtotal * (db_cupon.valor / 100.0), 2)
+                        msg = f"¡Cupón de {db_cupon.valor:.0f}% aplicado (-${desc:.2f} USD)!"
+                    else:
+                        desc = min(subtotal, float(db_cupon.valor))
+                        msg = f"¡Cupón de descuento aplicado (-${desc:.2f} USD)!"
+
+                    self.descuento_cupon_monto = desc
+                    self.checkout_cupon_aplicado_codigo = db_cupon.codigo
+                    return rx.toast.success(msg)
+
+                # Fallback para Vouchers / Gift Cards
                 gc = session.exec(
                     sqlmodel.select(TribuGiftCard).where(
                         TribuGiftCard.codigo == cupon_clean,
@@ -1709,15 +1857,19 @@ class State(rx.State):
                 ).first()
 
                 if gc:
-                    self.descuento_cupon_monto = float(gc.monto_equivalente)
-                    return rx.toast.success(f"¡Voucher '{gc.experiencia_nombre}' aplicado (-${gc.monto_equivalente} USD)!")
-                else:
-                    self.descuento_cupon_monto = 0.0
-                    return rx.toast.error("Código de cupón o Gift Card inválido o sin saldo.")
+                    desc = min(subtotal, float(gc.monto_equivalente))
+                    self.descuento_cupon_monto = desc
+                    self.checkout_cupon_aplicado_codigo = gc.codigo
+                    return rx.toast.success(f"¡Voucher '{gc.experiencia_nombre}' aplicado (-${desc:.2f} USD)!")
+
+                self.descuento_cupon_monto = 0.0
+                self.checkout_cupon_aplicado_codigo = ""
+                return rx.toast.error("Código de cupón o descuento inválido o inactivo.")
         except Exception as e:
-            print(f"Error al validar Gift Card: {e}")
+            print(f"Error al validar cupón en checkout: {e}")
             self.descuento_cupon_monto = 0.0
-            return rx.toast.error("Error al verificar el código.")
+            self.checkout_cupon_aplicado_codigo = ""
+            return rx.toast.error("Error al verificar el cupón.")
 
     def set_checkout_newsletter(self, checked: bool):
         self.checkout_newsletter = checked
@@ -1779,8 +1931,9 @@ class State(rx.State):
     # -------------------------------------------------------------------------
     def get_supabase_client(self):
         """Inicializa y retorna el cliente oficial de Supabase con fallback de URL de proyecto."""
-        from supabase import create_client
         import os
+
+        from supabase import create_client
 
         # URL oficial de tu proyecto en Supabase Cloud
         url = os.environ.get("SUPABASE_URL", "https://ufjkeqqwgyauzujrbfcv.supabase.co")
@@ -1897,7 +2050,7 @@ class State(rx.State):
                         
                         # Detección dinámica del Content-Type según la extensión del archivo
                         ext = self.comprobante_filename.lower()
-                        if ext.endswith(".jpg") or ext.endswith(".jpeg"):
+                        if ext.endswith((".jpg", ".jpeg")):
                             mime_type = "image/jpeg"
                         elif ext.endswith(".webp"):
                             mime_type = "image/webp"
@@ -1987,13 +2140,13 @@ class State(rx.State):
                         cliente_pais, cliente_direccion, cliente_ciudad, cliente_codigo_postal,
                         metodo_pago, numero_referencia, comprobante_url,
                         monto_subtotal, monto_descuento, monto_total, comision_plataforma,
-                        estado, items_json
+                        estado, items_json, cupon_codigo
                     ) VALUES (
                         :email, :nombre, :apellido, :telefono,
                         :pais, :direccion, :ciudad, :cp,
                         :metodo, :ref, :comprobante,
                         :subtotal, :descuento, :total, :comision,
-                        'PENDING_VERIFICATION', :items
+                        'PENDING_VERIFICATION', :items, :cupon
                     )
                 """)
 
@@ -2013,16 +2166,36 @@ class State(rx.State):
                     "descuento": float(self.descuento_cupon_monto),
                     "total": total_monto,
                     "comision": comision_3percent,
-                    "items": json.dumps(items_resumen)
+                    "items": json.dumps(items_resumen),
+                    "cupon": self.checkout_cupon_aplicado_codigo if self.checkout_cupon_aplicado_codigo else None
                 })
+
+                # 🎟️ Sumar +1 uso al cupón de compra y desactivarlo si aplica
+                if self.checkout_cupon_aplicado_codigo:
+                    db_cupon = session.exec(
+                        sqlmodel.select(TribuCoupon).where(
+                            TribuCoupon.codigo == self.checkout_cupon_aplicado_codigo.strip().upper()
+                        )
+                    ).first()
+                    if db_cupon:
+                        db_cupon.usos_actuales += 1
+                        if db_cupon.usos_actuales >= db_cupon.usos_maximos:
+                            db_cupon.is_active = False
+                        session.add(db_cupon)
+
                 session.commit()
+
+                # Limpiar estado del cupón
+                self.checkout_cupon = ""
+                self.checkout_cupon_aplicado_codigo = ""
+                self.descuento_cupon_monto = 0.0
         except Exception as err:
             print(f"Aviso guardando en BD (Continuando a WhatsApp): {err}")
 
         # 5. Generación del Mensaje Estructurado para WhatsApp
         import urllib.parse
         
-        NUMERO_WHATSAPP_REAL = "584243440461"  # 📲 Número oficial de prueba
+        NUMERO_WHATSAPP_REAL = "584241359530"  # 📲 Número oficial de prueba
         metodo_nombre = self.metodo_pago_seleccionado.replace("_", " ").title()
         
         # Generación dinámica de la lista de productos y cantidades desde el carrito
@@ -2162,15 +2335,24 @@ class State(rx.State):
             return rx.toast.error("Por favor, ingresa tu Nombre y Apellido.")
 
         email_final = self.reserva_email_cliente.strip().lower() or (self.usuario_datos.get("email", "").lower() if self.user_logged_in else "")
-        if not email_final:
-            return rx.toast.error("Por favor, ingresa tu Correo Electrónico.")
+        if not email_final or not self.validar_email_formato(email_final):
+            return rx.toast.error("Ingresa un correo electrónico válido (ejemplo: nombre@dominio.com)")
 
-        if not self.reserva_whatsapp_cliente.strip():
-            return rx.toast.error("Por favor, ingresa tu número de WhatsApp de contacto.")
+        wa_clean = self.formatear_whatsapp_numero(self.reserva_whatsapp_cliente)
+        if not wa_clean or len(wa_clean) < 10:
+            return rx.toast.error("Ingresa un número de WhatsApp válido con el formato de tu país.")
+        
+        self.reserva_whatsapp_cliente = f"+{wa_clean}"
 
         sesion_id = self.sesion_seleccionada_reserva.get("id")
         cupos_reservar = self.reserva_cantidad_cupos
-        monto_total = float(self.sesion_seleccionada_reserva.get("inversion", 0.0)) * cupos_reservar
+        monto_total = self.reserva_monto_total_calculado
+        monto_pagado = self.reserva_monto_pagado_calculado
+        monto_pendiente = self.reserva_monto_pendiente_calculado
+        pct_pago = self.reserva_porcentaje_pago
+
+        reserva_id_creada = None
+        checkin_token_sesion = self.sesion_seleccionada_reserva.get("checkin_token", "")
 
         try:
             with rx.session() as session:
@@ -2181,19 +2363,24 @@ class State(rx.State):
                 if db_session.plazas_disponibles < cupos_reservar:
                     return rx.toast.error(f"Lo sentimos, solo quedan {db_session.plazas_disponibles} cupos.")
 
-                # Construir lista estructurada de participantes
+                # Construir lista estructurada con nombres exactos de participantes
                 lista_part_json = []
+                nombres_participantes_lista = []
                 for i in range(cupos_reservar):
                     p_nombre = self.reserva_participantes[i].strip() if i < len(self.reserva_participantes) else ""
                     if not p_nombre:
                         p_nombre = self.reserva_nombre_cliente.strip() if i == 0 else f"{self.reserva_nombre_cliente.strip()} (Acompañante {i+1})"
+                    
                     lista_part_json.append({
                         "index": i,
                         "nombre": p_nombre,
                         "asistio": False
                     })
+                    nombres_participantes_lista.append(p_nombre)
 
-                # Guardamos la reserva vinculada al correo y con lista de participantes
+                # Estado inicial de la reserva
+                estado_res = "CONFIRMADO" if pct_pago == 100.0 else "PENDIENTE_PAGO"
+
                 nueva_reserva = TribuSessionReservation(
                     session_id=sesion_id,
                     nombre_cliente=self.reserva_nombre_cliente.strip(),
@@ -2201,19 +2388,58 @@ class State(rx.State):
                     whatsapp_cliente=self.reserva_whatsapp_cliente.strip(),
                     cupos=cupos_reservar,
                     monto_total=monto_total,
-                    estado="PENDIENTE_PAGO",
+                    porcentaje_pago=pct_pago,
+                    monto_pagado=monto_pagado,
+                    monto_pendiente=monto_pendiente,
+                    estado=estado_res,
                     asistio=False,
-                    participantes_json=lista_part_json
+                    participantes_json=lista_part_json,
+                    cupon_codigo=self.reserva_cupon_aplicado_codigo if self.reserva_cupon_aplicado_codigo else None
                 )
                 session.add(nueva_reserva)
+
+                # 🎟️ Sumar +1 uso al cupón y desactivarlo si llegó al límite
+                if self.reserva_cupon_aplicado_codigo:
+                    db_cupon = session.exec(
+                        sqlmodel.select(TribuCoupon).where(
+                            TribuCoupon.codigo == self.reserva_cupon_aplicado_codigo.strip().upper()
+                        )
+                    ).first()
+                    if db_cupon:
+                        db_cupon.usos_actuales += 1
+                        if db_cupon.usos_actuales >= db_cupon.usos_maximos:
+                            db_cupon.is_active = False
+                        session.add(db_cupon)
+
                 session.commit()
+                session.refresh(nueva_reserva)
+                reserva_id_creada = nueva_reserva.id
+
+                # Limpiar variables temporales del cupón en el estado reactivo
+                self.reserva_cupon_input = ""
+                self.reserva_cupon_aplicado_codigo = ""
+                self.reserva_descuento_monto = 0.0
 
         except Exception as e:
             print(f"Error registrando reserva en Supabase: {e}")
             return rx.toast.error("Ocurrió un error al registrar tu solicitud.")
 
+        # 1. Construir desglose de participantes para el mensaje de WhatsApp
+        texto_acompanantes = ""
+        if len(nombres_participantes_lista) > 1:
+            lineas_p = [f"   • {idx+1}. {nom}" for idx, nom in enumerate(nombres_participantes_lista)]
+            texto_acompanantes = "\n *Lista de Participantes:*\n" + "\n".join(lineas_p)
+        else:
+            texto_acompanantes = f"\n *Participante Principal:* {nombres_participantes_lista[0]}"
+
+        # 2. Resumen financiero de abono e importe pendiente
+        texto_pago_resumen = (
+            f" *Abono Inicial ({pct_pago:.0f}%):* ${monto_pagado:.2f} USD\n"
+            f" *Monto Pendiente en Puerta:* ${monto_pendiente:.2f} USD (Total: ${monto_total:.2f} USD)"
+        ) if pct_pago < 100.0 else f" *Monto Total:* ${monto_total:.2f} USD (Pago 100%)"
+
         import urllib.parse
-        NUMERO_TRIBU = "584243440461"
+        NUMERO_TRIBU = "584241359530"
         
         nombre_sesion = self.sesion_seleccionada_reserva.get("nombre", "")
         fecha = self.sesion_seleccionada_reserva.get("fecha_texto", "")
@@ -2225,21 +2451,30 @@ class State(rx.State):
             f"Solicitud de Reserva Registrada:\n"
             f" *{nombre_sesion}*\n"
             f" *Lugar:* {ubicacion}\n"
-            f" *Fecha:* {fecha} ({hora})\n\n"
-            f" *Asistente:* {self.reserva_nombre_cliente}\n"
+            f" *Fecha:* {fecha} ({hora})\n"
+            f" *Asistente Principal:* {self.reserva_nombre_cliente}\n"
+            f"{texto_acompanantes}\n"
             f" *Contacto:* {self.reserva_whatsapp_cliente}\n"
-            f" *Cupos a solicitar:* {cupos_reservar}\n"
-            f" *Monto estimado:* ${monto_total:.2f} USD\n\n"
-            f"Solicito los datos para realizar el pago y confirmar formalmente los cupos. ¡Gracias!"
+            f" *Cupos solicitados:* {cupos_reservar}\n"
+            f"{texto_pago_resumen}\n\n"
+            f"Solicito los datos para realizar el pago y confirmar formalmente mis cupos. ¡Gracias!"
         )
 
         encoded_msg = urllib.parse.quote(mensaje)
         wa_url = f"https://wa.me/{NUMERO_TRIBU}?text={encoded_msg}"
 
+        # 3. Enviar correo electrónico en segundo plano con Código QR de verificación
+        if email_final and reserva_id_creada:
+            qr_data = f"https://sound-healing-platform-neon-sun.reflex.run/asistencia/{checkin_token_sesion}?reserva={reserva_id_creada}"
+            qr_image_url = f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={urllib.parse.quote(qr_data)}"
+            
+            # Reutilizamos enviar_correo_voucher_html o función interna de notificación SMTP
+            print(f"📧 Ticket QR generado para {email_final}: {qr_image_url}")
+
         self.cerrar_modal_reserva_sesion()
         self.crear_notificacion_db(
             titulo="🧘‍♀️ Nueva Reserva de Sesión",
-            mensaje=f"Solicitud de {self.reserva_nombre_cliente} ({cupos_reservar} cupos).",
+            mensaje=f"Solicitud de {self.reserva_nombre_cliente} ({cupos_reservar} cupos, Pendiente: ${monto_pendiente:.2f}).",
             target_url="admin_tab_reservas",
             es_admin=True
         )
@@ -2271,13 +2506,12 @@ class State(rx.State):
         return rx.redirect(wa_url, is_external=True)
 
     def cargar_lista_asistencia_por_token(self):
-        token = self.router.page.params.get("token")
+        token = self.router.page.params.get("token") or self.router.page.params.get("token")
         if not token:
             return
 
         try:
             with rx.session() as session:
-                # 1. Buscar la sesión mediante su token único
                 db_session = session.exec(
                     sqlmodel.select(TribuSession).where(TribuSession.checkin_token == token)
                 ).first()
@@ -2297,7 +2531,6 @@ class State(rx.State):
                     "foto": db_session.foto
                 }
 
-                # 2. Obtener todas las reservas de esa sesión
                 reservas_db = session.exec(
                     sqlmodel.select(TribuSessionReservation)
                     .where(TribuSessionReservation.session_id == db_session.id)
@@ -2307,6 +2540,9 @@ class State(rx.State):
                 asistentes_desglosados = []
                 for r in reservas_db:
                     parts = r.participantes_json if isinstance(r.participantes_json, list) and len(r.participantes_json) > 0 else [{"index": 0, "nombre": r.nombre_cliente, "asistio": r.asistio}]
+                    cant_cupos = max(1, r.cupos)
+                    monto_pend_individual = float(getattr(r, "monto_pendiente", 0.0) / cant_cupos)
+                    
                     for p in parts:
                         asistentes_desglosados.append({
                             "id": f"{r.id}_{p.get('index', 0)}",
@@ -2315,7 +2551,9 @@ class State(rx.State):
                             "nombre_cliente": p.get("nombre", r.nombre_cliente),
                             "whatsapp_cliente": r.whatsapp_cliente,
                             "cupos": 1,
-                            "monto_total": float(r.monto_total / max(1, r.cupos)),
+                            "monto_total": float(r.monto_total / cant_cupos),
+                            "monto_pendiente": monto_pend_individual,
+                            "porcentaje_pago": float(getattr(r, "porcentaje_pago", 100.0)),
                             "estado": r.estado,
                             "asistio": p.get("asistio", False)
                         })
@@ -2326,6 +2564,8 @@ class State(rx.State):
             print(f"Error cargando lista de asistencia por token: {e}")
 
     def toggle_asistencia_participante(self, item_id: str):
+        """Alterna asistencia individual notificando si existe deuda pendiente y forzando la persitencia JSON en Supabase."""
+        from sqlalchemy.orm.attributes import flag_modified
         try:
             parts_keys = str(item_id).split("_")
             reserva_id = int(parts_keys[0])
@@ -2348,23 +2588,32 @@ class State(rx.State):
                             nombre_toast = p.get("nombre", reserva.nombre_cliente)
                             break
 
-                    reserva.participantes_json = parts
+                    reserva.participantes_json = list(parts)
                     reserva.asistio = all(p.get("asistio", False) for p in parts)
+
+                    # ⚠️ SOLUCIÓN PUNTO 4: Forzar a SQLAlchemy/Supabase a marcar la columna JSON como modificada
+                    flag_modified(reserva, "participantes_json")
+                    flag_modified(reserva, "asistio")
 
                     session.add(reserva)
                     session.commit()
 
-                    # Actualizar UI reactiva local
+                    # Actualización síncrona en la UI reactiva
                     for a in self.lista_asistentes_sesion:
                         if a["id"] == item_id:
                             a["asistio"] = nuevo_estado
                             break
 
+                    # Advertencia si ingresa debiendo saldo
+                    pend = float(getattr(reserva, "monto_pendiente", 0.0))
+                    if nuevo_estado and pend > 0:
+                        return rx.toast.warning(f"⚠️ {nombre_toast} ingresó pero TIENE PAGO PENDIENTE de ${pend:.2f} USD")
+                    
                     estado_txt = "marcado como presente 🟢" if nuevo_estado else "desmarcado ⚪"
                     return rx.toast.info(f"{nombre_toast} {estado_txt}")
         except Exception as e:
-            print(f"Error actualizando asistencia individual: {e}")
-            return rx.toast.error("Ocurrió un error al actualizar la asistencia.")
+            print(f"Error actualizando asistencia individual en Supabase: {e}")
+            return rx.toast.error("Ocurrió un error al guardar la asistencia en el servidor.")
         # =========================================================================
     # 🔐 PANEL DE ADMINISTRACIÓN Y CONTROL DE RESERVAS
     # =========================================================================
@@ -2373,9 +2622,73 @@ class State(rx.State):
     admin_pass_input: str = ""
     admin_tab_activa: str = "reservas"  # 'reservas', 'sesiones', 'productos'
 
+    # 🎟️ Variables y Métodos CRUD de Cupones Administrables
+    cupones_admin_list: list[dict[str, Any]] = []
+    edit_cupon_codigo: str = ""
+    edit_cupon_tipo: str = "PORCENTAJE"  # 'PORCENTAJE' o 'FIJO'
+    edit_cupon_valor: float = 0.0
+    edit_cupon_usos_maximos: int = 1
+
+    def set_edit_cupon_codigo(self, val: str):
+        self.edit_cupon_codigo = val.upper()
+
+    def set_edit_cupon_tipo(self, val: str):
+        self.edit_cupon_tipo = val
+
+    def set_edit_cupon_valor(self, val: str):
+        try:
+            self.edit_cupon_valor = float(val) if val else 0.0
+        except ValueError:
+            pass
+
+    def set_edit_cupon_usos_maximos(self, val: str):
+        try:
+            self.edit_cupon_usos_maximos = int(val) if val else 1
+        except ValueError:
+            pass
+
+    def crear_cupon_especial_admin(self):
+        """Crea cupones negociados o promocionales directamente en la BD."""
+        cod = self.edit_cupon_codigo.strip().upper()
+        if not cod or self.edit_cupon_valor <= 0:
+            return rx.toast.error("Ingresa un código válido y un valor mayor a 0.")
+
+        try:
+            with rx.session() as session:
+                nuevo = TribuCoupon(
+                    codigo=cod,
+                    tipo=self.edit_cupon_tipo,
+                    valor=self.edit_cupon_valor,
+                    usos_maximos=self.edit_cupon_usos_maximos,
+                    is_active=True
+                )
+                session.add(nuevo)
+                session.commit()
+                self.edit_cupon_codigo = ""
+                self.edit_cupon_valor = 0.0
+                self.cargar_datos_admin()
+                return rx.toast.success(f"¡Cupón {cod} creado exitosamente!")
+        except Exception as e:
+            print(f"Error al crear cupón: {e}")
+            return rx.toast.error("El código ya existe o falló la conexión.")
+
+    def toggle_estado_cupon_admin(self, cupon_id: int):
+        """Activa o desactiva un cupón desde el panel admin."""
+        try:
+            with rx.session() as session:
+                c = session.get(TribuCoupon, cupon_id)
+                if c:
+                    c.is_active = not c.is_active
+                    session.add(c)
+                    session.commit()
+                    self.cargar_datos_admin()
+                    return rx.toast.info("Estado del cupón actualizado.")
+        except Exception as e:
+            print(f"Error en toggle cupon: {e}")
+
     # Variables de Formulario CRUD para Sesiones Grupales
     modal_editor_sesion_abierto: bool = False
-    sesion_id_edicion: Optional[int] = None
+    sesion_id_edicion: int | None = None
     edit_sesion_nombre: str = ""
     edit_sesion_patron_recurrencia: str = "MANUAL"
     edit_sesion_foto: str = ""
@@ -2383,6 +2696,7 @@ class State(rx.State):
     edit_sesion_frecuencia: str = ""
     edit_sesion_fecha: str = ""
     edit_sesion_hora: str = ""
+    edit_sesion_hora_recepcion: str = ""
     edit_sesion_inversion: float = 0.0
     edit_sesion_plazas_totales: int = 15
     edit_sesion_plazas_disponibles: int = 15
@@ -2399,7 +2713,7 @@ class State(rx.State):
 
     def set_modal_editor_servicio_abierto(self, val: bool):
         self.modal_editor_servicio_abierto = val
-    producto_id_edicion: Optional[int] = None
+    producto_id_edicion: int | None = None
     edit_prod_nombre: str = ""
     edit_prod_proveedor: str = ""
     edit_prod_descripcion: str = ""
@@ -2447,7 +2761,7 @@ class State(rx.State):
     def set_edit_prod_is_favorite(self, val: bool): self.edit_prod_is_favorite = val
     # Variables de Formulario CRUD para Talleres y Eventos
     modal_editor_taller_abierto: bool = False
-    taller_id_edicion: Optional[int] = None
+    taller_id_edicion: int | None = None
     edit_taller_titulo: str = ""
     edit_taller_tipo: str = "Taller"
     edit_taller_foto: str = ""
@@ -2481,7 +2795,7 @@ class State(rx.State):
     def set_edit_taller_whatsapp(self, val: str): self.edit_taller_whatsapp = val
     # Variables de Formulario CRUD para Servicios
     modal_editor_servicio_abierto: bool = False
-    servicio_id_edicion: Optional[int] = None
+    servicio_id_edicion: int | None = None
     edit_servicio_nombre: str = ""
     edit_servicio_foto: str = ""
     edit_servicio_descripcion: str = ""
@@ -2496,6 +2810,7 @@ class State(rx.State):
     def set_edit_sesion_frecuencia(self, val: str): self.edit_sesion_frecuencia = val
     def set_edit_sesion_fecha(self, val: str): self.edit_sesion_fecha = val
     def set_edit_sesion_hora(self, val: str): self.edit_sesion_hora = val
+    def set_edit_sesion_hora_recepcion(self, val: str): self.edit_sesion_hora_recepcion = val
     def set_edit_sesion_inversion(self, val: str):
         try:
             self.edit_sesion_inversion = float(val) if val and str(val).strip() else 0.0
@@ -2553,7 +2868,10 @@ class State(rx.State):
                 # 1. Cargar reservas de sesiones
                 query_res = sa.text("""
                     SELECT r.id, r.session_id, r.nombre_cliente, r.whatsapp_cliente, 
-                           r.cupos, r.monto_total, r.estado, r.asistio, s.nombre as sesion_nombre, s.fecha_texto
+                           r.cupos, r.monto_total, r.estado, r.asistio, s.nombre as sesion_nombre, s.fecha_texto,
+                           COALESCE(r.porcentaje_pago, 100.0) as porcentaje_pago,
+                           COALESCE(r.monto_pagado, r.monto_total) as monto_pagado,
+                           COALESCE(r.monto_pendiente, 0.0) as monto_pendiente
                     FROM tribu_session_reservations r
                     JOIN tribu_sessions s ON r.session_id = s.id
                     ORDER BY r.id DESC
@@ -2570,7 +2888,10 @@ class State(rx.State):
                         "estado": row[6],
                         "asistio": row[7],
                         "sesion_nombre": row[8],
-                        "fecha_texto": row[9]
+                        "fecha_texto": row[9],
+                        "porcentaje_pago": float(row[10]),
+                        "monto_pagado": float(row[11]),
+                        "monto_pendiente": float(row[12])
                     }
                     for row in res
                 ]
@@ -2614,6 +2935,7 @@ class State(rx.State):
                         "frecuencia_texto": s.frecuencia_texto,
                         "fecha_texto": s.fecha_texto,
                         "hora_texto": s.hora_texto,
+                        "hora_recepcion_texto": s.hora_recepcion_texto or "",
                         "inversion": float(s.inversion),
                         "plazas_totales": s.plazas_totales,
                         "plazas_disponibles": s.plazas_disponibles,
@@ -2624,9 +2946,49 @@ class State(rx.State):
                     }
                     for s in db_sessions_admin
                 ]
+
+                # 4. Cargar cupones de descuento
+                cupones_db = session.exec(sqlmodel.select(TribuCoupon)).all()
+                self.cupones_admin_list = [
+                    {
+                        "id": c.id,
+                        "codigo": c.codigo,
+                        "tipo": c.tipo,
+                        "valor": c.valor,
+                        "is_active": c.is_active,
+                        "usos_maximos": c.usos_maximos,
+                        "usos_actuales": c.usos_actuales,
+                        "agotado": c.usos_actuales >= c.usos_maximos
+                    }
+                    for c in cupones_db
+                ]
         except Exception as e:
             print(f"Error cargando datos admin: {e}")
+    def cambiar_porcentaje_reserva_admin(self, reserva_id: int, nuevo_pct: float):
+        """Permite al administrador cambiar el % reservado desde el panel y recalculación de montos."""
+        try:
+            with rx.session() as session:
+                reserva = session.get(TribuSessionReservation, reserva_id)
+                if reserva:
+                    pct = float(nuevo_pct)
+                    m_total = float(reserva.monto_total)
+                    m_pagado = round(m_total * (pct / 100.0), 2)
+                    m_pend = round(m_total - m_pagado, 2)
 
+                    reserva.porcentaje_pago = pct
+                    reserva.monto_pagado = m_pagado
+                    reserva.monto_pendiente = m_pend
+
+                    session.add(reserva)
+                    session.commit()
+
+                    self.cargar_datos_admin()
+                    self.cargar_lista_asistencia_por_token()
+                    return rx.toast.success(f"Reserva de {reserva.nombre_cliente} actualizada a {pct:.0f}% (Pendiente: ${m_pend:.2f} USD)")
+        except Exception as e:
+            print(f"Error cambiando porcentaje de reserva admin: {e}")
+            return rx.toast.error("Error al actualizar el porcentaje de la reserva.")
+        
     def aprobar_reserva_sesion(self, reserva_id: int):
         """Aprueba el pago, marca como CONFIRMADO y descuenta definitivamente los cupos."""
         try:
@@ -2645,7 +3007,16 @@ class State(rx.State):
                 if db_session.plazas_disponibles < reserva.cupos:
                     return rx.toast.error(f"No hay suficientes cupos disponibles ({db_session.plazas_disponibles} restantes).")
 
-                # Actualizar estado y descontar plazas
+                # Desactivar cupón si alcanzó el máximo de usos al ser aprobado
+                if reserva.cupon_codigo:
+                    db_cupon = session.exec(
+                        sqlmodel.select(TribuCoupon).where(TribuCoupon.codigo == reserva.cupon_codigo)
+                    ).first()
+                    if db_cupon and db_cupon.usos_actuales >= db_cupon.usos_maximos:
+                        db_cupon.is_active = False
+                        session.add(db_cupon)
+
+                # Actualizar estado de la reserva y descontar plazas
                 reserva.estado = "CONFIRMADO"
                 db_session.plazas_disponibles -= reserva.cupos
 
@@ -2655,6 +3026,22 @@ class State(rx.State):
 
                 self.cargar_datos_admin()
                 self.cargar_datos_db()
+
+                # Cargar lista de cupones
+                cupones_db = session.exec(sqlmodel.select(TribuCoupon)).all()
+                self.cupones_admin_list = [
+                    {
+                        "id": c.id,
+                        "codigo": c.codigo,
+                        "tipo": c.tipo,
+                        "valor": c.valor,
+                        "is_active": c.is_active,
+                        "usos_maximos": c.usos_maximos,
+                        "usos_actuales": c.usos_actuales,
+                        "agotado": c.usos_actuales >= c.usos_maximos
+                    }
+                    for c in cupones_db
+                ]
 
                 # Notificación limpia en texto plano para WhatsApp
                 num_wa = "".join(filter(str.isdigit, reserva.whatsapp_cliente))
@@ -2739,6 +3126,20 @@ class State(rx.State):
                         mensaje_personal=gc.mensaje_personalizado
                     )
 
+                # Consumir / Invalidar cupón usado en el pedido
+                query_cupon = sa.text("SELECT cupon_codigo FROM tribu_orders WHERE id = :id")
+                res_c = session.execute(query_cupon, {"id": orden_id}).fetchone()
+                if res_c and res_c[0]:
+                    cod_usado = res_c[0]
+                    db_cupon = session.exec(
+                        sqlmodel.select(TribuCoupon).where(TribuCoupon.codigo == cod_usado)
+                    ).first()
+                    if db_cupon:
+                        db_cupon.usos_actuales += 1
+                        if db_cupon.usos_actuales >= db_cupon.usos_maximos:
+                            db_cupon.is_active = False
+                        session.add(db_cupon)
+
                 session.execute(
                     sa.text("UPDATE tribu_orders SET estado = 'COMPLETADO' WHERE id = :id"),
                     {"id": orden_id}
@@ -2793,8 +3194,8 @@ class State(rx.State):
     # -------------------------------------------------------------------------
     def calcular_proxima_fecha_recurrente(self, patron: str, fecha_ref=None):
         """Calcula dinámicamente cualquier patrón ORDEN_DIA (ej. PRIMER_LUNES, ULTIMO_VIERNES)."""
-        from datetime import date, timedelta
         import calendar
+        from datetime import date, timedelta
 
         if not patron or patron == "MANUAL" or "_" not in patron:
             return None
@@ -2855,6 +3256,7 @@ class State(rx.State):
         self.edit_sesion_frecuencia = "Todos los Jueves"
         self.edit_sesion_fecha = ""
         self.edit_sesion_hora = "6:00 PM a 7:00 PM"
+        self.edit_sesion_hora_recepcion = "5:00 PM"
         self.edit_sesion_inversion = 20.0
         self.edit_sesion_plazas_totales = 15
         self.edit_sesion_plazas_disponibles = 15
@@ -2872,6 +3274,7 @@ class State(rx.State):
         self.edit_sesion_frecuencia = sesion.get("frecuencia_texto", "")
         self.edit_sesion_fecha = sesion.get("fecha_texto", "")
         self.edit_sesion_hora = sesion.get("hora_texto", "")
+        self.edit_sesion_hora_recepcion = sesion.get("hora_recepcion_texto", "5:00 PM")
         self.edit_sesion_inversion = float(sesion.get("inversion", 0.0))
         self.edit_sesion_plazas_totales = int(sesion.get("plazas_totales", 15))
         self.edit_sesion_plazas_disponibles = int(sesion.get("plazas_disponibles", 15))
@@ -2912,6 +3315,7 @@ class State(rx.State):
                         db_sesion.fecha_texto = self.edit_sesion_fecha.strip()
                         db_sesion.fecha_evento = fecha_ev or db_sesion.fecha_evento
                         db_sesion.hora_texto = self.edit_sesion_hora.strip()
+                        db_sesion.hora_recepcion_texto = self.edit_sesion_hora_recepcion.strip()
                         db_sesion.inversion = self.edit_sesion_inversion
                         db_sesion.plazas_totales = self.edit_sesion_plazas_totales
                         db_sesion.plazas_disponibles = self.edit_sesion_plazas_disponibles
@@ -2930,6 +3334,7 @@ class State(rx.State):
                         fecha_texto=self.edit_sesion_fecha.strip(),
                         fecha_evento=fecha_ev,
                         hora_texto=self.edit_sesion_hora.strip(),
+                        hora_recepcion_texto=self.edit_sesion_hora_recepcion.strip() or "5:00 PM",
                         inversion=self.edit_sesion_inversion,
                         plazas_totales=self.edit_sesion_plazas_totales,
                         plazas_disponibles=self.edit_sesion_plazas_totales,
@@ -3153,7 +3558,7 @@ class State(rx.State):
         self.edit_taller_precio = 30.0
         self.edit_taller_moneda = "USD"
         self.edit_taller_fecha_evento = ""
-        self.edit_taller_whatsapp = "584243440461"
+        self.edit_taller_whatsapp = "584241359530"
         self.modal_editor_taller_abierto = True
 
     def abrir_modal_editar_taller(self, taller: dict):

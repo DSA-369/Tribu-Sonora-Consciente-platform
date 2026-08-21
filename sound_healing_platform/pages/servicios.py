@@ -1,7 +1,9 @@
 # sound_healing_platform/pages/servicios.py
 import reflex as rx
-from sound_healing_platform.state import State
+
 from sound_healing_platform.components.layout import plantilla_tribu
+from sound_healing_platform.state import State
+
 
 def tarjeta_servicio(servicio: rx.Var) -> rx.Component:
     """Tarjeta minimalista estilo editorial con esquinas cuadradas originales y zoom fluido."""
@@ -62,7 +64,7 @@ def tarjeta_servicio(servicio: rx.Var) -> rx.Component:
                         "transition": "all 0.2s ease-in-out"
                     },
                     on_click=rx.redirect(
-                        f"https://wa.me/584243440461?text=¡Hola%20Tribu%20Sonora!%20✨%20Quisiera%20solicitar%20información%20y%20agendar%20una%20sesión%20de:%20*{servicio['nombre']}*",
+                        f"https://wa.me/584241359530?text=¡Hola%20Tribu%20Sonora!%20✨%20Quisiera%20solicitar%20información%20y%20agendar%20una%20sesión%20de:%20*{servicio['nombre']}*",
                         is_external=True
                     )
                 ),
