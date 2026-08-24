@@ -55,6 +55,7 @@ reflex-components-recharts==0.9.1
 reflex-components-sonner==0.9.1
 reflex-hosting-cli==0.1.70
 rich==14.3.4
+ruff==0.16.4
 simple-websocket==1.1.0
 SQLAlchemy==2.0.51
 sqlmodel==0.0.39

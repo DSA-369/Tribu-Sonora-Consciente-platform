@@ -13,7 +13,7 @@ def acerca_de_page() -> rx.Component:
                 rx.vstack(
                     rx.heading("NUESTRA FILOSOFÍA", size="8", color="#2C3639", font_weight="light", letter_spacing="0.15em", style={"font-family": "Georgia, serif"}),
                     rx.text(
-                        '"Un santuario de sonido, quietud y conexión. A través de la presencia, el ritual y la práctica suave, te guiamos de regreso a tu armonía interior."',
+                        '"El Sonido como Puente hacia la Armonía. En Tribu Sonora Consciente entendemos la relajación profunda no como un lujo, sino como la base fundamental de la salud y el bienestar integral"',
                         size="4", color="#A27B5C", text_align="center", italic=True, max_width="700px", margin_top="25px", style={"font-family": "Georgia, serif"}
                     ),
                     width="100%", max_width="950px", align="center", padding_x="20px"
@@ -34,21 +34,25 @@ def acerca_de_page() -> rx.Component:
                     rx.flex(
                         rx.vstack(
                             rx.text(
-                                "Tribu Sonora Consciente fue creada como un santuario: un espacio para respirar, relajarse y reconectar con uno mismo. Enraizados en el poder sanador del sonido, se ha convertido en un lugar de encuentro para ceremonias, trabajo energético y reuniones comunitarias conscientes.",
+                                "El Origen de la Tribu. Antes de cruzar nuestras vidas, cada uno de nosotros transitó un camino individual de exploración holística. Jarold profundizó en la sanación a través del Reiki y la construcción artesanal del tambor chamánico; Danibeth se dedicó al estudio de las frecuencias de los cuencos de cuarzo, la lectura de oráculos e instrumentos ancestrales; y Jesús se sumergió en la cosmovisión, la medicina natural y las raíces de las culturas originarias de Suramérica.",
                                 size="3", color="#4B5563", line_height="1.7"
                             ),
                             rx.text(
-                                "Nuestro estudio en Caracas irradia una energía suave: cálida, pacífica y profundamente acogedora. Cada detalle es intencional, diseñado para que te sientas seguro, apoyado y acompañado.",
+                                "En 2019, la ciudad de Caracas fue el punto de convergencia. Al reunirmos para facilitar una primera presentación colectiva, surgió la necesidad de definir nuestra identidad. En ese compartir comprendimos que habíamos conformado una familia unida por el propósito de ser canales conscientes para elevar la vibración del entorno. De esa certeza nació nuestro nombre: Tribu Sonora Consciente.",
                                 size="3", color="#4B5563", line_height="1.7"
                             ),
                             width=rx.breakpoints(initial="100%", md="48%"), align="start", spacing="4"
                         ),
                         rx.vstack(
                             rx.text(
-                                "Comenzó como un pequeño grupo de amigos que se reunían para baños de sonido y rituales suaves: un santuario de tranquilidad en medio de la ajetreada vida cotidiana. Con el tiempo, el espacio se convirtió en un estudio donde las personas acuden para descansar, reconocer y renovarse a través del sonido, el movimiento y la intención.",
+                                "Desde entonces, Jarold, Danibeth y Jesús nos consolidamos como los pilares fundamentales de este espacio. A lo largo de los años, hemos guiado innumerables sesiones individuales y grupales, talleres, inauguraciones, círculos de bienestar, voluntariados y ceremonias, posicionándonos como un referente de la sonoterapia en Venezuela.",
                                 size="3", color="#4B5563", line_height="1.7"
                             ),
-                            width=rx.breakpoints(initial="100%", md="48%"), align="start"
+                            rx.text(
+                                "Hoy estrenamos nuestra plataforma web como un santuario digital para acortar distancias con nuestra comunidad: un canal donde podrás explorar el universo del sound healing, reservar tus cupos, adquirir instrumentos y seguir transformando la vida a través de la frecuencia.",
+                                size="3", color="#4B5563", line_height="1.7"
+                            ),
+                            width=rx.breakpoints(initial="100%", md="48%"), align="start", spacing="4"
                         ),
                         width="100%",
                         flex_direction=rx.breakpoints(initial="column", md="row"),
@@ -57,30 +61,30 @@ def acerca_de_page() -> rx.Component:
                         margin_bottom="60px"
                     ),
 
-                    # Galería de hitos / Línea de tiempo (Corregido con placeholders estéticos)
+                    # Galería de hitos / Línea de tiempo (Imágenes locales desde assets)
                     rx.flex(
                         rx.vstack(
-                            rx.image(src="https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?q=80&w=600&auto=format&fit=cover", width="100%", height="140px", object_fit="cover"),
-                            rx.heading("2018 - La Semilla", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
-                            rx.text("Una pequeña reunión de meditación en grupo se transforma en una práctica sagrada arraigada en la sanación a través del sonido.", size="2", color="#7F7F7F", line_height="1.5"),
+                            rx.image(src="/hito_raiz01.png", width="100%", height="140px", object_fit="cover"),
+                            rx.heading("Sabiduría Ancestral", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
+                            rx.text("Honramos las raíces y la medicina natural, utilizando herramientas sonoras milenarias que reconectan al ser con su esencia primaria.", size="2", color="#7F7F7F", line_height="1.5"),
                             width=rx.breakpoints(initial="100%", sm="45%", md="23%"), align="start"
                         ),
                         rx.vstack(
-                            rx.image(src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=600&auto=format&fit=cover", width="100%", height="140px", object_fit="cover"),
-                            rx.heading("2020 - El primer estudio", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
-                            rx.text("Tribu Sonora abre su primer espacio físico, donde alimentó baños de sonido y círculos comunitarios.", size="2", color="#7F7F7F", line_height="1.5"),
+                            rx.image(src="/hito_tech02.png", width="100%", height="140px", object_fit="cover"),
+                            rx.heading("Tecnología del Sonido", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
+                            rx.text("Aplicamos frecuencias y armónicos diseñados para desacelerar las ondas cerebrales, estimular el nervio vago e inducir estados de relajación somática profunda.", size="2", color="#7F7F7F", line_height="1.5"),
                             width=rx.breakpoints(initial="100%", sm="45%", md="23%"), align="start"
                         ),
                         rx.vstack(
-                            rx.image(src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=600&auto=format&fit=cover", width="100%", height="140px", object_fit="cover"),
-                            rx.heading("2022 - Lanzamiento de Ritual Corner", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
-                            rx.text("La tienda Ritual Corner ofrece a la comunidad tés artesanales, herramientas y artículos ceremoniales.", size="2", color="#7F7F7F", line_height="1.5"),
+                            rx.image(src="/hito_acompaña03.png", width="100%", height="140px", object_fit="cover"),
+                            rx.heading("Acompañamiento Consciente", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
+                            rx.text("Sostenemos espacios seguros e íntimos donde cada persona, sin importar su edad, puede liberar carga emocional, sanar y autorregular su sistema nervioso.", size="2", color="#7F7F7F", line_height="1.5"),
                             width=rx.breakpoints(initial="100%", sm="45%", md="23%"), align="start"
                         ),
                         rx.vstack(
-                            rx.image(src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=cover", width="100%", height="140px", object_fit="cover"),
-                            rx.heading("De 2024 a la actualidad", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
-                            rx.text("Tribu Sonora amplía su oferta con ejercicios de respiración, yoga yin, talleres y sesiones de sanación privadas.", size="2", color="#7F7F7F", line_height="1.5"),
+                            rx.image(src="/hito_web04.png", width="100%", height="140px", object_fit="cover"),
+                            rx.heading("Santuario Digital", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_top="10px"),
+                            rx.text("Tu portal directo para acceder a sesiones privadas, eventos colectivos, talleres formativos e instrumentos rituales desde cualquier lugar..", size="2", color="#7F7F7F", line_height="1.5"),
                             width=rx.breakpoints(initial="100%", sm="45%", md="23%"), align="start"
                         ),
                         width="100%",

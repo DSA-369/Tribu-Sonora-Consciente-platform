@@ -81,6 +81,7 @@ class TribuSession(sqlmodel.SQLModel, table=True):
     id: int | None = sqlmodel.Field(default=None, primary_key=True)
     nombre: str
     foto: str
+    fotos: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
     ubicacion: str
     frecuencia_texto: str
     fecha_texto: str
@@ -460,8 +461,41 @@ class State(rx.State):
         encoded = urllib.parse.quote(mensaje)
         return rx.redirect(f"https://wa.me/{num_wa}?text={encoded}", is_external=True)
 
-    # Variables para el Modal de Reserva de Sesiones
+    # Variables para el Modal de Reserva de Sesiones y Lightbox Galería
     modal_reserva_sesion_abierto: bool = False
+    modal_lightbox_abierto: bool = False
+    fotos_lightbox: list[str] = []
+    indice_foto_lightbox: int = 0
+
+    @rx.var
+    def foto_lightbox_actual(self) -> str:
+        """Devuelve la foto seleccionada actualmente en el visor flotante."""
+        if self.fotos_lightbox and 0 <= self.indice_foto_lightbox < len(self.fotos_lightbox):
+            return self.fotos_lightbox[self.indice_foto_lightbox]
+        return ""
+
+    def abrir_lightbox_galeria(self, lista_fotos: list, foto_inicial: str = ""):
+        """Abre la galería acumulando todas las fotos disponibles o la foto de portada."""
+        if isinstance(lista_fotos, list) and len(lista_fotos) > 0:
+            self.fotos_lightbox = [f for f in lista_fotos if isinstance(f, str) and f.strip()]
+        else:
+            self.fotos_lightbox = [foto_inicial] if foto_inicial else []
+        
+        self.indice_foto_lightbox = 0
+        self.modal_lightbox_abierto = True
+
+    def cerrar_lightbox(self):
+        self.modal_lightbox_abierto = False
+        self.fotos_lightbox = []
+        self.indice_foto_lightbox = 0
+
+    def foto_siguiente_lightbox(self):
+        if self.fotos_lightbox:
+            self.indice_foto_lightbox = (self.indice_foto_lightbox + 1) % len(self.fotos_lightbox)
+
+    def foto_anterior_lightbox(self):
+        if self.fotos_lightbox:
+            self.indice_foto_lightbox = (self.indice_foto_lightbox - 1 + len(self.fotos_lightbox)) % len(self.fotos_lightbox)
     sesion_seleccionada_reserva: dict[str, Any] = {}
     reserva_nombre_cliente: str = ""
     reserva_email_cliente: str = ""
@@ -1186,6 +1220,7 @@ class State(rx.State):
                         "id": s.id,
                         "nombre": s.nombre,
                         "foto": s.foto,
+                        "fotos": s.fotos or [],
                         "ubicacion": s.ubicacion,
                         "frecuencia_texto": s.frecuencia_texto,
                         "fecha_texto": s.fecha_texto,

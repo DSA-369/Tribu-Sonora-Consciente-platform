@@ -25,18 +25,68 @@ def tarjeta_sesion(sesion: rx.Var) -> rx.Component:
     """Tarjeta responsiva para cada sede de sesión recurrente."""
     return rx.box(
         rx.flex(
-            # Imagen de la sede
-            rx.box(
-                rx.image(
-                    src=sesion["foto"],
+            # Galería interactiva de la sede (Portada + Carrusel de miniaturas)
+            rx.vstack(
+                rx.box(
+                    rx.image(
+                        src=sesion["foto"],
+                        width="100%",
+                        height="180px",
+                        object_fit="cover",
+                        border_radius="8px",
+                        transition="transform 0.3s ease",
+                        _hover={"transform": "scale(1.03)"}
+                    ),
+                    rx.box(
+                        rx.hstack(
+                            rx.icon(tag="search", size=12, color="#FFFFFF"),
+                            rx.text("Ampliar fotos", size="1", color="#FFFFFF", font_weight="bold"),
+                            spacing="1",
+                            align="center"
+                        ),
+                        position="absolute",
+                        bottom="8px",
+                        left="8px",
+                        background_color="rgba(44, 54, 57, 0.8)",
+                        padding="4px 8px",
+                        border_radius="4px",
+                        pointer_events="none"
+                    ),
+                    position="relative",
+                    overflow="hidden",
+                    border_radius="8px",
+                    cursor="pointer",
                     width="100%",
-                    height="200px",
-                    object_fit="cover",
-                    border_radius="8px"
+                    on_click=lambda: State.abrir_lightbox_galeria(sesion["fotos"], sesion["foto"])
+                ),
+                # Carrusel horizontal de miniaturas
+                rx.cond(
+                    sesion["fotos"],
+                    rx.hstack(
+                        rx.foreach(
+                            sesion["fotos"].to(list),
+                            lambda img_url: rx.image(
+                                src=img_url,
+                                width="45px",
+                                height="45px",
+                                object_fit="cover",
+                                border_radius="4px",
+                                cursor="pointer",
+                                border="1px solid #EAE5DF",
+                                _hover={"border": "2px solid #8E6F54", "transform": "scale(1.05)"},
+                                on_click=lambda: State.abrir_lightbox_galeria(sesion["fotos"], img_url)
+                            )
+                        ),
+                        spacing="2",
+                        overflow_x="auto",
+                        width="100%",
+                        padding_y="4px"
+                    )
                 ),
                 width=rx.breakpoints(initial="100%", md="220px"),
                 min_width="220px",
-                overflow="hidden"
+                align="start",
+                spacing="2"
             ),
             
             # Detalles de la sesión
@@ -403,6 +453,72 @@ rx.vstack(
         ),
         open=State.modal_reserva_sesion_abierto
     )
+def modal_lightbox() -> rx.Component:
+    """Modal flotante de pantalla completa para explorar la galería de fotos."""
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                # Encabezado con indicador de orden y botón cerrar
+                rx.hstack(
+                    rx.hstack(
+                        rx.icon(tag="image", size=18, color="#FFFFFF"),
+                        rx.text("Galería del Espacio", size="2", color="#FFFFFF", font_weight="bold"),
+                        spacing="2",
+                        align="center"
+                    ),
+                    rx.icon(tag="x", size=22, color="#FFFFFF", cursor="pointer", on_click=State.cerrar_lightbox),
+                    justify="between",
+                    align="center",
+                    width="100%",
+                    margin_bottom="10px"
+                ),
+                # Visor principal con flechas laterales
+                rx.hstack(
+                    rx.cond(
+                        State.fotos_lightbox,
+                        rx.button(
+                            rx.icon(tag="chevron-left", size=24, color="#FFFFFF"),
+                            variant="soft",
+                            color_scheme="gray",
+                            on_click=State.foto_anterior_lightbox,
+                            cursor="pointer",
+                            padding="8px"
+                        )
+                    ),
+                    rx.image(
+                        src=State.foto_lightbox_actual,
+                        max_width="75vw",
+                        max_height="70vh",
+                        object_fit="contain",
+                        border_radius="8px"
+                    ),
+                    rx.cond(
+                        State.fotos_lightbox,
+                        rx.button(
+                            rx.icon(tag="chevron-right", size=24, color="#FFFFFF"),
+                            variant="soft",
+                            color_scheme="gray",
+                            on_click=State.foto_siguiente_lightbox,
+                            cursor="pointer",
+                            padding="8px"
+                        )
+                    ),
+                    justify="center",
+                    align="center",
+                    width="100%",
+                    gap="3"
+                ),
+                align="center",
+                width="100%"
+            ),
+            background_color="rgba(20, 20, 20, 0.95)",
+            padding="20px",
+            border_radius="12px",
+            border="1px solid rgba(255, 255, 255, 0.1)",
+            max_width="fit-content"
+        ),
+        open=State.modal_lightbox_abierto
+    )
 
 def horario_sesiones_page() -> rx.Component:
     """Vista Principal 'Horario de Sesiones'."""
@@ -440,6 +556,7 @@ def horario_sesiones_page() -> rx.Component:
                 spacing="3"
             ),
             modal_reserva_sesion(),
+            modal_lightbox(),
             width="100%",
             max_width="1050px",
             padding_x=rx.breakpoints(initial="10px", sm="20px"),
