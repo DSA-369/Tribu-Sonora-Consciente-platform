@@ -321,6 +321,14 @@ def tarjeta_sesion_admin(sesion: rx.Var) -> rx.Component:
                     on_click=lambda: State.compartir_asistencia_whatsapp(sesion)
                 ),
                 rx.button(
+                    "📝 Ver Lista",
+                    size="2",
+                    variant="soft",
+                    color_scheme="bronze",
+                    cursor="pointer",
+                    on_click=lambda: State.abrir_lista_asistencia_admin(sesion)
+                ),
+                rx.button(
                     "🔑 Renov. Token",
                     size="2",
                     variant="ghost",

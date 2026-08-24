@@ -262,7 +262,7 @@ def modal_reserva_sesion() -> rx.Component:
 
                 # Selector de Porcentaje de Pago / Abono Inicial
                 rx.vstack(
-                    rx.text("Porcentaje de Abono para Reservar*", size="1", font_weight="bold", color="#2C3639"),
+                    rx.text("Porcentaje de Abono para Reservar (Opcional)", size="1", font_weight="bold", color="#2C3639"),
                     rx.hstack(
                         rx.box(
                             rx.hstack(
@@ -351,30 +351,49 @@ rx.vstack(
     padding_y="8px"
 ),
                     # Resumen financiero dinámico
-                    rx.box(
-                        rx.hstack(
-                            rx.vstack(
-                                rx.text("Abono Hoy (" + State.reserva_porcentaje_pago.to_string() + "%):", size="1", color="#7F7F7F"),
-                                rx.text("$" + State.reserva_monto_pagado_calculado.to_string() + " USD", size="3", font_weight="bold", color="#2E7D32"),
-                                align="start",
-                                spacing="0"
-                            ),
-                            rx.vstack(
-                                rx.text("Pendiente en Puerta:", size="1", color="#7F7F7F"),
-                                rx.text("$" + State.reserva_monto_pendiente_calculado.to_string() + " USD", size="3", font_weight="bold", color="#DC2626"),
-                                align="start",
-                                spacing="0"
-                            ),
-                            justify="between",
-                            width="100%"
-                        ),
-                        background_color="#FAF6F0",
-                        padding="10px 14px",
-                        border_radius="8px",
-                        border="1px solid #EAE5DF",
-                        width="100%",
-                        margin_top="4px"
-                    ),
+                 rx.box(
+                     rx.cond(
+                         State.reserva_porcentaje_pago == 0.0,
+                         rx.hstack(
+                             rx.vstack(
+                                 rx.text("Abono Inicial:", size="1", color="#7F7F7F"),
+                                 rx.text("Por convenir en WhatsApp", size="2", font_weight="bold", color="#8E6F54"),
+                                 align="start",
+                                 spacing="0"
+                             ),
+                             rx.vstack(
+                                 rx.text("Monto Total de la Sesión:", size="1", color="#7F7F7F"),
+                                 rx.text("$" + State.reserva_monto_total_calculado.to_string() + " USD", size="3", font_weight="bold", color="#2C3639"),
+                                 align="start",
+                                 spacing="0"
+                             ),
+                             justify="between",
+                             width="100%"
+                         ),
+                         rx.hstack(
+                             rx.vstack(
+                                 rx.text("Abono Hoy (" + State.reserva_porcentaje_pago.to_string() + "%):", size="1", color="#7F7F7F"),
+                                 rx.text("$" + State.reserva_monto_pagado_calculado.to_string() + " USD", size="3", font_weight="bold", color="#2E7D32"),
+                                 align="start",
+                                 spacing="0"
+                             ),
+                             rx.vstack(
+                                 rx.text("Pendiente en Puerta:", size="1", color="#7F7F7F"),
+                                 rx.text("$" + State.reserva_monto_pendiente_calculado.to_string() + " USD", size="3", font_weight="bold", color="#DC2626"),
+                                 align="start",
+                                 spacing="0"
+                             ),
+                             justify="between",
+                             width="100%"
+                         )
+                     ),
+                     background_color="#FAF6F0",
+                     padding="10px 14px",
+                     border_radius="8px",
+                     border="1px solid #EAE5DF",
+                     width="100%",
+                     margin_top="4px"
+                 ),
                     width="100%",
                     spacing="2",
                     align="start"
@@ -486,12 +505,12 @@ def modal_lightbox() -> rx.Component:
                         )
                     ),
                     rx.image(
-                        src=State.foto_lightbox_actual,
-                        max_width="75vw",
-                        max_height="70vh",
-                        object_fit="contain",
-                        border_radius="8px"
-                    ),
+                     src=State.foto_lightbox_actual,
+                     max_width=rx.breakpoints(initial="55vw", sm="75vw"),
+                     max_height="70vh",
+                     object_fit="contain",
+                     border_radius="8px"
+                 ),
                     rx.cond(
                         State.fotos_lightbox,
                         rx.button(
@@ -512,10 +531,11 @@ def modal_lightbox() -> rx.Component:
                 width="100%"
             ),
             background_color="rgba(20, 20, 20, 0.95)",
-            padding="20px",
-            border_radius="12px",
-            border="1px solid rgba(255, 255, 255, 0.1)",
-            max_width="fit-content"
+         padding=rx.breakpoints(initial="14px", sm="20px"),
+         border_radius="12px",
+         border="1px solid rgba(255, 255, 255, 0.1)",
+         width=rx.breakpoints(initial="92vw", sm="auto"),
+         max_width="90vw"
         ),
         open=State.modal_lightbox_abierto
     )

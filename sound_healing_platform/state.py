@@ -502,13 +502,17 @@ class State(rx.State):
     reserva_whatsapp_cliente: str = ""
     reserva_cantidad_cupos: int = 1
     reserva_participantes: list[str] = [""]
-    reserva_porcentaje_pago: float = 100.0
+    reserva_porcentaje_pago: float = 0.0
     reserva_cupon_input: str = ""
     reserva_descuento_monto: float = 0.0
     reserva_cupon_aplicado_codigo: str = ""
 
     def set_reserva_porcentaje_pago(self, pct: float):
-        self.reserva_porcentaje_pago = float(pct)
+        val = float(pct)
+        if self.reserva_porcentaje_pago == val:
+            self.reserva_porcentaje_pago = 0.0
+        else:
+            self.reserva_porcentaje_pago = val
 
     def set_reserva_cupon_input(self, val: str):
         self.reserva_cupon_input = val
@@ -610,6 +614,7 @@ class State(rx.State):
     # Variables para el Documento / Checklist Digital de Asistencia por Token
     sesion_asistencia_info: dict[str, Any] = {}
     lista_asistentes_sesion: list[dict[str, Any]] = []
+    cargando_asistencia: bool = True
     busqueda_asistente: str = ""
 
     def set_busqueda_asistente(self, val: str):
@@ -2329,6 +2334,7 @@ class State(rx.State):
             
         self.sesion_seleccionada_reserva = sesion
         self.reserva_cantidad_cupos = 1
+        self.reserva_porcentaje_pago = 0.0
 
         # Autocompletado si el usuario tiene sesión activa
         if self.user_logged_in:
@@ -2340,6 +2346,7 @@ class State(rx.State):
             self.reserva_participantes = [nombre_auto]
         else:
             self.reserva_participantes = [""]
+        self.reserva_porcentaje_pago = 0.0
 
         self.modal_reserva_sesion_abierto = True
 
@@ -2468,10 +2475,18 @@ class State(rx.State):
             texto_acompanantes = f"\n *Participante Principal:* {nombres_participantes_lista[0]}"
 
         # 2. Resumen financiero de abono e importe pendiente
-        texto_pago_resumen = (
-            f" *Abono Inicial ({pct_pago:.0f}%):* ${monto_pagado:.2f} USD\n"
-            f" *Monto Pendiente en Puerta:* ${monto_pendiente:.2f} USD (Total: ${monto_total:.2f} USD)"
-        ) if pct_pago < 100.0 else f" *Monto Total:* ${monto_total:.2f} USD (Pago 100%)"
+        if pct_pago == 0.0:
+            texto_pago_resumen = (
+                f" *Abono Inicial:* Por convenir / negociar vía WhatsApp\n"
+                f" *Monto Total de la Sesión:* ${monto_total:.2f} USD"
+            )
+        elif pct_pago < 100.0:
+            texto_pago_resumen = (
+                f" *Abono Inicial ({pct_pago:.0f}%):* ${monto_pagado:.2f} USD\n"
+                f" *Monto Pendiente en Puerta:* ${monto_pendiente:.2f} USD (Total: ${monto_total:.2f} USD)"
+            )
+        else:
+            texto_pago_resumen = f" *Monto Total:* ${monto_total:.2f} USD (Pago 100%)"
 
         import urllib.parse
         NUMERO_TRIBU = "584241359530"
@@ -2519,6 +2534,13 @@ class State(rx.State):
     # =========================================================================
     # 📑 LÓGICA DE ASISTENCIA Y CHECK-IN POR TOKEN (DOCUMENTO COMPARTIBLE)
     # =========================================================================
+    def abrir_lista_asistencia_admin(self, sesion: dict):
+        """Redirige directamente al checklist de asistencia de la sesión seleccionada."""
+        token = sesion.get("checkin_token", "")
+        if not token:
+            return rx.toast.error("Esta sesión aún no posee un token de asistencia generado.")
+        return rx.redirect(f"/asistencia/{token}")
+
     def compartir_asistencia_whatsapp(self, sesion: dict):
         """Genera el enlace del checklist de asistencia y abre WhatsApp sin íconos ni emojis."""
         token = sesion.get("checkin_token", "")
@@ -2536,14 +2558,72 @@ class State(rx.State):
 
         import urllib.parse
         encoded_msg = urllib.parse.quote(mensaje)
-        wa_url = f"https://wa.me/?text={encoded_msg}"
+        wa_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
 
         return rx.redirect(wa_url, is_external=True)
 
     def cargar_lista_asistencia_por_token(self):
+        self.cargando_asistencia = True
         token = self.router.page.params.get("token") or self.router.page.params.get("token")
         if not token:
+            self.cargando_asistencia = False
             return
+
+        try:
+            with rx.session() as session:
+                db_session = session.exec(
+                    sqlmodel.select(TribuSession).where(TribuSession.checkin_token == token)
+                ).first()
+
+                if not db_session:
+                    self.sesion_asistencia_info = {}
+                    self.lista_asistentes_sesion = []
+                    self.cargando_asistencia = False
+                    return
+
+                self.sesion_asistencia_info = {
+                    "id": db_session.id,
+                    "nombre": db_session.nombre,
+                    "ubicacion": db_session.ubicacion,
+                    "fecha_texto": db_session.fecha_texto,
+                    "hora_texto": db_session.hora_texto,
+                    "plazas_totales": db_session.plazas_totales,
+                    "foto": db_session.foto
+                }
+
+                reservas_db = session.exec(
+                    sqlmodel.select(TribuSessionReservation)
+                    .where(TribuSessionReservation.session_id == db_session.id)
+                    .order_by(TribuSessionReservation.id.desc())
+                ).all()
+
+                asistentes_desglosados = []
+                for r in reservas_db:
+                    parts = r.participantes_json if isinstance(r.participantes_json, list) and len(r.participantes_json) > 0 else [{"index": 0, "nombre": r.nombre_cliente, "asistio": r.asistio}]
+                    cant_cupos = max(1, r.cupos)
+                    monto_pend_individual = float(getattr(r, "monto_pendiente", 0.0) / cant_cupos)
+
+                    for p in parts:
+                        asistentes_desglosados.append({
+                            "id": f"{r.id}_{p.get('index', 0)}",
+                            "reserva_id": r.id,
+                            "part_index": p.get("index", 0),
+                            "nombre_cliente": p.get("nombre", r.nombre_cliente),
+                            "whatsapp_cliente": r.whatsapp_cliente,
+                            "cupos": 1,
+                            "monto_total": float(r.monto_total / cant_cupos),
+                            "monto_pendiente": monto_pend_individual,
+                            "porcentaje_pago": float(getattr(r, "porcentaje_pago", 100.0)),
+                            "estado": r.estado,
+                            "asistio": p.get("asistio", False)
+                        })
+
+                self.lista_asistentes_sesion = asistentes_desglosados
+
+        except Exception as e:
+            print(f"Error cargando lista de asistencia por token: {e}")
+        finally:
+            self.cargando_asistencia = False
 
         try:
             with rx.session() as session:
