@@ -14,8 +14,30 @@ def badge_estado_reserva(estado: rx.Var) -> rx.Component:
         rx.badge("REGISTRADO", color_scheme="gray", size="1")
     )
 
+def boton_metodo_pago_puerta(asistente: rx.Var, metodo_clave: str, nombre_logo: str, img_src: str) -> rx.Component:
+    """Botón interactivo de método de pago con efecto hundido y resaltado activo."""
+    esta_seleccionado = (asistente["metodo_pago"] == metodo_clave)
+
+    return rx.box(
+        rx.image(
+            src=img_src,
+            alt=nombre_logo,
+            height="20px",
+            object_fit="contain"
+        ),
+        padding="4px 8px",
+        border_radius="6px",
+        cursor="pointer",
+        border=rx.cond(esta_seleccionado, "2px solid #8E6F54", "1px solid #EAE5DF"),
+        background_color=rx.cond(esta_seleccionado, "#FAF6F0", "#FFFFFF"),
+        box_shadow=rx.cond(esta_seleccionado, "inset 0px 2px 4px rgba(0,0,0,0.2)", "0px 1px 3px rgba(0,0,0,0.05)"),
+        transform=rx.cond(esta_seleccionado, "translateY(1px)", "none"),
+        _hover={"border_color": "#8E6F54"},
+        on_click=lambda: State.seleccionar_metodo_pago_asistencia(asistente["id"], metodo_clave)
+    )
+
 def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
-    """Tarjeta de asistencia minimalista adaptada exactamente al diseño de 25%.png (Sin íconos)."""
+    """Tarjeta de asistencia minimalista con selección interactiva de métodos de pago."""
     es_presente = asistente["asistio"]
     monto_pend = asistente["monto_pendiente"].to(float)
     pct_pago = asistente["porcentaje_pago"].to(float)
@@ -23,9 +45,27 @@ def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
 
     return rx.box(
         rx.flex(
-            # Columna Izquierda: Badge Estado + Nombre + Teléfono + Cuadritos %
+            # Columna Izquierda: Badge + Logos Métodos de Pago + Nombre + Teléfono + Cuadritos %
             rx.vstack(
-                badge_estado_reserva(asistente["estado"]),
+                rx.hstack(
+                    badge_estado_reserva(asistente["estado"]),
+                    # Botones Interactivos de Métodos de Pago (Visibles cuando hay deuda o para cambiar pago)
+                    rx.cond(
+                        tiene_deuda,
+                        rx.hstack(
+                            boton_metodo_pago_puerta(asistente, "mastercard", "MasterCard", "/mastercard.png"),
+                            boton_metodo_pago_puerta(asistente, "zelle", "Zelle", "/zelle.png"),
+                            boton_metodo_pago_puerta(asistente, "binance", "Binance", "/binance.png"),
+                            boton_metodo_pago_puerta(asistente, "pagomovil", "Pago Móvil", "/pgm.png"),
+                            boton_metodo_pago_puerta(asistente, "transferencia", "Transferencia", "/tb.png"),
+                            spacing="1",
+                            align="center"
+                        )
+                    ),
+                    spacing="2",
+                    align="center",
+                    flex_wrap="wrap"
+                ),
                 rx.heading(
                     asistente["nombre_cliente"],
                     size="4",

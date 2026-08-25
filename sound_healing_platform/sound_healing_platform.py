@@ -13,6 +13,7 @@ from sound_healing_platform.pages.horario_sesiones import horario_sesiones_page
 from sound_healing_platform.pages.login import login_page
 from sound_healing_platform.pages.paquetes_sesiones import paquetes_sesiones_page
 from sound_healing_platform.pages.privacidad import privacidad_page
+from sound_healing_platform.pages.product import product_page
 from sound_healing_platform.pages.rastreo import rastreo_page
 from sound_healing_platform.pages.servicios import servicios_page
 from sound_healing_platform.pages.shop import shop_page
@@ -154,3 +155,4 @@ app.add_page(login_page, route="/login", title="Iniciar Sesión | Tribu Sonora C
 app.add_page(privacidad_page, route="/politica-de-privacidad", title="Política de Privacidad | Tribu Sonora Consciente")
 app.add_page(terminos_page, route="/terminos-y-condiciones", title="Términos y Condiciones | Tribu Sonora Consciente")
 app.add_page(gift_cards_page, route="/tarjetas-de-regalo")
+app.add_page(product_page, route="/product/[id]", title="Producto | Tribu Sonora Consciente", on_load=State.cargar_producto_por_id)

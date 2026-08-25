@@ -114,6 +114,7 @@ class TribuSessionReservation(sqlmodel.SQLModel, table=True):
     asistio: bool = False
     participantes_json: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
     cupon_codigo: str | None = sqlmodel.Field(default=None)
+    metodo_pago: str | None = sqlmodel.Field(default=None)
 
 class TribuAdminUser(sqlmodel.SQLModel, table=True):
     """Modelo para usuarios administradores y facilitadores."""
@@ -616,6 +617,14 @@ class State(rx.State):
     lista_asistentes_sesion: list[dict[str, Any]] = []
     cargando_asistencia: bool = True
     busqueda_asistente: str = ""
+
+    def seleccionar_metodo_pago_asistencia(self, item_id: str, metodo: str):
+        """Asigna o conmuta el método de pago seleccionado directamente en la lista de asistentes."""
+        for a in self.lista_asistentes_sesion:
+            if a["id"] == item_id:
+                actual = a.get("metodo_pago", "")
+                a["metodo_pago"] = "" if actual == metodo else metodo
+                break
 
     def set_busqueda_asistente(self, val: str):
         self.busqueda_asistente = val
@@ -2564,7 +2573,7 @@ class State(rx.State):
 
     def cargar_lista_asistencia_por_token(self):
         self.cargando_asistencia = True
-        token = self.router.page.params.get("token") or self.router.page.params.get("token")
+        token = self.router.page.params.get("token")
         if not token:
             self.cargando_asistencia = False
             return
@@ -2615,7 +2624,8 @@ class State(rx.State):
                             "monto_pendiente": monto_pend_individual,
                             "porcentaje_pago": float(getattr(r, "porcentaje_pago", 100.0)),
                             "estado": r.estado,
-                            "asistio": p.get("asistio", False)
+                            "asistio": p.get("asistio", False),
+                            "metodo_pago": getattr(r, "metodo_pago", "") or ""
                         })
 
                 self.lista_asistentes_sesion = asistentes_desglosados
@@ -2670,7 +2680,8 @@ class State(rx.State):
                             "monto_pendiente": monto_pend_individual,
                             "porcentaje_pago": float(getattr(r, "porcentaje_pago", 100.0)),
                             "estado": r.estado,
-                            "asistio": p.get("asistio", False)
+                            "asistio": p.get("asistio", False),
+                            "metodo_pago": getattr(r, "metodo_pago", "") or ""
                         })
 
                 self.lista_asistentes_sesion = asistentes_desglosados
@@ -2679,12 +2690,13 @@ class State(rx.State):
             print(f"Error cargando lista de asistencia por token: {e}")
 
     def toggle_asistencia_participante(self, item_id: str):
-        """Alterna asistencia individual notificando si existe deuda pendiente y forzando la persitencia JSON en Supabase."""
+        """Alterna asistencia individual, liquide deuda al 100% si se seleccionó método de pago y persiste en Supabase."""
         from sqlalchemy.orm.attributes import flag_modified
         try:
             parts_keys = str(item_id).split("_")
             reserva_id = int(parts_keys[0])
             part_index = int(parts_keys[1]) if len(parts_keys) > 1 else 0
+            metodo_pago = next((a.get("metodo_pago", "") for a in self.lista_asistentes_sesion if a["id"] == item_id), "")
 
             with rx.session() as session:
                 reserva = session.get(TribuSessionReservation, reserva_id)
@@ -2706,30 +2718,48 @@ class State(rx.State):
                     reserva.participantes_json = list(parts)
                     reserva.asistio = all(p.get("asistio", False) for p in parts)
 
-                    # ⚠️ SOLUCIÓN PUNTO 4: Forzar a SQLAlchemy/Supabase a marcar la columna JSON como modificada
+                    # Si el participante tenía deuda y se seleccionó un método de pago en puerta
+                    m_total = float(reserva.monto_total)
+                    m_pend = float(getattr(reserva, "monto_pendiente", 0.0))
+                    pago_registrado = False
+
+                    if nuevo_estado and m_pend > 0 and metodo_pago:
+                        reserva.porcentaje_pago = 100.0
+                        reserva.monto_pagado = m_total
+                        reserva.monto_pendiente = 0.0
+                        reserva.estado = "CONFIRMADO"
+                        reserva.metodo_pago = metodo_pago.upper()
+                        pago_registrado = True
+
                     flag_modified(reserva, "participantes_json")
                     flag_modified(reserva, "asistio")
 
                     session.add(reserva)
                     session.commit()
 
-                    # Actualización síncrona en la UI reactiva
+                    # Actualización síncrona de todas las tarjetas asociadas a esta reserva
                     for a in self.lista_asistentes_sesion:
+                        if a["reserva_id"] == reserva_id and pago_registrado:
+                            a["porcentaje_pago"] = 100.0
+                            a["monto_pendiente"] = 0.0
+                            a["estado"] = "CONFIRMADO"
                         if a["id"] == item_id:
                             a["asistio"] = nuevo_estado
-                            break
 
-                    # Advertencia si ingresa debiendo saldo
-                    pend = float(getattr(reserva, "monto_pendiente", 0.0))
-                    if nuevo_estado and pend > 0:
-                        return rx.toast.warning(f"⚠️ {nombre_toast} ingresó pero TIENE PAGO PENDIENTE de ${pend:.2f} USD")
+                    if pago_registrado:
+                        rx.toast.success(f"💳 Pago del 100% registrado vía {metodo_pago.upper()} para {reserva.nombre_cliente}")
+
+                    pend_actual = 0.0 if pago_registrado else m_pend
+                    if nuevo_estado and pend_actual > 0:
+                        return rx.toast.warning(f"⚠️ {nombre_toast} ingresó pero TIENE PAGO PENDIENTE de ${pend_actual:.2f} USD")
                     
                     estado_txt = "marcado como presente 🟢" if nuevo_estado else "desmarcado ⚪"
                     return rx.toast.info(f"{nombre_toast} {estado_txt}")
         except Exception as e:
             print(f"Error actualizando asistencia individual en Supabase: {e}")
             return rx.toast.error("Ocurrió un error al guardar la asistencia en el servidor.")
-        # =========================================================================
+        
+    # =========================================================================
     # 🔐 PANEL DE ADMINISTRACIÓN Y CONTROL DE RESERVAS
     # =========================================================================
     admin_logged_in: bool = False
@@ -3158,14 +3188,33 @@ class State(rx.State):
                     for c in cupones_db
                 ]
 
-                # Notificación limpia en texto plano para WhatsApp
+                # Notificación estructurada con formato dinámico para WhatsApp
                 num_wa = "".join(filter(str.isdigit, reserva.whatsapp_cliente))
+                cupos_txt = f"{reserva.cupos} cupo" if reserva.cupos == 1 else f"{reserva.cupos} cupos"
+
+                # Formateo dinámico de hora de recepción y montos
+                hora_recepcion = db_session.hora_recepcion_texto or ""
+                if hora_recepcion and "recepción" not in hora_recepcion.lower():
+                    hora_recepcion_str = f"Hora de recepción: {hora_recepcion}"
+                else:
+                    hora_recepcion_str = hora_recepcion or "Hora de recepción: Por confirmar"
+
+                m_pagado_num = float(reserva.monto_pagado)
+                m_pend_num = float(reserva.monto_pendiente)
+                m_pagado = f"{int(m_pagado_num)}" if m_pagado_num.is_integer() else f"{m_pagado_num:.2f}"
+                m_pend = f"{int(m_pend_num)}" if m_pend_num.is_integer() else f"{m_pend_num:.2f}"
+                metodo_txt = f" ({reserva.metodo_pago.upper()})" if getattr(reserva, "metodo_pago", None) else ""
+
                 mensaje = (
-                    f"Hola {reserva.nombre_cliente}.\n\n"
-                    f"Tu pago ha sido verificado con exito. Tu reserva para la sesion '{db_session.nombre}' "
-                    f"ha sido CONFIRMADA ({reserva.cupos} cupos).\n\n"
-                    f"Te esperamos en la fecha pautada. Muchas gracias por ser parte de la Tribu."
+                    f"Hola {reserva.nombre_cliente}. El pago ha sido verificado con exito. "
+                    f"Tu reserva para la sesion '{db_session.nombre}' ha sido CONFIRMADA ({cupos_txt}). "
+                    f"Te esperamos en la fecha pautada ({db_session.fecha_texto}), {hora_recepcion_str}. "
+                    f"Iniciamos a las ({db_session.hora_texto}).\n\n"
+                    f" *Abono Inicial ({reserva.porcentaje_pago:.0f}%): ${m_pagado}{metodo_txt} ,  Monto Pendiente en Puerta: (${m_pend})* "
+                    f"Muchas gracias por ser parte de la Tribu.\n"
+                    f"Estamos emocionados de reencontrarnos"
                 )
+
                 import urllib.parse
                 encoded = urllib.parse.quote(mensaje)
                 wa_url = f"https://wa.me/{num_wa}?text={encoded}" if num_wa else ""
