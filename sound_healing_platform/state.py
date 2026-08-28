@@ -2429,8 +2429,8 @@ class State(rx.State):
                     })
                     nombres_participantes_lista.append(p_nombre)
 
-                # Estado inicial de la reserva
-                estado_res = "CONFIRMADO" if pct_pago == 100.0 else "PENDIENTE_PAGO"
+                # Estado inicial de la reserva: siempre entra como PENDIENTE_PAGO para auditoría del admin
+                estado_res = "PENDIENTE_PAGO"
 
                 nueva_reserva = TribuSessionReservation(
                     session_id=sesion_id,
