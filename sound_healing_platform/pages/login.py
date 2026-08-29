@@ -437,10 +437,11 @@ def login_page() -> rx.Component:
             rx.vstack(
                 rx.heading(
                     "Mi Cuenta Tribu",
+                    id="seccion-login-perfil",
                     size="8",
                     color="#2C3639",
                     text_align="center",
-                    style={"font-family": "Georgia, serif"},
+                    style={"font-family": "Georgia, serif", "scroll-margin-top": "120px"},
                     margin_bottom="8px"
                 ),
                 rx.text(

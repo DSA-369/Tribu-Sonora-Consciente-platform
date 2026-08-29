@@ -128,15 +128,25 @@ def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
                     align="start",
                     spacing="0"
                 ),
-                rx.badge(
-                    reserva["estado"],
-                    color_scheme=rx.match(
-                        reserva["estado"],
-                        ("CONFIRMADO", "green"),
-                        ("RECHAZADO", "red"),
-                        "amber"
+                rx.cond(
+                    reserva["estado"] == "CONFIRMADO",
+                    rx.badge(
+                        "CONFIRMADO",
+                        color="#000000",
+                        background_color="#22C55E",
+                        border="2px solid #15803D",
+                        font_weight="bold",
+                        size="2"
                     ),
-                    size="2"
+                    rx.badge(
+                        reserva["estado"],
+                        color_scheme=rx.match(
+                            reserva["estado"],
+                            ("RECHAZADO", "red"),
+                            "amber"
+                        ),
+                        size="2"
+                    )
                 ),
                 justify="between",
                 align="start",
@@ -233,7 +243,9 @@ def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
                 rx.button(
                     "Aprobar y Confirmar",
                     size="2",
-                    color_scheme="green",
+                    background_color=rx.cond(reserva["estado"] == "CONFIRMADO", "#9CA3AF", "#16A34A"),
+                    color=rx.cond(reserva["estado"] == "CONFIRMADO", "#000000", "#FFFFFF"),
+                    disabled=reserva["estado"] == "CONFIRMADO",
                     variant="solid",
                     on_click=lambda: State.aprobar_reserva_sesion(reserva["id"])
                 ),
@@ -1287,7 +1299,13 @@ def panel_admin_logueado() -> rx.Component:
     return rx.vstack(
         # Cabecera Admin
         rx.hstack(
-            rx.heading("Panel de Control Administrador", size="6", color="#2C3639", style={"font-family": "Georgia, serif"}),
+            rx.heading(
+                "Panel de Control Administrador",
+                id="seccion-admin-panel",
+                size="6",
+                color="#2C3639",
+                style={"font-family": "Georgia, serif", "scroll-margin-top": "120px"}
+            ),
             rx.button("Cerrar Sesión Admin", size="2", variant="outline", color_scheme="red", on_click=State.logout_admin),
             justify="between",
             align="center",

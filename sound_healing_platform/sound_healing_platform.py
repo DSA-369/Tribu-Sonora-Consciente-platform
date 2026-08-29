@@ -44,6 +44,7 @@ def index() -> rx.Component:
                         rx.flex(
                             rx.button(
                                 "RESERVA UNA SESIÓN", 
+                                class_name="btn-glowing-pulse",
                                 size="3", 
                                 background_color="#8E6F54", 
                                 color="#FFFFFF", 
@@ -147,11 +148,11 @@ app.add_page(vista_checkout, route="/checkout", title="Checkout | Tribu Sonora C
 app.add_page(rastreo_page, route="/rastreo", title="Rastrear Orden | Tribu Sonora Consciente")
 app.add_page(servicios_page, route="/servicios", title="Tipo de Servicios | Tribu Sonora Consciente", on_load=State.cargar_datos_db)
 app.add_page(talleres_page, route="/talleres", title="Talleres | Tribu Sonora Consciente", on_load=State.cargar_datos_db)
-app.add_page(horario_sesiones_page, route="/sesiones/horario", title="Horario de Sesiones | Tribu Sonora Consciente", on_load=State.cargar_datos_db)
+app.add_page(horario_sesiones_page, route="/sesiones/horario", title="Horario de Sesiones | Tribu Sonora Consciente", on_load=[State.cargar_datos_db, State.scroll_a_horario_sesiones])
 app.add_page(paquetes_sesiones_page, route="/sesiones/paquetes", title="Precios y Paquetes | Tribu Sonora Consciente")
 app.add_page(asistencia_page, route="/asistencia/[token]", title="Control de Asistencia | Tribu Sonora Consciente", on_load=State.cargar_lista_asistencia_por_token)
-app.add_page(admin_page, route="/admin", title="Panel Administrador | Tribu Sonora Consciente", on_load=[State.verificar_sesion_persistente, State.cargar_datos_admin, State.cargar_notificaciones_usuario])
-app.add_page(login_page, route="/login", title="Iniciar Sesión | Tribu Sonora Consciente", on_load=[State.verificar_sesion_persistente, State.cargar_notificaciones_usuario])
+app.add_page(admin_page, route="/admin", title="Panel Administrador | Tribu Sonora Consciente", on_load=[State.verificar_sesion_persistente, State.cargar_datos_admin, State.cargar_notificaciones_usuario, State.scroll_a_admin_panel])
+app.add_page(login_page, route="/login", title="Iniciar Sesión | Tribu Sonora Consciente", on_load=[State.verificar_sesion_persistente, State.cargar_notificaciones_usuario, State.scroll_a_login_perfil])
 app.add_page(privacidad_page, route="/politica-de-privacidad", title="Política de Privacidad | Tribu Sonora Consciente")
 app.add_page(terminos_page, route="/terminos-y-condiciones", title="Términos y Condiciones | Tribu Sonora Consciente")
 app.add_page(gift_cards_page, route="/tarjetas-de-regalo", title="Tarjetas de Regalo | Tribu Sonora Consciente")

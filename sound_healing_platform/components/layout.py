@@ -15,6 +15,26 @@ def plantilla_tribu(contenido_central: rx.Component, pagina_activa: str) -> rx.C
                 0% { transform: translateX(0); }
                 100% { transform: translateX(-50%); }
             }
+            @keyframes glowing-pulse {
+                0% {
+                    transform: scale(1);
+                    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7);
+                }
+                50% {
+                    transform: scale(1.05);
+                    box-shadow: 0 0 16px 6px rgba(234, 179, 8, 0.45);
+                }
+                100% {
+                    transform: scale(1);
+                    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0);
+                }
+            }
+            .btn-glowing-pulse {
+                animation: glowing-pulse 2.2s infinite ease-in-out;
+            }
+            .btn-glowing-pulse:hover {
+                animation-play-state: paused;
+            }
         """),
 
         # 1. BARRA DE ANUNCIO SUPERIOR (ESTILO PÍLDORA + COPYWRITING RESPONSIVO)
@@ -41,6 +61,7 @@ def plantilla_tribu(contenido_central: rx.Component, pagina_activa: str) -> rx.C
                         spacing="2",
                         align="center"
                     ),
+                    class_name="btn-glowing-pulse",
                     background_color="#2C3639",
                     padding=rx.breakpoints(initial="3px 10px", md="4px 14px"),
                     border_radius="20px",

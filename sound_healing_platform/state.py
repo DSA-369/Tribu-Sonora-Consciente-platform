@@ -1643,9 +1643,10 @@ class State(rx.State):
         if target_url.startswith("admin_tab_"):
             tab_target = target_url.replace("admin_tab_", "")
             self.admin_tab_activa = tab_target
-            return rx.redirect("/admin")
+            return rx.redirect("/admin#seccion-admin-panel")
         
-        return rx.redirect(target_url)
+        target = f"{target_url}#seccion-login-perfil" if target_url == "/login" else target_url
+        return rx.redirect(target)
 
     def crear_notificacion_db(self, titulo: str, mensaje: str, target_url: str, destinatario_email: str | None = None, es_admin: bool = False, es_publico: bool = False):
         """Método auxiliar interno para registrar notificaciones en Supabase."""
@@ -4045,17 +4046,35 @@ class State(rx.State):
         except Exception as e:
             print(f"Error cargando historial de usuario: {e}")
 
+    def scroll_a_horario_sesiones(self):
+        """Ejecuta un scroll suave hacia la sección de horario de sesiones una vez montado el DOM."""
+        return rx.call_script(
+            "setTimeout(() => { document.getElementById('seccion-horarios-sesiones')?.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 200);"
+        )
+
+    def scroll_a_login_perfil(self):
+        """Ejecuta un scroll suave hacia la sección de login/perfil una vez montado el DOM."""
+        return rx.call_script(
+            "setTimeout(() => { document.getElementById('seccion-login-perfil')?.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 200);"
+        )
+
+    def scroll_a_admin_panel(self):
+        """Ejecuta un scroll suave hacia la sección del panel de administración una vez montado el DOM."""
+        return rx.call_script(
+            "setTimeout(() => { document.getElementById('seccion-admin-panel')?.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 200);"
+        )
+
     def ir_a_horario_sesiones(self):
-        """Redirige directamente al Horario de Sesiones desde cualquier punto."""
+        """Redirige directamente al Horario de Sesiones desde cualquier punto con ancla Hash."""
         self.cerrar_menu_sesiones()
-        return rx.redirect("/sesiones/horario")
+        return rx.redirect("/sesiones/horario#seccion-horarios-sesiones")
 
     def ir_a_login(self):
-        """Redirige centralizadamente a la vista unificada de inicio de sesión."""
+        """Redirige centralizadamente a la vista unificada de inicio de sesión con ancla Hash."""
         self.show_menu_sesiones = False
         self.show_menu_shop = False
         self.show_menu_acerca_de = False
-        return rx.redirect("/login")
+        return rx.redirect("/login#seccion-login-perfil")
 
     def verificar_sesion_persistente(self):
         """Verifica la cookie de sesión, recarga el carrito de Supabase y el historial."""

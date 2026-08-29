@@ -547,11 +547,12 @@ def horario_sesiones_page() -> rx.Component:
             rx.vstack(
                 rx.heading(
                     "Horario de Sesiones Grupales",
+                    id="seccion-horarios-sesiones",
                     size="8",
                     color="#2C3639",
                     font_weight="normal",
                     text_align="center",
-                    style={"font-family": "Georgia, serif"},
+                    style={"font-family": "Georgia, serif", "scroll-margin-top": "120px"},
                     margin_bottom="12px"
                 ),
                 rx.text(
