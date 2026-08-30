@@ -124,7 +124,7 @@ def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
             rx.hstack(
                 rx.vstack(
                     rx.heading(reserva["sesion_nombre"], size="3", color="#2C3639", font_weight="bold"),
-                    rx.text("📅 Fecha: ", reserva["fecha_texto"], size="2", color="#8E6F54"),
+                    rx.text("📅 Fecha: ", reserva["fecha_texto"], " | Evento: ", reserva.get("fecha_evento", reserva["fecha_texto"]), size="2", color="#8E6F54"),
                     align="start",
                     spacing="0"
                 ),

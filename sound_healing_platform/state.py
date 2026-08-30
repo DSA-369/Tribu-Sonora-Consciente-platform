@@ -115,6 +115,7 @@ class TribuSessionReservation(sqlmodel.SQLModel, table=True):
     participantes_json: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
     cupon_codigo: str | None = sqlmodel.Field(default=None)
     metodo_pago: str | None = sqlmodel.Field(default=None)
+    fecha_evento: str | None = sqlmodel.Field(default=None)
 
 class TribuAdminUser(sqlmodel.SQLModel, table=True):
     """Modelo para usuarios administradores y facilitadores."""
@@ -617,6 +618,12 @@ class State(rx.State):
     lista_asistentes_sesion: list[dict[str, Any]] = []
     cargando_asistencia: bool = True
     busqueda_asistente: str = ""
+    fechas_historicas_sesion: list[str] = []
+    fecha_asistencia_seleccionada: str = ""
+
+    def set_fecha_asistencia_seleccionada(self, fecha: str):
+        self.fecha_asistencia_seleccionada = fecha
+        self.cargar_lista_asistencia_por_token()
 
     def seleccionar_metodo_pago_asistencia(self, item_id: str, metodo: str):
         """Asigna o conmuta el método de pago seleccionado directamente en la lista de asistentes."""
@@ -2434,20 +2441,21 @@ class State(rx.State):
                 estado_res = "PENDIENTE_PAGO"
 
                 nueva_reserva = TribuSessionReservation(
-                    session_id=sesion_id,
-                    nombre_cliente=self.reserva_nombre_cliente.strip(),
-                    cliente_email=email_final,
-                    whatsapp_cliente=self.reserva_whatsapp_cliente.strip(),
-                    cupos=cupos_reservar,
-                    monto_total=monto_total,
-                    porcentaje_pago=pct_pago,
-                    monto_pagado=monto_pagado,
-                    monto_pendiente=monto_pendiente,
-                    estado=estado_res,
-                    asistio=False,
-                    participantes_json=lista_part_json,
-                    cupon_codigo=self.reserva_cupon_aplicado_codigo if self.reserva_cupon_aplicado_codigo else None
-                )
+                 session_id=sesion_id,
+                 nombre_cliente=self.reserva_nombre_cliente.strip(),
+                 cliente_email=email_final,
+                 whatsapp_cliente=self.reserva_whatsapp_cliente.strip(),
+                 cupos=cupos_reservar,
+                 monto_total=monto_total,
+                 porcentaje_pago=pct_pago,
+                 monto_pagado=monto_pagado,
+                 monto_pendiente=monto_pendiente,
+                 estado=estado_res,
+                 asistio=False,
+                 participantes_json=lista_part_json,
+                 cupon_codigo=self.reserva_cupon_aplicado_codigo if self.reserva_cupon_aplicado_codigo else None,
+                 fecha_evento=db_session.fecha_evento
+             )
                 session.add(nueva_reserva)
 
                 # 🎟️ Sumar +1 uso al cupón y desactivarlo si llegó al límite
@@ -2588,7 +2596,7 @@ class State(rx.State):
                 if not db_session:
                     self.sesion_asistencia_info = {}
                     self.lista_asistentes_sesion = []
-                    self.cargando_asistencia = False
+                    self.fechas_historicas_sesion = []
                     return
 
                 self.sesion_asistencia_info = {
@@ -2601,9 +2609,28 @@ class State(rx.State):
                     "foto": db_session.foto
                 }
 
+                # Consulta de todas las fechas con reservas registradas para esta sesión
+                todas_fechas_db = session.exec(
+                    sqlmodel.select(TribuSessionReservation.fecha_evento)
+                    .where(TribuSessionReservation.session_id == db_session.id)
+                    .distinct()
+                ).all()
+
+                fechas_unicas = [f for f in todas_fechas_db if f]
+                if db_session.fecha_evento and db_session.fecha_evento not in fechas_unicas:
+                    fechas_unicas.append(db_session.fecha_evento)
+                fechas_unicas.sort(reverse=True)
+                self.fechas_historicas_sesion = fechas_unicas
+
+                # Filtrar por la fecha seleccionada o por la fecha activa por defecto
+                fecha_filtro = self.fecha_asistencia_seleccionada or db_session.fecha_evento
+
                 reservas_db = session.exec(
                     sqlmodel.select(TribuSessionReservation)
-                    .where(TribuSessionReservation.session_id == db_session.id)
+                    .where(
+                        TribuSessionReservation.session_id == db_session.id,
+                        TribuSessionReservation.fecha_evento == fecha_filtro
+                    )
                     .order_by(TribuSessionReservation.id.desc())
                 ).all()
 
@@ -2635,60 +2662,6 @@ class State(rx.State):
             print(f"Error cargando lista de asistencia por token: {e}")
         finally:
             self.cargando_asistencia = False
-
-        try:
-            with rx.session() as session:
-                db_session = session.exec(
-                    sqlmodel.select(TribuSession).where(TribuSession.checkin_token == token)
-                ).first()
-
-                if not db_session:
-                    self.sesion_asistencia_info = {}
-                    self.lista_asistentes_sesion = []
-                    return
-
-                self.sesion_asistencia_info = {
-                    "id": db_session.id,
-                    "nombre": db_session.nombre,
-                    "ubicacion": db_session.ubicacion,
-                    "fecha_texto": db_session.fecha_texto,
-                    "hora_texto": db_session.hora_texto,
-                    "plazas_totales": db_session.plazas_totales,
-                    "foto": db_session.foto
-                }
-
-                reservas_db = session.exec(
-                    sqlmodel.select(TribuSessionReservation)
-                    .where(TribuSessionReservation.session_id == db_session.id)
-                    .order_by(TribuSessionReservation.id.desc())
-                ).all()
-
-                asistentes_desglosados = []
-                for r in reservas_db:
-                    parts = r.participantes_json if isinstance(r.participantes_json, list) and len(r.participantes_json) > 0 else [{"index": 0, "nombre": r.nombre_cliente, "asistio": r.asistio}]
-                    cant_cupos = max(1, r.cupos)
-                    monto_pend_individual = float(getattr(r, "monto_pendiente", 0.0) / cant_cupos)
-                    
-                    for p in parts:
-                        asistentes_desglosados.append({
-                            "id": f"{r.id}_{p.get('index', 0)}",
-                            "reserva_id": r.id,
-                            "part_index": p.get("index", 0),
-                            "nombre_cliente": p.get("nombre", r.nombre_cliente),
-                            "whatsapp_cliente": r.whatsapp_cliente,
-                            "cupos": 1,
-                            "monto_total": float(r.monto_total / cant_cupos),
-                            "monto_pendiente": monto_pend_individual,
-                            "porcentaje_pago": float(getattr(r, "porcentaje_pago", 100.0)),
-                            "estado": r.estado,
-                            "asistio": p.get("asistio", False),
-                            "metodo_pago": getattr(r, "metodo_pago", "") or ""
-                        })
-
-                self.lista_asistentes_sesion = asistentes_desglosados
-
-        except Exception as e:
-            print(f"Error cargando lista de asistencia por token: {e}")
 
     def toggle_asistencia_participante(self, item_id: str):
         """Alterna asistencia individual, liquide deuda al 100% si se seleccionó método de pago y persiste en Supabase."""
@@ -3017,7 +2990,8 @@ class State(rx.State):
                            r.cupos, r.monto_total, r.estado, r.asistio, s.nombre as sesion_nombre, s.fecha_texto,
                            COALESCE(r.porcentaje_pago, 100.0) as porcentaje_pago,
                            COALESCE(r.monto_pagado, r.monto_total) as monto_pagado,
-                           COALESCE(r.monto_pendiente, 0.0) as monto_pendiente
+                           COALESCE(r.monto_pendiente, 0.0) as monto_pendiente,
+                           r.fecha_evento
                     FROM tribu_session_reservations r
                     JOIN tribu_sessions s ON r.session_id = s.id
                     ORDER BY r.id DESC
@@ -3037,7 +3011,8 @@ class State(rx.State):
                         "fecha_texto": row[9],
                         "porcentaje_pago": float(row[10]),
                         "monto_pagado": float(row[11]),
-                        "monto_pendiente": float(row[12])
+                        "monto_pendiente": float(row[12]),
+                        "fecha_evento": row[13] or row[9]
                     }
                     for row in res
                 ]

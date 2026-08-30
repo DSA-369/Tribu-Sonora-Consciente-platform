@@ -314,16 +314,46 @@ def asistencia_page() -> rx.Component:
                             margin_bottom="15px"
                         ),
 
-                        # 3. Buscador de Asistentes
-                        rx.input(
-                            placeholder="🔍 Buscar por nombre o teléfono...",
-                            value=State.busqueda_asistente,
-                            on_change=State.set_busqueda_asistente,
-                            size="3",
-                            border_radius="10px",
-                            border="1.5px solid #2C3639",
-                            background_color="#FFFFFF",
+                        # 3. Selector de Fecha Histórica y Buscador de Asistentes
+                        rx.hstack(
+                            rx.cond(
+                                State.fechas_historicas_sesion.length() > 0,
+                                rx.box(
+                                    rx.hstack(
+                                        rx.icon(tag="history", size=16, color="#8E6F54"),
+                                        rx.text("Evento:", size="2", font_weight="bold", color="#2C3639"),
+                                        rx.select(
+                                            State.fechas_historicas_sesion,
+                                            value=State.fecha_asistencia_seleccionada,
+                                            on_change=State.set_fecha_asistencia_seleccionada,
+                                            size="2",
+                                            border_radius="8px",
+                                            background_color="#FFFFFF"
+                                        ),
+                                        align="center",
+                                        spacing="2"
+                                    ),
+                                    padding="6px 12px",
+                                    background_color="#FFFFFF",
+                                    border="1px solid #EAE5DF",
+                                    border_radius="10px",
+                                    min_width="230px"
+                                )
+                            ),
+                            rx.input(
+                                placeholder="🔍 Buscar por nombre o teléfono...",
+                                value=State.busqueda_asistente,
+                                on_change=State.set_busqueda_asistente,
+                                size="3",
+                                border_radius="10px",
+                                border="1.5px solid #2C3639",
+                                background_color="#FFFFFF",
+                                flex="1"
+                            ),
                             width="100%",
+                            gap="10px",
+                            flex_direction=rx.breakpoints(initial="column", sm="row"),
+                            align_items=rx.breakpoints(initial="stretch", sm="center"),
                             margin_bottom="15px"
                         ),
 
