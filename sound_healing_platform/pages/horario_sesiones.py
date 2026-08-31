@@ -399,54 +399,58 @@ rx.vstack(
                     align="start"
                 ),
 
-                # Campos Dinámicos para N Participantes
+                # Bloque Dinámico de Datos Completo por Participante (Nombre, WhatsApp y Correo)
                 rx.vstack(
                     rx.foreach(
                         State.reserva_participantes,
-                        lambda val, idx: rx.vstack(
+                        lambda item, idx: rx.vstack(
                             rx.text("Nombre y Apellido del Participante " + (idx + 1).to_string() + "*", size="1", font_weight="bold", color="#8E6F54"),
                             rx.input(
                                 placeholder="Ej. Nombre Completo",
-                                value=val,
-                                on_change=lambda nuevo_val: State.actualizar_nombre_participante(idx, nuevo_val),
+                                value=item["nombre"],
+                                on_change=lambda val: State.actualizar_campo_participante(idx, "nombre", val),
                                 size="3",
                                 width="100%"
                             ),
-                            spacing="1",
+                            rx.text("Teléfono WhatsApp* del Participante " + (idx + 1).to_string() + "*", size="1", font_weight="bold", color="#8E6F54"),
+                            rx.input(
+                                placeholder="Ej. +584123445369",
+                                value=item["whatsapp"],
+                                on_change=lambda val: State.actualizar_campo_participante(idx, "whatsapp", val),
+                                size="3",
+                                width="100%"
+                            ),
+                            rx.hstack(
+                                rx.text(
+                                    "Correo Electrónico de Contacto" + rx.cond(
+                                        State.sesion_seleccionada_reserva["requiere_correo_obligatorio"],
+                                        "* Participante ",
+                                        " (Opcional) del Participante "
+                                    ) + (idx + 1).to_string() + rx.cond(
+                                        State.sesion_seleccionada_reserva["requiere_correo_obligatorio"],
+                                        "*",
+                                        ""
+                                    ),
+                                    size="1",
+                                    font_weight="bold",
+                                    color="#2C3639"
+                                ),
+                                width="100%"
+                            ),
+                            rx.input(
+                                placeholder="ejemplo@correo.com",
+                                value=item["email"],
+                                on_change=lambda val: State.actualizar_campo_participante(idx, "email", val),
+                                size="3",
+                                width="100%"
+                            ),
+                            spacing="2",
                             align="start",
-                            width="100%"
+                            width="100%",
+                            padding_bottom="10px"
                         )
                     ),
                     spacing="3",
-                    width="100%"
-                ),
-
-                # Correo y WhatsApp de Contacto Principal
-                rx.vstack(
-                    rx.text("Correo Electrónico de Contacto*", size="1", font_weight="bold", color="#2C3639"),
-                    rx.input(
-                        placeholder="ejemplo@correo.com",
-                        value=State.reserva_email_cliente,
-                        on_change=State.set_reserva_email,
-                        size="3",
-                        width="100%"
-                    ),
-                    spacing="1",
-                    align="start",
-                    width="100%"
-                ),
-
-                rx.vstack(
-                    rx.text("Teléfono WhatsApp*", size="1", font_weight="bold", color="#2C3639"),
-                    rx.input(
-                        placeholder="Ej. +584123445369",
-                        value=State.reserva_whatsapp_cliente,
-                        on_change=State.set_reserva_whatsapp,
-                        size="3",
-                        width="100%"
-                    ),
-                    spacing="1",
-                    align="start",
                     width="100%"
                 ),
 

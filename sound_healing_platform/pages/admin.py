@@ -508,6 +508,39 @@ def modal_editor_sesion() -> rx.Component:
                         color="#1A1A1A"
                     ),
 
+                    rx.divider(color_scheme="gray", margin_y="6px"),
+
+                    # 🎛️ SWITCHES DE OBLIGATORIEDAD (CORREO Y PORCENTAJE DE RESERVA)
+                    rx.vstack(
+                        rx.text("⚙️ Configuración de Campos Obligatorios en Formulario", size="1", font_weight="bold", color="#8E6F54"),
+                        rx.hstack(
+                            rx.switch(
+                                checked=State.edit_sesion_requiere_correo,
+                                on_change=State.set_edit_sesion_requiere_correo,
+                                color_scheme="bronze"
+                            ),
+                            rx.text("Hacer el Correo Electrónico OBLIGATORIO para cada participante", size="2", color="#2C3639"),
+                            align="center",
+                            spacing="2"
+                        ),
+                        rx.hstack(
+                            rx.switch(
+                                checked=State.edit_sesion_requiere_porcentaje,
+                                on_change=State.set_edit_sesion_requiere_porcentaje,
+                                color_scheme="bronze"
+                            ),
+                            rx.text("Hacer la Selección de Porcentaje de Reserva OBLIGATORIA", size="2", color="#2C3639"),
+                            align="center",
+                            spacing="2"
+                        ),
+                        spacing="2",
+                        align="start",
+                        width="100%",
+                        background_color="#FAF6F0",
+                        padding="10px",
+                        border_radius="8px"
+                    ),
+
                     spacing="2",
                     width="100%"
                 ),
@@ -1294,8 +1327,282 @@ def modal_editor_servicio() -> rx.Component:
         open=State.modal_editor_servicio_abierto,
         on_open_change=State.set_modal_editor_servicio_abierto
     )
+def modal_editor_crm() -> rx.Component:
+    """Modal flotante para actualizar notas internas y etiquetas de clientes."""
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.hstack(
+                    rx.heading("📝 Editar Cliente / Notas Internas", size="4", color="#2C3639", style={"font-family": "Georgia, serif"}),
+                    rx.icon(
+                        tag="x",
+                        size=20,
+                        color="#2C3639",
+                        cursor="pointer",
+                        on_click=lambda: State.set_modal_editor_crm_abierto(False)
+                    ),
+                    justify="between",
+                    align="center",
+                    width="100%"
+                ),
+                rx.divider(color_scheme="gray", margin_y="8px"),
+                rx.vstack(
+                    rx.text("Categoría / Etiqueta del Cliente:", size="2", font_weight="bold", color="#2C3639"),
+                    rx.select(
+                        ["NUEVO", "FRECUENTE", "INACTIVO", "VIP"],
+                        value=State.edit_crm_etiqueta,
+                        on_change=State.set_edit_crm_etiqueta,
+                        width="100%"
+                    ),
+                    rx.text("Notas Internas del Facilitador:", size="2", font_weight="bold", color="#2C3639", margin_top="10px"),
+                    rx.text_area(
+                        placeholder="Ej: Prefiere sentarse cerca de los cuencos, sensible a la vibración...",
+                        value=State.edit_crm_notas,
+                        on_change=State.set_edit_crm_notas,
+                        rows="4",
+                        width="100%"
+                    ),
+                    rx.hstack(
+                        rx.button(
+                            "Cancelar",
+                            size="2",
+                            variant="outline",
+                            color_scheme="gray",
+                            cursor="pointer",
+                            on_click=lambda: State.set_modal_editor_crm_abierto(False)
+                        ),
+                        rx.button(
+                            "Guardar Cambios",
+                            size="2",
+                            background_color="#8E6F54",
+                            color="#FFFFFF",
+                            cursor="pointer",
+                            on_click=State.guardar_nota_cliente_crm
+                        ),
+                        justify="end",
+                        width="100%",
+                        margin_top="15px"
+                    ),
+                    spacing="3",
+                    width="100%"
+                ),
+                spacing="3",
+                width="100%"
+            ),
+            background_color="#FFFFFF",
+            padding="25px",
+            border_radius="12px",
+            max_width="480px"
+        ),
+        open=State.modal_editor_crm_abierto,
+        on_open_change=State.set_modal_editor_crm_abierto
+    )
+
+def modal_mensaje_1a1_crm() -> rx.Component:
+    """Modal flotante para redactar y enviar mensajes personalizados 1-a-1 vía WhatsApp."""
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.hstack(
+                    rx.heading(
+                        "💬 Mensaje 1-a-1: " + State.mensaje_1a1_destinatario_nombre,
+                        size="4",
+                        color="#2C3639",
+                        style={"font-family": "Georgia, serif"}
+                    ),
+                    rx.icon(
+                        tag="x",
+                        size=20,
+                        color="#2C3639",
+                        cursor="pointer",
+                        on_click=State.cerrar_modal_mensaje_1a1
+                    ),
+                    justify="between",
+                    align="center",
+                    width="100%"
+                ),
+                rx.divider(color_scheme="gray", margin_y="8px"),
+                rx.vstack(
+                    rx.hstack(
+                        rx.vstack(
+                            rx.text("Destinatario (WhatsApp):", size="2", font_weight="bold", color="#2C3639"),
+                            rx.badge(State.mensaje_1a1_destinatario_wa, color_scheme="green", size="2"),
+                            align="start",
+                            spacing="1"
+                        ),
+                        rx.vstack(
+                            rx.text("Sesión a promocionar:", size="2", font_weight="bold", color="#2C3639"),
+                            rx.select(
+                                State.opciones_sesiones_invitacion,
+                                value=State.mensaje_1a1_sesion_id_seleccionada,
+                                on_change=State.cambiar_sesion_invitacion,
+                                size="2",
+                                width="100%"
+                            ),
+                            align="start",
+                            spacing="1",
+                            flex="1"
+                        ),
+                        width="100%",
+                        spacing="3",
+                        align="center"
+                    ),
+                    rx.text("Mensaje Personalizado (Plantilla Auto-generada):", size="2", font_weight="bold", color="#2C3639", margin_top="10px"),
+                    rx.text_area(
+                        placeholder="Escribe el mensaje directo para el cliente...",
+                        value=State.mensaje_1a1_texto,
+                        on_change=State.set_mensaje_1a1_texto,
+                        rows="12",
+                        width="100%"
+                    ),
+                    rx.hstack(
+                        rx.button(
+                            "Cancelar",
+                            size="2",
+                            variant="outline",
+                            color_scheme="gray",
+                            cursor="pointer",
+                            on_click=State.cerrar_modal_mensaje_1a1
+                        ),
+                        rx.button(
+                            "📱 Enviar por WhatsApp",
+                            size="2",
+                            background_color="#25D366",
+                            color="#FFFFFF",
+                            font_weight="bold",
+                            cursor="pointer",
+                            on_click=State.enviar_mensaje_1a1_whatsapp
+                        ),
+                        justify="end",
+                        width="100%",
+                        margin_top="15px"
+                    ),
+                    spacing="3",
+                    width="100%"
+                ),
+                spacing="3",
+                width="100%"
+            ),
+            background_color="#FFFFFF",
+            padding="25px",
+            border_radius="12px",
+            max_width="600px"
+        ),
+        open=State.modal_mensaje_1a1_abierto,
+        on_open_change=State.set_modal_mensaje_1a1_abierto
+    )
+
+def tarjeta_cliente_crm(cliente: rx.Var) -> rx.Component:
+
+    """Tarjeta individual de cliente consolidado en el CRM."""
+    return rx.box(
+        rx.flex(
+            rx.vstack(
+                rx.hstack(
+                    rx.badge(
+                        cliente["etiqueta"],
+                        color_scheme=rx.cond(
+                            cliente["etiqueta"] == "FRECUENTE", "green",
+                            rx.cond(cliente["etiqueta"] == "VIP", "purple", "blue")
+                        ),
+                        size="1"
+                    ),
+                    rx.heading(cliente["nombre"], size="3", color="#2C3639", font_weight="bold"),
+                    align="center",
+                    spacing="2"
+                ),
+                rx.hstack(
+                    rx.icon(tag="phone", size=14, color="#8E6F54"),
+                    rx.link(
+                        cliente["whatsapp"],
+                        href="https://wa.me/" + cliente["whatsapp"].to_string(),
+                        is_external=True,
+                        size="2",
+                        color="#8E6F54",
+                        text_decoration="underline"
+                    ),
+                    rx.cond(
+                        cliente["email"] != "",
+                        rx.hstack(
+                            rx.icon(tag="mail", size=14, color="#7F7F7F"),
+                            rx.text(cliente["email"], size="2", color="#7F7F7F"),
+                            spacing="1",
+                            align="center"
+                        )
+                    ),
+                    spacing="3",
+                    align="center",
+                    flex_wrap="wrap"
+                ),
+                rx.cond(
+                    cliente["notas_internas"] != "",
+                    rx.box(
+                        rx.text("📌 ", cliente["notas_internas"], size="2", color="#4A5568", font_style="italic"),
+                        padding="6px 10px",
+                        background_color="#FAF6F0",
+                        border_left="3px solid #8E6F54",
+                        border_radius="4px",
+                        margin_top="4px"
+                    )
+                ),
+                align="start",
+                spacing="1",
+                flex="1"
+            ),
+            rx.hstack(
+                rx.vstack(
+                    rx.text("Reservas", size="1", color="#7F7F7F"),
+                    rx.text(cliente["total_reservas"], size="3", font_weight="bold", color="#2C3639"),
+                    align="center",
+                    spacing="0"
+                ),
+                rx.vstack(
+                    rx.text("Asistencias", size="1", color="#7F7F7F"),
+                    rx.text(cliente["asistencias"], size="3", font_weight="bold", color="#2E7D32"),
+                    align="center",
+                    spacing="0"
+                ),
+                rx.vstack(
+                    rx.text("Inversión", size="1", color="#7F7F7F"),
+                    rx.text("$", cliente["inversion_total"], size="3", font_weight="bold", color="#8E6F54"),
+                    align="center",
+                    spacing="0"
+                ),
+                rx.button(
+                    "💬 Mensaje 1-a-1",
+                    size="2",
+                    variant="solid",
+                    color_scheme="green",
+                    cursor="pointer",
+                    on_click=lambda: State.abrir_modal_mensaje_1a1(cliente)
+                ),
+                rx.button(
+                    "✏️ Notas",
+                    size="2",
+                    variant="soft",
+                    color_scheme="brown",
+                    cursor="pointer",
+                    on_click=lambda: State.abrir_modal_editar_crm(cliente)
+                ),
+                spacing="4",
+                align="center"
+            ),
+            justify="between",
+            align_items=rx.breakpoints(initial="stretch", sm="center"),
+            flex_direction=rx.breakpoints(initial="column", sm="row"),
+            gap="12px",
+            width="100%"
+        ),
+        background_color="#FFFFFF",
+        border="1px solid #EAE5DF",
+        border_radius="10px",
+        padding="14px",
+        margin_bottom="10px",
+        width="100%"
+    )
+
 def panel_admin_logueado() -> rx.Component:
-    """Panel principal de administración autenticado con 6 pestañas unificadas."""
+    """Panel principal de administración autenticado con módulos unificados CRM."""
     return rx.vstack(
         # Cabecera Admin
         rx.hstack(
@@ -1314,8 +1621,16 @@ def panel_admin_logueado() -> rx.Component:
         
         rx.divider(margin_y="15px"),
 
-        # Pestañas de Navegación Administrador (6 Módulos Unificados)
+        # Pestañas de Navegación Administrador
         rx.hstack(
+            rx.button(
+                "👥 Clientes / CRM",
+                size="2",
+                variant=rx.cond(State.admin_tab_activa == "crm", "solid", "ghost"),
+                background_color=rx.cond(State.admin_tab_activa == "crm", "#8E6F54", "transparent"),
+                color=rx.cond(State.admin_tab_activa == "crm", "#FFFFFF", "#2C3639"),
+                on_click=lambda: State.set_admin_tab("crm")
+            ),
             rx.button(
                 "📋 Reservas",
                 size="2",
@@ -1379,22 +1694,71 @@ def panel_admin_logueado() -> rx.Component:
 
         rx.divider(margin_y="10px"),
 
-        # Contenido Pestaña 1: Confirmar Pedidos
-        rx.cond(
-            State.admin_tab_activa == "pedidos",
-            rx.vstack(
-                rx.heading("Confirmación de Pedidos y Compras Recibidas", size="4", color="#2C3639"),
-                rx.cond(
-                    State.ordenes_admin_list.length() == 0,
-                    rx.text("No hay pedidos registrados actualmente.", color="#7F7F7F"),
-                    rx.foreach(State.ordenes_admin_list, tarjeta_orden_admin)
-                ),
-                width="100%",
-                spacing="3"
+        # Contenido Dinámico de Pestañas con rx.match (Estructura Limpia)
+        rx.match(
+            State.admin_tab_activa,
+            # Pestaña CRM
+            (
+                "crm",
+                rx.vstack(
+                    modal_editor_crm(),
+                    modal_mensaje_1a1_crm(),
+                    rx.heading("Directorio de Clientes y Comunidad (CRM)", size="4", color="#2C3639"),
+                    rx.hstack(
+                        rx.input(
+                            placeholder="🔍 Buscar por nombre, teléfono o correo...",
+                            value=State.busqueda_cliente_crm,
+                            on_change=State.set_busqueda_cliente_crm,
+                            size="2",
+                            border_radius="8px",
+                            flex="1"
+                        ),
+                        rx.select(
+                            ["TODOS", "NUEVO", "FRECUENTE", "INACTIVO", "VIP"],
+                            value=State.filtro_etiqueta_crm,
+                            on_change=State.set_filtro_etiqueta_crm,
+                            size="2",
+                            border_radius="8px"
+                        ),
+                        rx.button(
+                            "📥 Exportar CSV",
+                            size="2",
+                            variant="soft",
+                            color_scheme="green",
+                            cursor="pointer",
+                            on_click=State.exportar_clientes_csv
+                        ),
+                        width="100%",
+                        gap="10px",
+                        flex_wrap="wrap",
+                        margin_bottom="15px"
+                    ),
+                    rx.cond(
+                        State.clientes_crm_filtrados.length() == 0,
+                        rx.text("No se encontraron clientes registrados en la base de datos.", color="#7F7F7F"),
+                        rx.foreach(State.clientes_crm_filtrados, tarjeta_cliente_crm)
+                    ),
+                    width="100%",
+                    spacing="3"
+                )
             ),
-            # Contenido Pestaña 2: Reservas
-            rx.cond(
-                State.admin_tab_activa == "reservas",
+            # Pestaña Pedidos
+            (
+                "pedidos",
+                rx.vstack(
+                    rx.heading("Confirmación de Pedidos y Compras Recibidas", size="4", color="#2C3639"),
+                    rx.cond(
+                        State.ordenes_admin_list.length() == 0,
+                        rx.text("No hay pedidos registrados actualmente.", color="#7F7F7F"),
+                        rx.foreach(State.ordenes_admin_list, tarjeta_orden_admin)
+                    ),
+                    width="100%",
+                    spacing="3"
+                )
+            ),
+            # Pestaña Reservas
+            (
+                "reservas",
                 rx.vstack(
                     rx.heading("Solicitudes de Reservas Recibidas", size="4", color="#2C3639"),
                     rx.cond(
@@ -1404,213 +1768,212 @@ def panel_admin_logueado() -> rx.Component:
                     ),
                     width="100%",
                     spacing="3"
+                )
+            ),
+            # Pestaña Sesiones
+            (
+                "sesiones",
+                rx.vstack(
+                    rx.hstack(
+                        rx.heading("Catálogo de Sesiones Grupales", size="4", color="#2C3639"),
+                        rx.button(
+                            "+ Crear Nueva Sesión",
+                            size="2",
+                            background_color="#2C3639",
+                            color="#FFFFFF",
+                            font_weight="bold",
+                            on_click=State.abrir_modal_nueva_sesion
+                        ),
+                        justify="between",
+                        align="center",
+                        width="100%"
+                    ),
+                    rx.foreach(State.sesiones_tribu, tarjeta_sesion_admin),
+                    modal_editor_sesion(),
+                    width="100%",
+                    spacing="3"
+                )
+            ),
+            # Pestaña Productos
+            (
+                "productos",
+                rx.vstack(
+                    rx.input(
+                        rx.input.slot(rx.icon(tag="search", size=16, color="#7F7F7F")),
+                        placeholder="Buscar producto por nombre o categoría...",
+                        value=State.busqueda_producto_admin,
+                        on_change=State.set_busqueda_producto_admin,
+                        width="100%",
+                        size="2",
+                        background_color="#FFFFFF",
+                        border="1px solid #EAE5DF",
+                        border_radius="8px"
+                    ),
+                    rx.hstack(
+                        rx.heading("Inventario de Productos", size="4", color="#2C3639"),
+                        rx.button(
+                            "+ Crear Nuevo Producto",
+                            size="2",
+                            background_color="#2C3639",
+                            color="#FFFFFF",
+                            font_weight="bold",
+                            on_click=State.abrir_modal_nuevo_producto
+                        ),
+                        justify="between",
+                        align="center",
+                        width="100%"
+                    ),
+                    rx.cond(
+                        State.productos_admin_filtrados.length() == 0,
+                        rx.text("No se encontraron productos coincidentes.", color="#7F7F7F"),
+                        rx.foreach(State.productos_admin_filtrados, tarjeta_producto_admin)
+                    ),
+                    modal_editor_producto(),
+                    width="100%",
+                    spacing="3"
+                )
+            ),
+            # Pestaña Talleres
+            (
+                "talleres",
+                rx.vstack(
+                    rx.hstack(
+                        rx.heading("Agenda de Talleres y Eventos", size="4", color="#2C3639"),
+                        rx.button(
+                            "+ Crear Nuevo Taller",
+                            size="2",
+                            background_color="#2C3639",
+                            color="#FFFFFF",
+                            font_weight="bold",
+                            on_click=State.abrir_modal_nuevo_taller
+                        ),
+                        justify="between",
+                        align="center",
+                        width="100%"
+                    ),
+                    rx.cond(
+                        State.talleres_tribu.length() == 0,
+                        rx.text("No hay talleres ni eventos registrados actualmente.", color="#7F7F7F"),
+                        rx.foreach(State.talleres_tribu, tarjeta_taller_admin)
+                    ),
+                    modal_editor_taller(),
+                    width="100%",
+                    spacing="3"
+                )
+            ),
+            # Pestaña Servicios
+            (
+                "servicios",
+                rx.vstack(
+                    rx.hstack(
+                        rx.heading("Catálogo de Servicios", size="4", color="#2C3639"),
+                        rx.button(
+                            "+ Crear Nuevo Servicio",
+                            size="2",
+                            background_color="#2C3639",
+                            color="#FFFFFF",
+                            font_weight="bold",
+                            on_click=State.abrir_modal_nuevo_servicio
+                        ),
+                        justify="between",
+                        align="center",
+                        width="100%"
+                    ),
+                    rx.cond(
+                        State.servicios_tribu.length() == 0,
+                        rx.text("No hay servicios registrados actualmente.", color="#7F7F7F"),
+                        rx.foreach(State.servicios_tribu, tarjeta_servicio_admin)
+                    ),
+                    modal_editor_servicio(),
+                    width="100%",
+                    spacing="3"
+                )
+            ),
+            # Fallback / Pestaña Cupones
+            rx.vstack(
+                rx.heading("Gestión de Cupones Especiales y Promociones", size="4", color="#2C3639"),
+                rx.hstack(
+                    rx.input(
+                        placeholder="Código (Ej. PROMO15)",
+                        value=State.edit_cupon_codigo,
+                        on_change=State.set_edit_cupon_codigo,
+                        size="2",
+                        width="30%"
+                    ),
+                    rx.select(
+                        ["PORCENTAJE", "FIJO"],
+                        value=State.edit_cupon_tipo,
+                        on_change=State.set_edit_cupon_tipo,
+                        size="2",
+                        width="20%"
+                    ),
+                    rx.input(
+                        placeholder="Valor (% o $)",
+                        type="number",
+                        value=State.edit_cupon_valor.to_string(),
+                        on_change=State.set_edit_cupon_valor,
+                        size="2",
+                        width="20%"
+                    ),
+                    rx.input(
+                        placeholder="Usos Máx.",
+                        type="number",
+                        value=State.edit_cupon_usos_maximos.to_string(),
+                        on_change=State.set_edit_cupon_usos_maximos,
+                        size="2",
+                        width="15%"
+                    ),
+                    rx.button(
+                        "Crear Cupón",
+                        on_click=State.crear_cupon_especial_admin,
+                        size="2",
+                        background_color="#8E6F54",
+                        color="#FFFFFF",
+                        font_weight="bold",
+                        width="15%"
+                    ),
+                    width="100%",
+                    spacing="2"
                 ),
-                # Contenido Pestaña 3: Sesiones Grupales (CRUD)
+                rx.divider(margin_y="10px"),
+                rx.text("Cupones Registrados", font_weight="bold", color="#2C3639"),
                 rx.cond(
-                    State.admin_tab_activa == "sesiones",
-                    rx.vstack(
-                        rx.hstack(
-                            rx.heading("Catálogo de Sesiones Grupales", size="4", color="#2C3639"),
+                    State.cupones_admin_list.length() == 0,
+                    rx.text("No hay cupones creados aún.", color="#7F7F7F"),
+                    rx.foreach(
+                        State.cupones_admin_list,
+                        lambda c: rx.hstack(
+                            rx.hstack(
+                                rx.text("🎟️ ", c["codigo"], font_weight="bold", size="2", color="#2C3639"),
+                                rx.badge(c["tipo"], color_scheme="bronze", size="1"),
+                                rx.badge(
+                                    c["usos_actuales"].to_string() + " / " + c["usos_maximos"].to_string() + " usos",
+                                    color_scheme=rx.cond(c["agotado"], "red", "green"),
+                                    size="1"
+                                ),
+                                spacing="2",
+                                align="center"
+                            ),
+                            rx.text("Valor: ", c["valor"].to_string(), rx.cond(c["tipo"] == "PORCENTAJE", "%", " USD"), font_weight="bold", color="#8E6F54", size="2"),
                             rx.button(
-                                "+ Crear Nueva Sesión",
-                                size="2",
-                                background_color="#2C3639",
-                                color="#FFFFFF",
-                                font_weight="bold",
-                                on_click=State.abrir_modal_nueva_sesion
+                                rx.cond(c["is_active"], "Inactivar", "Activar"),
+                                size="1",
+                                color_scheme=rx.cond(c["is_active"], "red", "green"),
+                                variant="soft",
+                                on_click=lambda: State.toggle_estado_cupon_admin(c["id"])
                             ),
                             justify="between",
                             align="center",
-                            width="100%"
-                        ),
-                        rx.foreach(State.sesiones_tribu, tarjeta_sesion_admin),
-                        modal_editor_sesion(),
-                        width="100%",
-                        spacing="3"
-                    ),
-                    # Contenido Pestaña 4: Productos y Stock (CRUD)
-                    rx.cond(
-                        State.admin_tab_activa == "productos",
-                        rx.vstack(
-                            # 🔍 Cuadrícula de búsqueda de productos (Ubicación Rectángulo Azul)
-                            rx.input(
-                                rx.input.slot(rx.icon(tag="search", size=16, color="#7F7F7F")),
-                                placeholder="Buscar producto por nombre o categoría...",
-                                value=State.busqueda_producto_admin,
-                                on_change=State.set_busqueda_producto_admin,
-                                width="100%",
-                                size="2",
-                                background_color="#FFFFFF",
-                                border="1px solid #EAE5DF",
-                                border_radius="8px"
-                            ),
-                            rx.hstack(
-                                rx.heading("Inventario de Productos", size="4", color="#2C3639"),
-                                rx.button(
-                                    "+ Crear Nuevo Producto",
-                                    size="2",
-                                    background_color="#2C3639",
-                                    color="#FFFFFF",
-                                    font_weight="bold",
-                                    on_click=State.abrir_modal_nuevo_producto
-                                ),
-                                justify="between",
-                                align="center",
-                                width="100%"
-                            ),
-                            rx.cond(
-                                State.productos_admin_filtrados.length() == 0,
-                                rx.text("No se encontraron productos coincidentes.", color="#7F7F7F"),
-                                rx.foreach(State.productos_admin_filtrados, tarjeta_producto_admin)
-                            ),
-                            modal_editor_producto(),
                             width="100%",
-                            spacing="3"
-                        ),
-                        # Contenido Pestaña 5: Talleres y Eventos (CRUD)
-                        rx.cond(
-                            State.admin_tab_activa == "talleres",
-                            rx.vstack(
-                                rx.hstack(
-                                    rx.heading("Agenda de Talleres y Eventos", size="4", color="#2C3639"),
-                                    rx.button(
-                                        "+ Crear Nuevo Taller",
-                                        size="2",
-                                        background_color="#2C3639",
-                                        color="#FFFFFF",
-                                        font_weight="bold",
-                                        on_click=State.abrir_modal_nuevo_taller
-                                    ),
-                                    justify="between",
-                                    align="center",
-                                    width="100%"
-                                ),
-                                rx.cond(
-                                    State.talleres_tribu.length() == 0,
-                                    rx.text("No hay talleres ni eventos registrados actualmente.", color="#7F7F7F"),
-                                    rx.foreach(State.talleres_tribu, tarjeta_taller_admin)
-                                ),
-                                modal_editor_taller(),
-                                width="100%",
-                                spacing="3"
-                            ),
-                            # Contenido Pestaña 6: Servicios (CRUD)
-                            rx.cond(
-                                State.admin_tab_activa == "servicios",
-                                rx.vstack(
-                                    rx.hstack(
-                                        rx.heading("Catálogo de Servicios", size="4", color="#2C3639"),
-                                        rx.button(
-                                            "+ Crear Nuevo Servicio",
-                                            size="2",
-                                            background_color="#2C3639",
-                                            color="#FFFFFF",
-                                            font_weight="bold",
-                                            on_click=State.abrir_modal_nuevo_servicio
-                                        ),
-                                        justify="between",
-                                        align="center",
-                                        width="100%"
-                                    ),
-                                    rx.cond(
-                                        State.servicios_tribu.length() == 0,
-                                        rx.text("No hay servicios registrados actualmente.", color="#7F7F7F"),
-                                        rx.foreach(State.servicios_tribu, tarjeta_servicio_admin)
-                                    ),
-                                    modal_editor_servicio(),
-                                    width="100%",
-                                    spacing="3"
-                                ),
-                                # Contenido Pestaña 7: Cupones y Descuentos
-                                rx.vstack(
-                                    rx.heading("Gestión de Cupones Especiales y Promociones", size="4", color="#2C3639"),
-                                    rx.hstack(
-                                        rx.input(
-                                            placeholder="Código (Ej. PROMO15)",
-                                            value=State.edit_cupon_codigo,
-                                            on_change=State.set_edit_cupon_codigo,
-                                            size="2",
-                                            width="30%"
-                                        ),
-                                        rx.select(
-                                            ["PORCENTAJE", "FIJO"],
-                                            value=State.edit_cupon_tipo,
-                                            on_change=State.set_edit_cupon_tipo,
-                                            size="2",
-                                            width="20%"
-                                        ),
-                                        rx.input(
-                                            placeholder="Valor (% o $)",
-                                            type="number",
-                                            value=State.edit_cupon_valor.to_string(),
-                                            on_change=State.set_edit_cupon_valor,
-                                            size="2",
-                                            width="20%"
-                                        ),
-                                        rx.input(
-                                            placeholder="Usos Máx.",
-                                            type="number",
-                                            value=State.edit_cupon_usos_maximos.to_string(),
-                                            on_change=State.set_edit_cupon_usos_maximos,
-                                            size="2",
-                                            width="15%"
-                                        ),
-                                        rx.button(
-                                            "Crear Cupón",
-                                            on_click=State.crear_cupon_especial_admin,
-                                            size="2",
-                                            background_color="#8E6F54",
-                                            color="#FFFFFF",
-                                            font_weight="bold",
-                                            width="15%"
-                                        ),
-                                        width="100%",
-                                        spacing="2"
-                                    ),
-                                    rx.divider(margin_y="10px"),
-                                    rx.text("Cupones Registrados", font_weight="bold", color="#2C3639"),
-                                    rx.cond(
-                                        State.cupones_admin_list.length() == 0,
-                                        rx.text("No hay cupones creados aún.", color="#7F7F7F"),
-                                        rx.foreach(
-                                            State.cupones_admin_list,
-                                            lambda c: rx.hstack(
-                                                rx.hstack(
-                                                    rx.text("🎟️ ", c["codigo"], font_weight="bold", size="2", color="#2C3639"),
-                                                    rx.badge(c["tipo"], color_scheme="bronze", size="1"),
-                                                    rx.badge(
-                                                        c["usos_actuales"].to_string() + " / " + c["usos_maximos"].to_string() + " usos",
-                                                        color_scheme=rx.cond(c["agotado"], "red", "green"),
-                                                        size="1"
-                                                    ),
-                                                    spacing="2",
-                                                    align="center"
-                                                ),
-                                                rx.text("Valor: ", c["valor"].to_string(), rx.cond(c["tipo"] == "PORCENTAJE", "%", " USD"), font_weight="bold", color="#8E6F54", size="2"),
-                                                rx.button(
-                                                    rx.cond(c["is_active"], "Inactivar", "Activar"),
-                                                    size="1",
-                                                    color_scheme=rx.cond(c["is_active"], "red", "green"),
-                                                    variant="soft",
-                                                    on_click=lambda: State.toggle_estado_cupon_admin(c["id"])
-                                                ),
-                                                justify="between",
-                                                align="center",
-                                                width="100%",
-                                                padding="10px 14px",
-                                                border="1px solid #EAE5DF",
-                                                border_radius="8px",
-                                                background_color="#FFFFFF"
-                                            )
-                                        )
-                                    ),
-                                    width="100%",
-                                    spacing="3"
-                                )
-                            )
+                            padding="10px 14px",
+                            border="1px solid #EAE5DF",
+                            border_radius="8px",
+                            background_color="#FFFFFF"
                         )
                     )
-                )
+                ),
+                width="100%",
+                spacing="3"
             )
         ),
         width="100%",

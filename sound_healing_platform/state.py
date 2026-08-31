@@ -9,185 +9,23 @@ import sqlmodel
 # 🏛️ TABLAS DE BASE DE DATOS (SQLMODEL - ESTÁNDAR PROFESIONAL)
 # ==================================================================
 
-class InstagramPost(sqlmodel.SQLModel, table=True):
-    """Modelo exacto y real para la tabla de Instagram en Supabase."""
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    foto: str
-    url: str
-
-class FeaturedEvent(sqlmodel.SQLModel, table=True):
-    """Modelo exacto y real para la tabla de Eventos en Supabase."""
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    nombre: str
-    logo: str
-    url: str
-
-class TribuGuide(sqlmodel.SQLModel, table=True):
-    """Modelo adaptado para la Revista: ID, Nombre, Foto, Descripcion Corta y Biografia Larga."""
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    nombre: str
-    foto: str
-    descripcion: str
-    biografia: str
-class TribuService(sqlmodel.SQLModel, table=True):
-    """Modelo exacto para la tabla de Servicios en Supabase."""
-    __tablename__ = "tribu_services"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    nombre: str
-    foto: str
-    descripcion: str
-    is_active: bool = sqlmodel.Field(default=True)
-    
-class TribuWorkshop(sqlmodel.SQLModel, table=True):
-    """Modelo exacto para la tabla de Talleres y Eventos en Supabase."""
-    __tablename__ = "tribu_workshops"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    titulo: str
-    tipo: str
-    foto: str
-    facilitador: str
-    descripcion: str
-    fecha_texto: str
-    hora_texto: str
-    duracion_texto: str
-    ubicacion: str
-    precio: float
-    moneda: str
-    fecha_evento: str
-    whatsapp_contacto: str | None = sqlmodel.Field(default=None)
-    is_active: bool = sqlmodel.Field(default=True)
-
-class TribuProduct(sqlmodel.SQLModel, table=True):
-    """Modelo profesional para la tienda unificada y real en Supabase."""
-    __tablename__ = "tribu_products"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    nombre: str
-    descripcion: str
-    precio: float
-    precio_anterior: float | None = sqlmodel.Field(default=None)
-    stock: int
-    is_best_seller: bool
-    is_favorite: bool
-    categoria: str
-    proveedor: str | None = sqlmodel.Field(default=None)
-    intencion: str | None = sqlmodel.Field(default=None)
-    fotos: list[str] = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
-    variaciones: Any | None = sqlmodel.Field(default=None, sa_column=sa.Column(sa.JSON))
-    is_active: bool
-
-class TribuSession(sqlmodel.SQLModel, table=True):
-    """Modelo exacto para la tabla de Sesiones Grupales Recurrentes en Supabase."""
-    __tablename__ = "tribu_sessions"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    nombre: str
-    foto: str
-    fotos: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
-    ubicacion: str
-    frecuencia_texto: str
-    fecha_texto: str
-    hora_texto: str
-    hora_recepcion_texto: str | None = sqlmodel.Field(default="")
-    inversion: float
-    plazas_totales: int
-    plazas_disponibles: int
-    instagram_url: str
-    recomendaciones: str
-    checkin_token: str | None = sqlmodel.Field(default=None)
-    patron_recurrencia: str | None = sqlmodel.Field(default="MANUAL")
-    fecha_evento: str | None = sqlmodel.Field(default=None)
-    is_active: bool = sqlmodel.Field(default=True)
-
-class TribuSessionReservation(sqlmodel.SQLModel, table=True):
-    """Modelo para reservas de sesiones grupales en Supabase con desglose de pago parcial."""
-    __tablename__ = "tribu_session_reservations"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    session_id: int
-    nombre_cliente: str
-    whatsapp_cliente: str
-    cliente_email: str | None = None
-    cupos: int = 1
-    monto_total: float = 0.0
-    porcentaje_pago: float = 100.0
-    monto_pagado: float = 0.0
-    monto_pendiente: float = 0.0
-    estado: str = "PENDIENTE_PAGO"
-    asistio: bool = False
-    participantes_json: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
-    cupon_codigo: str | None = sqlmodel.Field(default=None)
-    metodo_pago: str | None = sqlmodel.Field(default=None)
-    fecha_evento: str | None = sqlmodel.Field(default=None)
-
-class TribuAdminUser(sqlmodel.SQLModel, table=True):
-    """Modelo para usuarios administradores y facilitadores."""
-    __tablename__ = "tribu_admin_users"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    email: str
-    password_hash: str
-    nombre: str
-    rol: str = "ADMIN"
-    is_active: bool = True
-
-class TribuUser(sqlmodel.SQLModel, table=True):
-    """Modelo exacto para la tabla de clientes registrados en Supabase."""
-    __tablename__ = "tribu_users"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    email: str = sqlmodel.Field(index=True, unique=True)
-    nombre: str
-    apellido: str | None = None
-    password: str
-    telefono: str | None = None
-    pais: str | None = "Venezuela"
-    direccion: str | None = None
-    apartamento: str | None = None
-    ciudad: str | None = None
-    codigo_postal: str | None = None
-    is_active: bool = True
-
-class TribuCart(sqlmodel.SQLModel, table=True):
-    """Modelo para la persistencia del carrito de usuarios en Supabase."""
-    __tablename__ = "tribu_carts"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    user_id: int = sqlmodel.Field(index=True, unique=True)
-    items_json: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
-class TribuGiftCard(sqlmodel.SQLModel, table=True):
-    """Modelo exacto para Vouchers de Experiencias y Gift Cards en Supabase."""
-    __tablename__ = "tribu_gift_cards"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    codigo: str = sqlmodel.Field(unique=True, index=True)
-    tipo: str = "EXPERIENCIA"
-    experiencia_nombre: str
-    monto_equivalente: float
-    comprador_nombre: str
-    comprador_email: str
-    comprador_telefono: str | None = None
-    destinatario_nombre: str
-    destinatario_email: str | None = None
-    destinatario_whatsapp: str | None = None
-    mensaje_personalizado: str | None = None
-    estado: str = "PENDIENTE_PAGO"    
-class TribuNotification(sqlmodel.SQLModel, table=True):
-    """Modelo exacto para el sistema de notificaciones unificado en Supabase."""
-    __tablename__ = "tribu_notifications"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    destinatario_email: str | None = None
-    es_admin: bool = False
-    es_publico: bool = False
-    titulo: str
-    mensaje: str
-    target_url: str = "/"
-    leido: bool = False
-
-class TribuCoupon(sqlmodel.SQLModel, table=True):
-    """Modelo profesional para cupones y descuentos especiales negociados."""
-    __tablename__ = "tribu_coupons"
-    id: int | None = sqlmodel.Field(default=None, primary_key=True)
-    codigo: str = sqlmodel.Field(unique=True, index=True)
-    tipo: str = "PORCENTAJE"  # 'PORCENTAJE' o 'FIJO'
-    valor: float = 0.0
-    is_active: bool = True
-    usos_maximos: int = 100
-    usos_actuales: int = 0
-
+from sound_healing_platform.models import (
+    InstagramPost,
+    FeaturedEvent,
+    TribuGuide,
+    TribuService,
+    TribuWorkshop,
+    TribuProduct,
+    TribuSession,
+    TribuSessionReservation,
+    TribuAdminUser,
+    TribuUser,
+    TribuCart,
+    TribuGiftCard,
+    TribuNotification,
+    TribuCoupon,
+    TribuClientNote,
+)
 
 # ==================================================================
 # ⚙️ ESTADO DE LA APLICACIÓN (MÉTODOS Y VARIABLES DE CONTROL UI)
@@ -503,7 +341,7 @@ class State(rx.State):
     reserva_email_cliente: str = ""
     reserva_whatsapp_cliente: str = ""
     reserva_cantidad_cupos: int = 1
-    reserva_participantes: list[str] = [""]
+    reserva_participantes: list[dict[str, str]] = [{"nombre": "", "whatsapp": "", "email": ""}]
     reserva_porcentaje_pago: float = 0.0
     reserva_cupon_input: str = ""
     reserva_descuento_monto: float = 0.0
@@ -605,13 +443,20 @@ class State(rx.State):
     def set_reserva_nombre(self, val: str):
         self.reserva_nombre_cliente = val
 
-    def actualizar_nombre_participante(self, idx: int, val: str):
+    def actualizar_campo_participante(self, idx: int, campo: str, val: str):
         nuevos = list(self.reserva_participantes)
         if 0 <= idx < len(nuevos):
-            nuevos[idx] = val
+            item = dict(nuevos[idx])
+            item[campo] = val
+            nuevos[idx] = item
             self.reserva_participantes = nuevos
             if idx == 0:
-                self.reserva_nombre_cliente = val
+                if campo == "nombre":
+                    self.reserva_nombre_cliente = val
+                elif campo == "whatsapp":
+                    self.reserva_whatsapp_cliente = val
+                elif campo == "email":
+                    self.reserva_email_cliente = val
 
     # Variables para el Documento / Checklist Digital de Asistencia por Token
     sesion_asistencia_info: dict[str, Any] = {}
@@ -1254,7 +1099,9 @@ class State(rx.State):
                         "recomendaciones": s.recomendaciones,
                         "checkin_token": s.checkin_token or "",
                         "patron_recurrencia": s.patron_recurrencia or "MANUAL",
-                        "fecha_evento": s.fecha_evento or ""
+                        "fecha_evento": s.fecha_evento or "",
+                        "requiere_correo_obligatorio": bool(getattr(s, "requiere_correo_obligatorio", False)),
+                        "requiere_porcentaje_obligatorio": bool(getattr(s, "requiere_porcentaje_obligatorio", False))
                     }
                     for s in db_sessions
                 ]
@@ -2353,17 +2200,16 @@ class State(rx.State):
         self.reserva_cantidad_cupos = 1
         self.reserva_porcentaje_pago = 0.0
 
-        # Autocompletado si el usuario tiene sesión activa
         if self.user_logged_in:
             nom = self.usuario_datos.get("nombre", "")
             ape = self.usuario_datos.get("apellido", "")
             nombre_auto = f"{nom} {ape}".strip()
+            email_auto = self.usuario_datos.get("email", "")
             self.reserva_nombre_cliente = nombre_auto
-            self.reserva_email_cliente = self.usuario_datos.get("email", "")
-            self.reserva_participantes = [nombre_auto]
+            self.reserva_email_cliente = email_auto
+            self.reserva_participantes = [{"nombre": nombre_auto, "whatsapp": "", "email": email_auto}]
         else:
-            self.reserva_participantes = [""]
-        self.reserva_porcentaje_pago = 0.0
+            self.reserva_participantes = [{"nombre": "", "whatsapp": "", "email": ""}]
 
         self.modal_reserva_sesion_abierto = True
 
@@ -2373,13 +2219,13 @@ class State(rx.State):
         self.reserva_email_cliente = ""
         self.reserva_whatsapp_cliente = ""
         self.reserva_cantidad_cupos = 1
-        self.reserva_participantes = [""]
+        self.reserva_participantes = [{"nombre": "", "whatsapp": "", "email": ""}]
 
     def incrementar_cupos_reserva(self):
         max_disp = self.sesion_seleccionada_reserva.get("plazas_disponibles", 1)
         if self.reserva_cantidad_cupos < max_disp:
             self.reserva_cantidad_cupos += 1
-            self.reserva_participantes.append("")
+            self.reserva_participantes.append({"nombre": "", "whatsapp": "", "email": ""})
         else:
             rx.toast.warning(f"Límite alcanzado: solo quedan {max_disp} cupos disponibles.")
 
@@ -2390,18 +2236,37 @@ class State(rx.State):
                 self.reserva_participantes.pop()
 
     def confirmar_reserva_sesion(self):
-        if not self.reserva_nombre_cliente.strip():
-            return rx.toast.error("Por favor, ingresa tu Nombre y Apellido.")
+        req_correo = bool(self.sesion_seleccionada_reserva.get("requiere_correo_obligatorio", False))
+        req_pct = bool(self.sesion_seleccionada_reserva.get("requiere_porcentaje_obligatorio", False))
 
-        email_final = self.reserva_email_cliente.strip().lower() or (self.usuario_datos.get("email", "").lower() if self.user_logged_in else "")
-        if not email_final or not self.validar_email_formato(email_final):
-            return rx.toast.error("Ingresa un correo electrónico válido (ejemplo: nombre@dominio.com)")
+        if req_pct and self.reserva_porcentaje_pago <= 0:
+            return rx.toast.error("Para esta sesión es obligatorio seleccionar un porcentaje de abono (25%, 50% o 100%).")
 
-        wa_clean = self.formatear_whatsapp_numero(self.reserva_whatsapp_cliente)
-        if not wa_clean or len(wa_clean) < 10:
-            return rx.toast.error("Ingresa un número de WhatsApp válido con el formato de tu país.")
-        
-        self.reserva_whatsapp_cliente = f"+{wa_clean}"
+        for idx, p in enumerate(self.reserva_participantes):
+            num_part = idx + 1
+            p_nom = p.get("nombre", "").strip()
+            p_wa = p.get("whatsapp", "").strip()
+            p_email = p.get("email", "").strip()
+
+            if not p_nom:
+                return rx.toast.error(f"Por favor ingresa el Nombre y Apellido del Participante {num_part}.")
+
+            wa_clean = self.formatear_whatsapp_numero(p_wa)
+            if not wa_clean or len(wa_clean) < 10:
+                return rx.toast.error(f"Ingresa un WhatsApp válido para el Participante {num_part}.")
+
+            if req_correo and not p_email:
+                return rx.toast.error(f"El correo electrónico es obligatorio para el Participante {num_part}.")
+
+            if p_email and not self.validar_email_formato(p_email):
+                return rx.toast.error(f"El correo del Participante {num_part} no tiene un formato válido.")
+
+        principal = self.reserva_participantes[0]
+        self.reserva_nombre_cliente = principal.get("nombre", "").strip()
+        self.reserva_whatsapp_cliente = f"+{self.formatear_whatsapp_numero(principal.get('whatsapp', ''))}"
+        self.reserva_email_cliente = principal.get("email", "").strip()
+
+        email_final = self.reserva_email_cliente.lower()
 
         sesion_id = self.sesion_seleccionada_reserva.get("id")
         cupos_reservar = self.reserva_cantidad_cupos
@@ -2422,43 +2287,43 @@ class State(rx.State):
                 if db_session.plazas_disponibles < cupos_reservar:
                     return rx.toast.error(f"Lo sentimos, solo quedan {db_session.plazas_disponibles} cupos.")
 
-                # Construir lista estructurada con nombres exactos de participantes
                 lista_part_json = []
                 nombres_participantes_lista = []
                 for i in range(cupos_reservar):
-                    p_nombre = self.reserva_participantes[i].strip() if i < len(self.reserva_participantes) else ""
-                    if not p_nombre:
-                        p_nombre = self.reserva_nombre_cliente.strip() if i == 0 else f"{self.reserva_nombre_cliente.strip()} (Acompañante {i+1})"
-                    
+                    p_data = self.reserva_participantes[i] if i < len(self.reserva_participantes) else {}
+                    p_nombre = p_data.get("nombre", "").strip() or f"Participante {i+1}"
+                    p_wa = p_data.get("whatsapp", "").strip()
+                    p_em = p_data.get("email", "").strip()
+
                     lista_part_json.append({
                         "index": i,
                         "nombre": p_nombre,
+                        "whatsapp": p_wa,
+                        "email": p_em,
                         "asistio": False
                     })
                     nombres_participantes_lista.append(p_nombre)
 
-                # Estado inicial de la reserva: siempre entra como PENDIENTE_PAGO para auditoría del admin
                 estado_res = "PENDIENTE_PAGO"
 
                 nueva_reserva = TribuSessionReservation(
-                 session_id=sesion_id,
-                 nombre_cliente=self.reserva_nombre_cliente.strip(),
-                 cliente_email=email_final,
-                 whatsapp_cliente=self.reserva_whatsapp_cliente.strip(),
-                 cupos=cupos_reservar,
-                 monto_total=monto_total,
-                 porcentaje_pago=pct_pago,
-                 monto_pagado=monto_pagado,
-                 monto_pendiente=monto_pendiente,
-                 estado=estado_res,
-                 asistio=False,
-                 participantes_json=lista_part_json,
-                 cupon_codigo=self.reserva_cupon_aplicado_codigo if self.reserva_cupon_aplicado_codigo else None,
-                 fecha_evento=db_session.fecha_evento
-             )
+                    session_id=sesion_id,
+                    nombre_cliente=self.reserva_nombre_cliente.strip(),
+                    cliente_email=email_final,
+                    whatsapp_cliente=self.reserva_whatsapp_cliente.strip(),
+                    cupos=cupos_reservar,
+                    monto_total=monto_total,
+                    porcentaje_pago=pct_pago,
+                    monto_pagado=monto_pagado,
+                    monto_pendiente=monto_pendiente,
+                    estado=estado_res,
+                    asistio=False,
+                    participantes_json=lista_part_json,
+                    cupon_codigo=self.reserva_cupon_aplicado_codigo if self.reserva_cupon_aplicado_codigo else None,
+                    fecha_evento=db_session.fecha_evento
+                )
                 session.add(nueva_reserva)
 
-                # 🎟️ Sumar +1 uso al cupón y desactivarlo si llegó al límite
                 if self.reserva_cupon_aplicado_codigo:
                     db_cupon = session.exec(
                         sqlmodel.select(TribuCoupon).where(
@@ -2475,7 +2340,6 @@ class State(rx.State):
                 session.refresh(nueva_reserva)
                 reserva_id_creada = nueva_reserva.id
 
-                # Limpiar variables temporales del cupón en el estado reactivo
                 self.reserva_cupon_input = ""
                 self.reserva_cupon_aplicado_codigo = ""
                 self.reserva_descuento_monto = 0.0
@@ -2531,12 +2395,9 @@ class State(rx.State):
         encoded_msg = urllib.parse.quote(mensaje)
         wa_url = f"https://wa.me/{NUMERO_TRIBU}?text={encoded_msg}"
 
-        # 3. Enviar correo electrónico en segundo plano con Código QR de verificación
         if email_final and reserva_id_creada:
             qr_data = f"https://sound-healing-platform-neon-sun.reflex.run/asistencia/{checkin_token_sesion}?reserva={reserva_id_creada}"
             qr_image_url = f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={urllib.parse.quote(qr_data)}"
-            
-            # Reutilizamos enviar_correo_voucher_html o función interna de notificación SMTP
             print(f"📧 Ticket QR generado para {email_final}: {qr_image_url}")
 
         self.cerrar_modal_reserva_sesion()
@@ -2821,6 +2682,14 @@ class State(rx.State):
     edit_sesion_plazas_disponibles: int = 15
     edit_sesion_instagram: str = ""
     edit_sesion_recomendaciones: str = ""
+    edit_sesion_requiere_correo: bool = False
+    edit_sesion_requiere_porcentaje: bool = False
+
+    def set_edit_sesion_requiere_correo(self, val: bool):
+        self.edit_sesion_requiere_correo = val
+
+    def set_edit_sesion_requiere_porcentaje(self, val: bool):
+        self.edit_sesion_requiere_porcentaje = val
 
     # Variables de Formulario CRUD para Productos y Stock
     modal_editor_producto_abierto: bool = False
@@ -2960,6 +2829,208 @@ class State(rx.State):
     reservas_admin_list: list[dict[str, Any]] = []
     ordenes_admin_list: list[dict[str, Any]] = []
     sesiones_admin_list: list[dict[str, Any]] = []
+    clientes_crm_list: list[dict[str, Any]] = []
+
+    busqueda_cliente_crm: str = ""
+    filtro_etiqueta_crm: str = "TODOS"
+    edit_crm_whatsapp: str = ""
+    edit_crm_etiqueta: str = "NUEVO"
+    edit_crm_notas: str = ""
+    modal_editor_crm_abierto: bool = False
+
+    # 💬 Variables y Métodos para Envíos 1-a-1 en CRM
+    modal_mensaje_1a1_abierto: bool = False
+    mensaje_1a1_destinatario_nombre: str = ""
+    mensaje_1a1_destinatario_wa: str = ""
+    mensaje_1a1_texto: str = ""
+    mensaje_1a1_sesion_id_seleccionada: str = ""
+
+    def set_modal_mensaje_1a1_abierto(self, val: bool):
+        self.modal_mensaje_1a1_abierto = val
+
+    def set_mensaje_1a1_texto(self, val: str):
+        self.mensaje_1a1_texto = val
+
+    @rx.var
+    def opciones_sesiones_invitacion(self) -> list[str]:
+        """Devuelve las sesiones disponibles en formato de texto para el selector."""
+        return [
+            f"#{s.get('id')} - {s.get('nombre')} ({s.get('fecha_texto')})"
+            for s in self.sesiones_tribu
+        ]
+
+    def generar_plantilla_mensaje_1a1(self, sesion_id_str: str = ""):
+        """Construye la plantilla de invitación reemplazando todas las etiquetas dinámicas."""
+        primer_nombre = self.mensaje_1a1_destinatario_nombre.strip().split()[0] if self.mensaje_1a1_destinatario_nombre else "amigo/a"
+
+        sesion_encontrada = None
+        if sesion_id_str and sesion_id_str.isdigit():
+            s_id = int(sesion_id_str)
+            sesion_encontrada = next((s for s in self.sesiones_tribu if s.get("id") == s_id), None)
+
+        if not sesion_encontrada and self.sesiones_tribu:
+            sesion_encontrada = self.sesiones_tribu[0]
+
+        if sesion_encontrada:
+            self.mensaje_1a1_sesion_id_seleccionada = f"#{sesion_encontrada.get('id')} - {sesion_encontrada.get('nombre')} ({sesion_encontrada.get('fecha_texto')})"
+            patron = sesion_encontrada.get("patron_recurrencia") if sesion_encontrada.get("patron_recurrencia") != "MANUAL" else sesion_encontrada.get("frecuencia_texto", "próximo encuentro")
+            fecha = sesion_encontrada.get("fecha_texto", "")
+            hora = sesion_encontrada.get("hora_texto", "")
+            recepcion = sesion_encontrada.get("hora_recepcion_texto", "") or "Por confirmar"
+            lugar = sesion_encontrada.get("ubicacion", "")
+            inv_val = float(sesion_encontrada.get("inversion", 0.0))
+            monto = f"{inv_val:.0f}" if inv_val.is_integer() else f"{inv_val:.2f}"
+            post = sesion_encontrada.get("instagram_url", "")
+        else:
+            self.mensaje_1a1_sesion_id_seleccionada = ""
+            patron = "próximo encuentro"
+            fecha = "Por confirmar"
+            hora = "Por confirmar"
+            recepcion = "Por confirmar"
+            lugar = "Caracas"
+            monto = "0"
+            post = "https://www.instagram.com/tribusonoraconsciente"
+
+        self.mensaje_1a1_texto = (
+            f"¡Hola, {primer_nombre}!\n\n"
+            f"Te saludamos con mucho cariño de parte de Tribu Sonora Consciente\n\n"
+            f"Queremos invitarte especialmente a nuestra próxima sesión presencial de Sound Healing, programada para este {patron}.\n\n"
+            f"Fecha:  {fecha}\n"
+            f"Hora: {hora}\n"
+            f"Recepción: {recepcion}\n"
+            f"Lugar: {lugar}\n"
+            f"Inversión: ${monto} USD\n"
+            f"Post: {post}\n\n"
+            f"Será un espacio ideal para profundizar en tu práctica, llegar a la relajación, desconexión del estrés y la armonización a través de la tecnología del sonido y la vibración.\n\n"
+            f"Cuéntanos si nos acompañas. Puedes reservar tu cupo directamente en nuestra web: \n"
+            f"https://www.tribusonoraconsciente.com/sesiones/horario#seccion-horarios-sesiones\n\n"
+            f"¡Nos encantará compartir esta experiencia contigo!."
+        )
+
+    def cambiar_sesion_invitacion(self, opcion_texto: str):
+        s_id_str = opcion_texto.split(" ")[0].replace("#", "") if opcion_texto else ""
+        self.generar_plantilla_mensaje_1a1(s_id_str)
+
+    def abrir_modal_mensaje_1a1(self, cliente: dict):
+        self.mensaje_1a1_destinatario_nombre = cliente.get("nombre", "")
+        self.mensaje_1a1_destinatario_wa = cliente.get("whatsapp", "")
+        self.generar_plantilla_mensaje_1a1()
+        self.modal_mensaje_1a1_abierto = True
+
+    def cerrar_modal_mensaje_1a1(self):
+        self.modal_mensaje_1a1_abierto = False
+
+    def enviar_mensaje_1a1_whatsapp(self):
+        if not self.mensaje_1a1_destinatario_wa:
+            return rx.toast.error("El cliente no posee número de WhatsApp válido.")
+        
+        if not self.mensaje_1a1_texto.strip():
+            return rx.toast.error("Por favor escribe un mensaje antes de enviar.")
+
+        import urllib.parse
+        num_wa = self.formatear_whatsapp_numero(self.mensaje_1a1_destinatario_wa)
+        encoded_msg = urllib.parse.quote(self.mensaje_1a1_texto.strip())
+        wa_url = f"https://wa.me/{num_wa}?text={encoded_msg}"
+
+        self.modal_mensaje_1a1_abierto = False
+        rx.toast.success(f"Redirigiendo a WhatsApp para envío a {self.mensaje_1a1_destinatario_nombre}...")
+        return rx.redirect(wa_url, is_external=True)
+
+    def set_busqueda_cliente_crm(self, val: str):
+        self.busqueda_cliente_crm = val
+
+    def set_filtro_etiqueta_crm(self, val: str):
+        self.filtro_etiqueta_crm = val
+
+    def set_edit_crm_etiqueta(self, val: str):
+        self.edit_crm_etiqueta = val
+
+    def set_edit_crm_notas(self, val: str):
+        self.edit_crm_notas = val
+
+    def set_modal_editor_crm_abierto(self, val: bool):
+        self.modal_editor_crm_abierto = val
+
+    @rx.var
+    def clientes_crm_filtrados(self) -> list[dict[str, Any]]:
+        q = self.busqueda_cliente_crm.strip().lower()
+        etq = self.filtro_etiqueta_crm
+        res = self.clientes_crm_list
+
+        if etq != "TODOS":
+            res = [c for c in res if c.get("etiqueta") == etq]
+
+        if q:
+            res = [
+                c for c in res
+                if q in c.get("nombre", "").lower()
+                or q in c.get("whatsapp", "").lower()
+                or q in c.get("email", "").lower()
+            ]
+        return res
+
+    def abrir_modal_editar_crm(self, cliente: dict):
+        self.edit_crm_whatsapp = cliente.get("whatsapp", "")
+        self.edit_crm_etiqueta = cliente.get("etiqueta", "NUEVO")
+        self.edit_crm_notas = cliente.get("notas_internas", "") or ""
+        self.modal_editor_crm_abierto = True
+
+    def guardar_nota_cliente_crm(self):
+        if not self.edit_crm_whatsapp:
+            return rx.toast.error("No se ha seleccionado un cliente válido.")
+
+        try:
+            with rx.session() as session:
+                db_note = session.exec(
+                    sqlmodel.select(TribuClientNote).where(TribuClientNote.whatsapp_cliente == self.edit_crm_whatsapp)
+                ).first()
+
+                if db_note:
+                    db_note.etiqueta = self.edit_crm_etiqueta
+                    db_note.notas_internas = self.edit_crm_notas.strip()
+                    session.add(db_note)
+                else:
+                    nueva_nota = TribuClientNote(
+                        whatsapp_cliente=self.edit_crm_whatsapp,
+                        etiqueta=self.edit_crm_etiqueta,
+                        notas_internas=self.edit_crm_notas.strip()
+                    )
+                    session.add(nueva_nota)
+
+                session.commit()
+                self.modal_editor_crm_abierto = False
+                self.cargar_datos_admin()
+                return rx.toast.success("Información de cliente actualizada.")
+        except Exception as e:
+            print(f"Error guardando nota de cliente: {e}")
+            return rx.toast.error("Error al actualizar cliente.")
+
+    def exportar_clientes_csv(self):
+        """Genera y descarga un archivo CSV con la base de datos de clientes."""
+        import csv
+        import io
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["Nombre", "WhatsApp", "Email", "Total Reservas", "Asistencias", "Inversion Total ($)", "Etiqueta", "Notas"])
+
+        for c in self.clientes_crm_filtrados:
+            writer.writerow([
+                c.get("nombre", ""),
+                c.get("whatsapp", ""),
+                c.get("email", ""),
+                c.get("total_reservas", 0),
+                c.get("asistencias", 0),
+                f"{c.get('inversion_total', 0.0):.2f}",
+                c.get("etiqueta", "NUEVO"),
+                c.get("notas_internas", "") or ""
+            ])
+
+        output.seek(0)
+        return rx.download(
+            data=output.getvalue(),
+            filename="directorio_clientes_tribu.csv"
+        )
 
     def set_admin_email(self, val: str):
         self.admin_email_input = val
@@ -3068,21 +3139,42 @@ class State(rx.State):
                     for s in db_sessions_admin
                 ]
 
-                # 4. Cargar cupones de descuento
-                cupones_db = session.exec(sqlmodel.select(TribuCoupon)).all()
-                self.cupones_admin_list = [
-                    {
-                        "id": c.id,
-                        "codigo": c.codigo,
-                        "tipo": c.tipo,
-                        "valor": c.valor,
-                        "is_active": c.is_active,
-                        "usos_maximos": c.usos_maximos,
-                        "usos_actuales": c.usos_actuales,
-                        "agotado": c.usos_actuales >= c.usos_maximos
-                    }
-                    for c in cupones_db
-                ]
+                # 5. Consolidación de Directorio de Clientes (CRM)
+                query_crm = sa.text("""
+                    SELECT 
+                        COALESCE(r.whatsapp_cliente, '') as whatsapp,
+                        MAX(r.nombre_cliente) as nombre,
+                        MAX(COALESCE(r.cliente_email, '')) as email,
+                        COUNT(r.id) as total_reservas,
+                        SUM(CASE WHEN r.asistio = true THEN 1 ELSE 0 END) as asistencias,
+                        SUM(COALESCE(r.monto_pagado, r.monto_total)) as inversion_total
+                    FROM tribu_session_reservations r
+                    WHERE r.whatsapp_cliente IS NOT NULL AND r.whatsapp_cliente != ''
+                    GROUP BY r.whatsapp_cliente
+                    ORDER BY total_reservas DESC
+                """)
+                res_crm = session.execute(query_crm).fetchall()
+
+                notas_db = {n.whatsapp_cliente: n for n in session.exec(sqlmodel.select(TribuClientNote)).all()}
+
+                crm_consolidado = []
+                for row in res_crm:
+                    wa = row[0]
+                    nota_obj = notas_db.get(wa)
+                    etq_defecto = "FRECUENTE" if row[3] >= 2 else "NUEVO"
+
+                    crm_consolidado.append({
+                        "whatsapp": wa,
+                        "nombre": row[1],
+                        "email": row[2],
+                        "total_reservas": row[3],
+                        "asistencias": row[4],
+                        "inversion_total": float(row[5] or 0.0),
+                        "etiqueta": nota_obj.etiqueta if nota_obj else etq_defecto,
+                        "notas_internas": nota_obj.notas_internas if nota_obj else ""
+                    })
+
+                self.clientes_crm_list = crm_consolidado
         except Exception as e:
             print(f"Error cargando datos admin: {e}")
     def cambiar_porcentaje_reserva_admin(self, reserva_id: int, nuevo_pct: float):
@@ -3402,6 +3494,8 @@ class State(rx.State):
         self.edit_sesion_plazas_disponibles = 15
         self.edit_sesion_instagram = ""
         self.edit_sesion_recomendaciones = "Traer ropa cómoda, hidratación y mat de yoga o manta."
+        self.edit_sesion_requiere_correo = False
+        self.edit_sesion_requiere_porcentaje = False
         self.modal_editor_sesion_abierto = True
 
     def abrir_modal_editar_sesion(self, sesion: dict):
@@ -3420,6 +3514,8 @@ class State(rx.State):
         self.edit_sesion_plazas_disponibles = int(sesion.get("plazas_disponibles", 15))
         self.edit_sesion_instagram = sesion.get("instagram_url", "")
         self.edit_sesion_recomendaciones = sesion.get("recomendaciones", "")
+        self.edit_sesion_requiere_correo = bool(sesion.get("requiere_correo_obligatorio", False))
+        self.edit_sesion_requiere_porcentaje = bool(sesion.get("requiere_porcentaje_obligatorio", False))
         self.modal_editor_sesion_abierto = True
 
     def set_modal_editor_sesion_abierto(self, val: bool):
@@ -3461,6 +3557,8 @@ class State(rx.State):
                         db_sesion.plazas_disponibles = self.edit_sesion_plazas_disponibles
                         db_sesion.instagram_url = self.edit_sesion_instagram.strip()
                         db_sesion.recomendaciones = self.edit_sesion_recomendaciones.strip()
+                        db_sesion.requiere_correo_obligatorio = self.edit_sesion_requiere_correo
+                        db_sesion.requiere_porcentaje_obligatorio = self.edit_sesion_requiere_porcentaje
                         session.add(db_sesion)
                         rx.toast.success("Sesión actualizada exitosamente.")
                 else:
@@ -3481,6 +3579,8 @@ class State(rx.State):
                         instagram_url=self.edit_sesion_instagram.strip(),
                         recomendaciones=self.edit_sesion_recomendaciones.strip(),
                         checkin_token=token_nuevo,
+                        requiere_correo_obligatorio=self.edit_sesion_requiere_correo,
+                        requiere_porcentaje_obligatorio=self.edit_sesion_requiere_porcentaje,
                         is_active=True
                     )
                     session.add(nueva_sesion)
