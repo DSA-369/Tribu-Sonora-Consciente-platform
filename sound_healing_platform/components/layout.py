@@ -10,7 +10,7 @@ def plantilla_tribu(contenido_central: rx.Component, pagina_activa: str) -> rx.C
     Corregido con contenedores puente transparentes y breakpoints para perfecta visualización móvil.
     """
     return rx.box(
-        rx.html("<style>.reflex-badge { display: none !important; }</style>"),
+        rx.html("<style>.reflex-badge, a[href*='reflex.dev'] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }</style>"),
         rx.el.style("""
             @keyframes infinito {
                 0% { transform: translateX(0); }
