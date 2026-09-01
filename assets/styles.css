@@ -1,0 +1,9 @@
+/* Ocultar insignia de Reflex de forma global */
+.reflex-badge,
+a[href*="reflex.dev"],
+div:has(a[href*="reflex.dev"]) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
