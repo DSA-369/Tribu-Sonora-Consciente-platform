@@ -138,11 +138,7 @@ def index() -> rx.Component:
         pagina_activa="home"
     )
 
-app = rx.App(
-    stylesheets=[
-        "/styles.css",
-    ],
-)
+app = rx.App()
 app.add_page(index, route="/", title="Tribu Sonora Consciente", on_load=[State.cargar_datos_db, State.cargar_notificaciones_usuario])
 app.add_page(contacto_page, route="/contacto", title="Contacto | Tribu Sonora Consciente")
 app.add_page(acerca_de_page, route="/acerca-de", title="Acerca de | Tribu Sonora Consciente", on_load=State.cargar_datos_db)
