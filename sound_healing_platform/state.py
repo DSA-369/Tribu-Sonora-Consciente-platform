@@ -472,11 +472,48 @@ class State(rx.State):
 
     def seleccionar_metodo_pago_asistencia(self, item_id: str, metodo: str):
         """Asigna o conmuta el método de pago seleccionado directamente en la lista de asistentes."""
-        for a in self.lista_asistentes_sesion:
+        metodo_upper = metodo.strip().upper()
+        parts_keys = str(item_id).split("_")
+        reserva_id = int(parts_keys[0]) if parts_keys[0].isdigit() else None
+        
+        metodo_final = ""
+        nuevos_asistentes = list(self.lista_asistentes_sesion)
+        for a in nuevos_asistentes:
             if a["id"] == item_id:
-                actual = a.get("metodo_pago", "")
-                a["metodo_pago"] = "" if actual == metodo else metodo
+                actual = str(a.get("metodo_pago", "") or "").upper()
+                metodo_final = "" if actual == metodo_upper else metodo_upper
+                a["metodo_pago"] = metodo_final
+                if metodo_final == "CORTESIA":
+                    a["porcentaje_pago"] = 0.0
+                    a["monto_pagado"] = 0.0
+                    a["monto_pendiente"] = 0.0
+                    a["monto_total"] = 0.0
                 break
+
+        self.lista_asistentes_sesion = nuevos_asistentes
+
+        if reserva_id:
+            try:
+                with rx.session() as session:
+                    reserva = session.get(TribuSessionReservation, reserva_id)
+                    if reserva:
+                        reserva.metodo_pago = metodo_final
+                        if metodo_final == "CORTESIA":
+                            reserva.porcentaje_pago = 0.0
+                            reserva.monto_pagado = 0.0
+                            reserva.monto_pendiente = 0.0
+                            reserva.monto_total = 0.0
+                        session.add(reserva)
+                        session.commit()
+
+                        if metodo_final == "CORTESIA":
+                            return rx.toast.success("🎟️ Pase de Cortesía asignado en puerta (Monto $0 USD)")
+                        elif metodo_final:
+                            return rx.toast.success(f"💳 Método de pago seleccionado: {metodo_final}")
+                        else:
+                            return rx.toast.info("Método de pago desmarcado.")
+            except Exception as e:
+                print(f"Error actualizando método de pago de asistencia en DB: {e}")
 
     def set_busqueda_asistente(self, val: str):
         self.busqueda_asistente = val
@@ -2514,7 +2551,8 @@ class State(rx.State):
                             "porcentaje_pago": float(getattr(r, "porcentaje_pago", 100.0)),
                             "estado": r.estado,
                             "asistio": p.get("asistio", False),
-                            "metodo_pago": getattr(r, "metodo_pago", "") or ""
+                            "metodo_pago": getattr(r, "metodo_pago", "") or "",
+                            "metodo_pago_reserva": getattr(r, "metodo_pago_reserva", "") or ""
                         })
 
                 self.lista_asistentes_sesion = asistentes_desglosados
@@ -3062,7 +3100,9 @@ class State(rx.State):
                            COALESCE(r.porcentaje_pago, 100.0) as porcentaje_pago,
                            COALESCE(r.monto_pagado, r.monto_total) as monto_pagado,
                            COALESCE(r.monto_pendiente, 0.0) as monto_pendiente,
-                           r.fecha_evento
+                           r.fecha_evento,
+                           COALESCE(r.metodo_pago, '') as metodo_pago,
+                           COALESCE(r.metodo_pago_reserva, '') as metodo_pago_reserva
                     FROM tribu_session_reservations r
                     JOIN tribu_sessions s ON r.session_id = s.id
                     ORDER BY r.id DESC
@@ -3083,7 +3123,9 @@ class State(rx.State):
                         "porcentaje_pago": float(row[10]),
                         "monto_pagado": float(row[11]),
                         "monto_pendiente": float(row[12]),
-                        "fecha_evento": row[13] or row[9]
+                        "fecha_evento": row[13] or row[9],
+                        "metodo_pago": row[14] or "",
+                        "metodo_pago_reserva": row[15] or ""
                     }
                     for row in res
                 ]
@@ -3177,6 +3219,49 @@ class State(rx.State):
                 self.clientes_crm_list = crm_consolidado
         except Exception as e:
             print(f"Error cargando datos admin: {e}")
+
+    def seleccionar_metodo_pago_reserva_admin(self, reserva_id: int, metodo: str):
+        """Asigna o conmuta el método de pago de la reserva (metodo_pago_reserva) en el panel administrador."""
+        metodo_upper = metodo.strip().upper()
+        nuevas_reservas = list(self.reservas_admin_list)
+        metodo_final = ""
+        
+        for r in nuevas_reservas:
+            if r["id"] == reserva_id:
+                actual = str(r.get("metodo_pago_reserva", "") or "").upper()
+                metodo_final = "" if actual == metodo_upper else metodo_upper
+                r["metodo_pago_reserva"] = metodo_final
+                if metodo_final == "CORTESIA":
+                    r["porcentaje_pago"] = 0.0
+                    r["monto_pagado"] = 0.0
+                    r["monto_pendiente"] = 0.0
+                    r["monto_total"] = 0.0
+                break
+
+        self.reservas_admin_list = nuevas_reservas
+
+        try:
+            with rx.session() as session:
+                reserva = session.get(TribuSessionReservation, reserva_id)
+                if reserva:
+                    reserva.metodo_pago_reserva = metodo_final
+                    if metodo_final == "CORTESIA":
+                        reserva.porcentaje_pago = 0.0
+                        reserva.monto_pagado = 0.0
+                        reserva.monto_pendiente = 0.0
+                        reserva.monto_total = 0.0
+                    session.add(reserva)
+                    session.commit()
+                    
+                    if metodo_final == "CORTESIA":
+                        return rx.toast.success("🎟️ Pase de Cortesía asignado (Monto $0 USD)")
+                    elif metodo_final:
+                        return rx.toast.success(f"💳 Método de pago seleccionado: {metodo_final}")
+                    else:
+                        return rx.toast.info("Método de pago desmarcado.")
+        except Exception as e:
+            print(f"Error actualizando método de pago de reserva en admin: {e}")
+            return rx.toast.error("Error al actualizar método de pago.")
     def cambiar_porcentaje_reserva_admin(self, reserva_id: int, nuevo_pct: float):
         """Permite al administrador cambiar el % reservado desde el panel y recalculación de montos."""
         try:
@@ -3271,7 +3356,8 @@ class State(rx.State):
                 m_pend_num = float(reserva.monto_pendiente)
                 m_pagado = f"{int(m_pagado_num)}" if m_pagado_num.is_integer() else f"{m_pagado_num:.2f}"
                 m_pend = f"{int(m_pend_num)}" if m_pend_num.is_integer() else f"{m_pend_num:.2f}"
-                metodo_txt = f" ({reserva.metodo_pago.upper()})" if getattr(reserva, "metodo_pago", None) else ""
+                metodo_val = getattr(reserva, "metodo_pago_reserva", None) or getattr(reserva, "metodo_pago", None)
+                metodo_txt = f" ({metodo_val.upper()})" if metodo_val else ""
 
                 mensaje = (
                     f"Hola {reserva.nombre_cliente}. El pago ha sido verificado con exito. "

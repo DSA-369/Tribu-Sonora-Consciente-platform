@@ -16,7 +16,7 @@ def badge_estado_reserva(estado: rx.Var) -> rx.Component:
 
 def boton_metodo_pago_puerta(asistente: rx.Var, metodo_clave: str, nombre_logo: str, img_src: str) -> rx.Component:
     """Botón interactivo de método de pago con efecto hundido y resaltado activo."""
-    esta_seleccionado = (asistente["metodo_pago"] == metodo_clave)
+    esta_seleccionado = (asistente["metodo_pago"].to_string().lower() == metodo_clave.lower())
 
     return rx.box(
         rx.image(
@@ -41,7 +41,10 @@ def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
     es_presente = asistente["asistio"]
     monto_pend = asistente["monto_pendiente"].to(float)
     pct_pago = asistente["porcentaje_pago"].to(float)
+    es_cortesia = (asistente["metodo_pago"].to_string().upper() == "CORTESIA")
     tiene_deuda = monto_pend > 0
+    tiene_metodo_puerta = (asistente["metodo_pago"].to_string() != "")
+    tiene_metodo_reserva = (asistente["metodo_pago_reserva"].to_string() != "")
 
     return rx.box(
         rx.flex(
@@ -49,18 +52,26 @@ def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
             rx.vstack(
                 rx.hstack(
                     badge_estado_reserva(asistente["estado"]),
-                    # Botones Interactivos de Métodos de Pago (Visibles cuando hay deuda o para cambiar pago)
+                    # Indicador de Método de Pago con el que Reservó Inicialmente (Letras negras limpias, solo si existe)
                     rx.cond(
-                        tiene_deuda,
-                        rx.hstack(
-                            boton_metodo_pago_puerta(asistente, "mastercard", "MasterCard", "/mastercard.png"),
-                            boton_metodo_pago_puerta(asistente, "zelle", "Zelle", "/zelle.png"),
-                            boton_metodo_pago_puerta(asistente, "binance", "Binance", "/binance.png"),
-                            boton_metodo_pago_puerta(asistente, "pagomovil", "Pago Móvil", "/pgm.png"),
-                            boton_metodo_pago_puerta(asistente, "transferencia", "Transferencia", "/tb.png"),
-                            spacing="1",
-                            align="center"
+                        tiene_metodo_reserva,
+                        rx.text(
+                            "Reserva: " + asistente["metodo_pago_reserva"].to_string().upper(),
+                            size="2",
+                            color="#2C3639",
+                            font_weight="medium"
                         )
+                    ),
+                    # Botones Interactivos de Métodos de Pago para Puerta
+                    rx.hstack(
+                        boton_metodo_pago_puerta(asistente, "mastercard", "MasterCard", "/mastercard.png"),
+                        boton_metodo_pago_puerta(asistente, "zelle", "Zelle", "/zelle.png"),
+                        boton_metodo_pago_puerta(asistente, "binance", "Binance", "/binance.png"),
+                        boton_metodo_pago_puerta(asistente, "cash", "Cash", "/cash.png"),
+                        boton_metodo_pago_puerta(asistente, "transferencia", "Transferencia", "/tb.png"),
+                        boton_metodo_pago_puerta(asistente, "cortesia", "Pase de Cortesía", "/pdc.png"),
+                        spacing="1",
+                        align="center"
                     ),
                     spacing="2",
                     align="center",
@@ -155,21 +166,43 @@ def tarjeta_asistente_tactil(asistente: rx.Var) -> rx.Component:
                 rx.box(
                     rx.text(
                         rx.cond(
-                            tiene_deuda,
-                            "Pendiente: " + asistente["monto_pendiente"].to_string() + "$",
-                            "100% Pagado"
+                            es_cortesia,
+                            "🎟️ Pase de Cortesía",
+                            rx.cond(
+                                tiene_deuda,
+                                "Pendiente: " + asistente["monto_pendiente"].to_string() + "$",
+                                "100% Pagado"
+                            )
                         ),
                         size="1",
                         font_weight="bold",
-                        color=rx.cond(tiene_deuda, "#DC2626", "#2E7D32"),
+                        color=rx.cond(
+                            es_cortesia,
+                            "#7C3AED",
+                            rx.cond(tiene_deuda, "#DC2626", "#2E7D32")
+                        ),
                         text_align="center"
                     ),
                     padding="3px 12px",
                     border_radius="15px",
-                    border=rx.cond(tiene_deuda, "1.5px solid #DC2626", "1.5px solid #2E7D32"),
+                    border=rx.cond(
+                        es_cortesia,
+                        "1.5px solid #7C3AED",
+                        rx.cond(tiene_deuda, "1.5px solid #DC2626", "1.5px solid #2E7D32")
+                    ),
                     background_color="#FFFFFF",
                     width="100%",
                     text_align="center"
+                ),
+                # Indicador explícito del Método de Pago registrado en Puerta (Letras negras limpias, solo si existe)
+                rx.cond(
+                    tiene_metodo_puerta,
+                    rx.text(
+                        "Método: " + asistente["metodo_pago"].to_string().upper(),
+                        size="2",
+                        color="#2C3639",
+                        font_weight="medium"
+                    )
                 ),
                 align="center",
                 spacing="2",

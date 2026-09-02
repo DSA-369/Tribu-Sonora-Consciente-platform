@@ -113,11 +113,44 @@ def tarjeta_orden_admin(ord_item: rx.Var) -> rx.Component:
         width="100%"
     )
     
+def boton_metodo_pago_admin(reserva: rx.Var, metodo_clave: str, nombre_logo: str, img_src: str) -> rx.Component:
+    """Botón interactivo de método de pago para la tarjeta de reserva admin."""
+    metodo_actual = reserva["metodo_pago_reserva"].to_string().lower()
+    esta_seleccionado = (metodo_actual == metodo_clave.lower())
+
+    return rx.box(
+        rx.hstack(
+            rx.cond(
+                esta_seleccionado,
+                rx.text("✓", font_weight="bold", color="#16A34A", size="1"),
+                rx.fragment()
+            ),
+            rx.image(
+                src=img_src,
+                alt=nombre_logo,
+                height="20px",
+                object_fit="contain"
+            ),
+            spacing="1",
+            align="center"
+        ),
+        padding="4px 8px",
+        border_radius="6px",
+        cursor="pointer",
+        border=rx.cond(esta_seleccionado, "2px solid #16A34A", "1px solid #EAE5DF"),
+        background_color=rx.cond(esta_seleccionado, "#DCFCE7", "#FFFFFF"),
+        box_shadow=rx.cond(esta_seleccionado, "0px 0px 6px rgba(22, 163, 74, 0.4)", "0px 1px 3px rgba(0,0,0,0.05)"),
+        transform=rx.cond(esta_seleccionado, "translateY(1px)", "none"),
+        _hover={"border_color": "#16A34A"},
+        on_click=lambda: State.seleccionar_metodo_pago_reserva_admin(reserva["id"], metodo_clave)
+    )
+
 def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
     """Tarjeta individual de reserva para el panel administrador adaptada a la vista de control."""
     pct_pago = reserva["porcentaje_pago"].to(float)
     monto_pend = reserva["monto_pendiente"].to(float)
     tiene_deuda = monto_pend > 0
+    tiene_metodo_reserva = (reserva["metodo_pago_reserva"].to_string() != "")
 
     return rx.box(
         rx.vstack(
@@ -128,25 +161,38 @@ def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
                     align="start",
                     spacing="0"
                 ),
-                rx.cond(
-                    reserva["estado"] == "CONFIRMADO",
-                    rx.badge(
-                        "CONFIRMADO",
-                        color="#000000",
-                        background_color="#22C55E",
-                        border="2px solid #15803D",
-                        font_weight="bold",
-                        size="2"
-                    ),
-                    rx.badge(
-                        reserva["estado"],
-                        color_scheme=rx.match(
-                            reserva["estado"],
-                            ("RECHAZADO", "red"),
-                            "amber"
+                rx.hstack(
+                    rx.cond(
+                        reserva["estado"] == "CONFIRMADO",
+                        rx.badge(
+                            "CONFIRMADO",
+                            color="#000000",
+                            background_color="#22C55E",
+                            border="2px solid #15803D",
+                            font_weight="bold",
+                            size="2"
                         ),
-                        size="2"
-                    )
+                        rx.badge(
+                            reserva["estado"],
+                            color_scheme=rx.match(
+                                reserva["estado"],
+                                ("RECHAZADO", "red"),
+                                "amber"
+                            ),
+                            size="2"
+                        )
+                    ),
+                    rx.cond(
+                        tiene_metodo_reserva,
+                        rx.text(
+                            "Reserva: " + reserva["metodo_pago_reserva"].to_string().upper(),
+                            size="2",
+                            color="#2C3639",
+                            font_weight="medium"
+                        )
+                    ),
+                    spacing="3",
+                    align="center"
                 ),
                 justify="between",
                 align="start",
@@ -163,7 +209,7 @@ def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
                 spacing="1"
             ),
 
-            # Fila de Selector de Porcentaje + Píldora de Pendiente (Fuente de Verdad)
+            # Fila de Selector de Porcentaje + Píldora de Pendiente + Métodos de Pago
             rx.vstack(
                 rx.text("Reservó con:", size="1", font_weight="bold", color="#2C3639"),
                 rx.hstack(
@@ -217,20 +263,60 @@ def tarjeta_reserva_admin(reserva: rx.Var) -> rx.Component:
                     # Píldora de Saldo Restante
                     rx.box(
                         rx.text(
-                            rx.cond(tiene_deuda, "Pendiente: " + reserva["monto_pendiente"].to_string() + "$", "100% Pagado"),
+                            rx.cond(
+                                reserva["metodo_pago_reserva"].to_string().upper() == "CORTESIA",
+                                "🎟️ Pase de Cortesía ($0)",
+                                rx.cond(tiene_deuda, "Pendiente: " + reserva["monto_pendiente"].to_string() + "$", "100% Pagado")
+                            ),
                             size="1",
                             font_weight="bold",
-                            color=rx.cond(tiene_deuda, "#DC2626", "#2E7D32")
+                            color=rx.cond(
+                                reserva["metodo_pago_reserva"].to_string().upper() == "CORTESIA",
+                                "#7C3AED",
+                                rx.cond(tiene_deuda, "#DC2626", "#2E7D32")
+                            )
                         ),
                         padding="4px 12px",
                         border_radius="15px",
-                        border=rx.cond(tiene_deuda, "1.5px solid #DC2626", "1.5px solid #2E7D32"),
+                        border=rx.cond(
+                            reserva["metodo_pago_reserva"].to_string().upper() == "CORTESIA",
+                            "1.5px solid #7C3AED",
+                            rx.cond(tiene_deuda, "1.5px solid #DC2626", "1.5px solid #2E7D32")
+                        ),
                         background_color="#FFFFFF"
                     ),
                     spacing="3",
                     align="center",
                     flex_wrap="wrap"
                 ),
+
+                # Botones Interactivos de Métodos de Pago con Confirmación Visual
+                rx.vstack(
+                    rx.cond(
+                        reserva["metodo_pago_reserva"] != "",
+                        rx.hstack(
+                            rx.text("Método Pago Seleccionado:", size="1", font_weight="bold", color="#2C3639"),
+                            rx.text(reserva["metodo_pago_reserva"].to_string().upper(), size="2", color="#2C3639", font_weight="medium"),
+                            spacing="2",
+                            align="center"
+                        )
+                    ),
+                    rx.hstack(
+                        boton_metodo_pago_admin(reserva, "mastercard", "MasterCard", "/mastercard.png"),
+                        boton_metodo_pago_admin(reserva, "zelle", "Zelle", "/zelle.png"),
+                        boton_metodo_pago_admin(reserva, "binance", "Binance", "/binance.png"),
+                        boton_metodo_pago_admin(reserva, "cash", "Cash", "/cash.png"),
+                        boton_metodo_pago_admin(reserva, "transferencia", "Transferencia", "/tb.png"),
+                        boton_metodo_pago_admin(reserva, "cortesia", "Pase de Cortesía", "/pdc.png"),
+                        spacing="1",
+                        align="center",
+                        flex_wrap="wrap",
+                        margin_top="2px"
+                    ),
+                    spacing="1",
+                    align="start"
+                ),
+
                 align="start",
                 spacing="1",
                 padding_y="4px"
@@ -1406,7 +1492,7 @@ def modal_mensaje_1a1_crm() -> rx.Component:
                 rx.hstack(
                     rx.heading(
                         "💬 Mensaje 1-a-1: " + State.mensaje_1a1_destinatario_nombre,
-                        size="4",
+                        size=rx.breakpoints(initial="3", sm="4"),
                         color="#2C3639",
                         style={"font-family": "Georgia, serif"}
                     ),
@@ -1423,12 +1509,13 @@ def modal_mensaje_1a1_crm() -> rx.Component:
                 ),
                 rx.divider(color_scheme="gray", margin_y="8px"),
                 rx.vstack(
-                    rx.hstack(
+                    rx.flex(
                         rx.vstack(
                             rx.text("Destinatario (WhatsApp):", size="2", font_weight="bold", color="#2C3639"),
                             rx.badge(State.mensaje_1a1_destinatario_wa, color_scheme="green", size="2"),
                             align="start",
-                            spacing="1"
+                            spacing="1",
+                            min_width="150px"
                         ),
                         rx.vstack(
                             rx.text("Sesión a promocionar:", size="2", font_weight="bold", color="#2C3639"),
@@ -1441,19 +1528,22 @@ def modal_mensaje_1a1_crm() -> rx.Component:
                             ),
                             align="start",
                             spacing="1",
-                            flex="1"
+                            flex="1",
+                            width="100%"
                         ),
                         width="100%",
-                        spacing="3",
-                        align="center"
+                        gap="12px",
+                        flex_direction=rx.breakpoints(initial="column", sm="row"),
+                        align_items=rx.breakpoints(initial="stretch", sm="center")
                     ),
                     rx.text("Mensaje Personalizado (Plantilla Auto-generada):", size="2", font_weight="bold", color="#2C3639", margin_top="10px"),
                     rx.text_area(
                         placeholder="Escribe el mensaje directo para el cliente...",
                         value=State.mensaje_1a1_texto,
                         on_change=State.set_mensaje_1a1_texto,
-                        rows="12",
-                        width="100%"
+                        rows="10",
+                        width="100%",
+                        style={"font-size": "14px"}
                     ),
                     rx.hstack(
                         rx.button(
@@ -1484,17 +1574,19 @@ def modal_mensaje_1a1_crm() -> rx.Component:
                 width="100%"
             ),
             background_color="#FFFFFF",
-            padding="25px",
+            padding=rx.breakpoints(initial="16px", sm="25px"),
             border_radius="12px",
-            max_width="600px"
+            max_width="600px",
+            width=rx.breakpoints(initial="95vw", sm="100%"),
+            max_height="90vh",
+            overflow_y="auto"
         ),
         open=State.modal_mensaje_1a1_abierto,
         on_open_change=State.set_modal_mensaje_1a1_abierto
     )
 
 def tarjeta_cliente_crm(cliente: rx.Var) -> rx.Component:
-
-    """Tarjeta individual de cliente consolidado en el CRM."""
+    """Tarjeta individual de cliente consolidado en el CRM optimizada para pantallas móviles."""
     return rx.box(
         rx.flex(
             rx.vstack(
@@ -1509,7 +1601,8 @@ def tarjeta_cliente_crm(cliente: rx.Var) -> rx.Component:
                     ),
                     rx.heading(cliente["nombre"], size="3", color="#2C3639", font_weight="bold"),
                     align="center",
-                    spacing="2"
+                    spacing="2",
+                    flex_wrap="wrap"
                 ),
                 rx.hstack(
                     rx.icon(tag="phone", size=14, color="#8E6F54"),
@@ -1525,7 +1618,7 @@ def tarjeta_cliente_crm(cliente: rx.Var) -> rx.Component:
                         cliente["email"] != "",
                         rx.hstack(
                             rx.icon(tag="mail", size=14, color="#7F7F7F"),
-                            rx.text(cliente["email"], size="2", color="#7F7F7F"),
+                            rx.text(cliente["email"], size="2", color="#7F7F7F", style={"word-break": "break-all"}),
                             spacing="1",
                             align="center"
                         )
@@ -1542,54 +1635,67 @@ def tarjeta_cliente_crm(cliente: rx.Var) -> rx.Component:
                         background_color="#FAF6F0",
                         border_left="3px solid #8E6F54",
                         border_radius="4px",
-                        margin_top="4px"
+                        margin_top="4px",
+                        width="100%"
                     )
                 ),
                 align="start",
                 spacing="1",
-                flex="1"
+                width="100%"
             ),
-            rx.hstack(
-                rx.vstack(
-                    rx.text("Reservas", size="1", color="#7F7F7F"),
-                    rx.text(cliente["total_reservas"], size="3", font_weight="bold", color="#2C3639"),
+            rx.flex(
+                rx.hstack(
+                    rx.vstack(
+                        rx.text("Reservas", size="1", color="#7F7F7F"),
+                        rx.text(cliente["total_reservas"], size="3", font_weight="bold", color="#2C3639"),
+                        align="center",
+                        spacing="0"
+                    ),
+                    rx.vstack(
+                        rx.text("Asistencias", size="1", color="#7F7F7F"),
+                        rx.text(cliente["asistencias"], size="3", font_weight="bold", color="#2E7D32"),
+                        align="center",
+                        spacing="0"
+                    ),
+                    rx.vstack(
+                        rx.text("Inversión", size="1", color="#7F7F7F"),
+                        rx.text("$", cliente["inversion_total"], size="3", font_weight="bold", color="#8E6F54"),
+                        align="center",
+                        spacing="0"
+                    ),
+                    spacing="4",
+                    align="center"
+                ),
+                rx.hstack(
+                    rx.button(
+                        "💬 Mensaje 1-a-1",
+                        size="2",
+                        variant="solid",
+                        color_scheme="green",
+                        cursor="pointer",
+                        on_click=lambda: State.abrir_modal_mensaje_1a1(cliente)
+                    ),
+                    rx.button(
+                        "✏️ Notas",
+                        size="2",
+                        variant="soft",
+                        color_scheme="brown",
+                        cursor="pointer",
+                        on_click=lambda: State.abrir_modal_editar_crm(cliente)
+                    ),
+                    spacing="2",
                     align="center",
-                    spacing="0"
+                    flex_wrap="wrap"
                 ),
-                rx.vstack(
-                    rx.text("Asistencias", size="1", color="#7F7F7F"),
-                    rx.text(cliente["asistencias"], size="3", font_weight="bold", color="#2E7D32"),
-                    align="center",
-                    spacing="0"
-                ),
-                rx.vstack(
-                    rx.text("Inversión", size="1", color="#7F7F7F"),
-                    rx.text("$", cliente["inversion_total"], size="3", font_weight="bold", color="#8E6F54"),
-                    align="center",
-                    spacing="0"
-                ),
-                rx.button(
-                    "💬 Mensaje 1-a-1",
-                    size="2",
-                    variant="solid",
-                    color_scheme="green",
-                    cursor="pointer",
-                    on_click=lambda: State.abrir_modal_mensaje_1a1(cliente)
-                ),
-                rx.button(
-                    "✏️ Notas",
-                    size="2",
-                    variant="soft",
-                    color_scheme="brown",
-                    cursor="pointer",
-                    on_click=lambda: State.abrir_modal_editar_crm(cliente)
-                ),
-                spacing="4",
-                align="center"
+                justify="between",
+                align="center",
+                flex_wrap="wrap",
+                gap="10px",
+                width="100%"
             ),
             justify="between",
-            align_items=rx.breakpoints(initial="stretch", sm="center"),
-            flex_direction=rx.breakpoints(initial="column", sm="row"),
+            align_items="stretch",
+            flex_direction="column",
             gap="12px",
             width="100%"
         ),
