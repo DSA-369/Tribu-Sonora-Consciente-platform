@@ -115,6 +115,7 @@ class TribuSessionReservation(sqlmodel.SQLModel, table=True):
     participantes_json: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
     cupon_codigo: str | None = sqlmodel.Field(default=None)
     metodo_pago: str | None = sqlmodel.Field(default=None)
+    metodo_pago_reserva: str | None = sqlmodel.Field(default=None)
     fecha_evento: str | None = sqlmodel.Field(default=None)
 
 class TribuAdminUser(sqlmodel.SQLModel, table=True):
