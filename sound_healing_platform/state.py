@@ -1266,6 +1266,7 @@ class State(rx.State):
                     self.producto_detalle = {
                         "id": product.id,
                         "nombre": product.nombre,
+                        "proveedor": product.proveedor or "",
                         "descripcion": product.descripcion,
                         "precio": float(product.precio),
                         "precio_anterior": float(product.precio_anterior) if product.precio_anterior else 0.0,

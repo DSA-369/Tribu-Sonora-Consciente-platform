@@ -74,6 +74,14 @@ def tarjeta_producto_ver_todo(producto: rx.Var) -> rx.Component:
             ),
             position="relative", overflow="hidden", width="100%"
         ),
+        rx.heading(
+            producto["nombre"], 
+            size="3", 
+            color="#2C3639", 
+            font_weight="normal",
+            style={"font-family": "Georgia, serif"}, 
+            margin_top="12px"
+        ),
         rx.cond(
             producto["proveedor"] != "",
             rx.text(
@@ -82,16 +90,8 @@ def tarjeta_producto_ver_todo(producto: rx.Var) -> rx.Component:
                 color="#7F7F7F",
                 letter_spacing="0.1em",
                 text_transform="uppercase",
-                margin_top="10px"
+                margin_top="2px"
             )
-        ),
-        rx.heading(
-            producto["nombre"], 
-            size="3", 
-            color="#2C3639", 
-            font_weight="normal",
-            style={"font-family": "Georgia, serif"}, 
-            margin_top="4px"
         ),
         rx.hstack(
             rx.text("$", color="#2C3639", size="2", font_weight="medium"),

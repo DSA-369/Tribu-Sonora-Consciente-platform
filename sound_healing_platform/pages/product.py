@@ -143,7 +143,17 @@ def panel_informacion_producto() -> rx.Component:
             )
         ),
         
-        rx.text("Impuestos incluidos.", size="1", color="#7F7F7F", margin_bottom="20px"),
+        rx.cond(
+            State.producto_detalle["proveedor"] != "",
+            rx.text(
+                State.producto_detalle["proveedor"],
+                size="1",
+                color="#7F7F7F",
+                font_weight="medium",
+                margin_bottom="20px"
+            ),
+            rx.box(margin_bottom="10px")
+        ),
         
         # 🎨 SELECTOR VISUAL DE VARIANTES (Amazon / Mercado Libre Style)
         rx.cond(
