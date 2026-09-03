@@ -1,4 +1,4 @@
-# 🎵 Tribu Sonora Consciente — Web Platform
+# 🎵 Tribu Sonora Consciente — Web Platform www.tribusonoraconsciente.com
 
 Plataforma web integral diseñada para la gestión, difusión y agendamiento de experiencias de sonoterapia, talleres vivenciales y venta de instrumentos acústicos de resonancia.
 
