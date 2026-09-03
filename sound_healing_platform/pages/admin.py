@@ -1707,6 +1707,73 @@ def tarjeta_cliente_crm(cliente: rx.Var) -> rx.Component:
         width="100%"
     )
 
+def tarjeta_diario_admin(entrada: rx.Var) -> rx.Component:
+    """Tarjeta individual para gestionar consultas de la Bitácora de Integración."""
+    return rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.vstack(
+                    rx.hstack(
+                        rx.heading(entrada["nombre"], size="3", color="#2C3639", font_weight="bold"),
+                        rx.badge(
+                            rx.cond(entrada["atendido"], "ATENDIDO", "PENDIENTE"),
+                            color_scheme=rx.cond(entrada["atendido"], "green", "amber"),
+                            size="1"
+                        ),
+                        rx.cond(
+                            entrada["es_privado"],
+                            rx.badge("🔒 PRIVADO", color_scheme="purple", size="1")
+                        ),
+                        spacing="2",
+                        align="center"
+                    ),
+                    rx.text("📧 Correo: ", entrada["correo"], size="2", color="#2C3639"),
+                    rx.cond(
+                        entrada["telefono"] != "",
+                        rx.text("📞 WhatsApp: ", entrada["telefono"], size="2", color="#4B5563")
+                    ),
+                    rx.cond(
+                        entrada["sesion_asistida"] != "",
+                        rx.text("🧘 Sesión: ", entrada["sesion_asistida"], size="2", color="#8E6F54", font_weight="medium")
+                    ),
+                    align="start",
+                    spacing="1"
+                ),
+                rx.button(
+                    rx.cond(entrada["atendido"], "⚪ Marcar Pendiente", "🟢 Marcar Atendido"),
+                    size="2",
+                    variant="soft",
+                    color_scheme=rx.cond(entrada["atendido"], "amber", "green"),
+                    cursor="pointer",
+                    on_click=lambda: State.marcar_diario_atendido(entrada["id"])
+                ),
+                justify="between",
+                align="start",
+                width="100%"
+            ),
+
+            rx.divider(color_scheme="gray", margin_y="8px"),
+
+            rx.box(
+                rx.text('"', entrada["mensaje"], '"', size="2", color="#4B5563", style={"font-style": "italic", "white-space": "pre-wrap"}),
+                padding="10px 14px",
+                background_color="#FAF6F0",
+                border_left="3px solid #8E6F54",
+                border_radius="6px",
+                width="100%"
+            ),
+            width="100%",
+            spacing="2"
+        ),
+        background_color="#FFFFFF",
+        border="1px solid #EAE5DF",
+        border_radius="10px",
+        padding="15px",
+        margin_bottom="12px",
+        width="100%"
+    )
+
+
 def panel_admin_logueado() -> rx.Component:
     """Panel principal de administración autenticado con módulos unificados CRM."""
     return rx.vstack(
@@ -1736,6 +1803,14 @@ def panel_admin_logueado() -> rx.Component:
                 background_color=rx.cond(State.admin_tab_activa == "crm", "#8E6F54", "transparent"),
                 color=rx.cond(State.admin_tab_activa == "crm", "#FFFFFF", "#2C3639"),
                 on_click=lambda: State.set_admin_tab("crm")
+            ),
+            rx.button(
+                "📖 Bitácora / Diario",
+                size="2",
+                variant=rx.cond(State.admin_tab_activa == "diario", "solid", "ghost"),
+                background_color=rx.cond(State.admin_tab_activa == "diario", "#8E6F54", "transparent"),
+                color=rx.cond(State.admin_tab_activa == "diario", "#FFFFFF", "#2C3639"),
+                on_click=lambda: State.set_admin_tab("diario")
             ),
             rx.button(
                 "📋 Reservas",
@@ -1803,6 +1878,20 @@ def panel_admin_logueado() -> rx.Component:
         # Contenido Dinámico de Pestañas con rx.match (Estructura Limpia)
         rx.match(
             State.admin_tab_activa,
+            # Pestaña Bitácora / Diario
+            (
+                "diario",
+                rx.vstack(
+                    rx.heading("Consultas y Bitácora de Integración", size="4", color="#2C3639"),
+                    rx.cond(
+                        State.diario_admin_list.length() == 0,
+                        rx.text("No hay consultas ni vivencias registradas en la bitácora.", color="#7F7F7F"),
+                        rx.foreach(State.diario_admin_list, tarjeta_diario_admin)
+                    ),
+                    width="100%",
+                    spacing="3"
+                )
+            ),
             # Pestaña CRM
             (
                 "crm",

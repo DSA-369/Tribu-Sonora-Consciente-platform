@@ -160,15 +160,164 @@ def acerca_de_page() -> rx.Component:
             # Separación sutil
             rx.center(rx.box(width="85%", height="1px", background_color="#EAE5DF"), width="100%", background_color="#FAF6F0"),
 
-            # SECCIÓN 5: DIARIO (id="diario")
+            # SECCIÓN 5: DIARIO / BITÁCORA DE INTEGRACIÓN (id="diario")
             rx.center(
                 rx.vstack(
-                    rx.heading("DIARIO", size="7", color="#2C3639", font_weight="normal", letter_spacing="0.1em", style={"font-family": "Georgia, serif"}, margin_bottom="30px"),
-                    rx.text("Un espacio de reflexión, escritos conscientes, novedades sobre sonoterapia y sabiduría ancestral en camino.", size="3", color="#7F7F7F", text_align="center", max_width="600px"),
-                    width="100%", max_width="950px", align="center", padding_x="20px"
+                    rx.heading(
+                        "BITÁCORA DE INTEGRACIÓN",
+                        size=rx.breakpoints(initial="6", sm="7"),
+                        color="#2C3639",
+                        font_weight="normal",
+                        letter_spacing="0.1em",
+                        style={"font-family": "Georgia, serif"},
+                        margin_bottom="15px",
+                        text_align="center"
+                    ),
+                    rx.text(
+                        "Un espacio sagrado para compartir tus vivencias, procesar lo experimentado en las sesiones de sound healing y recibir acompañamiento personalizado de la Tribu.",
+                        size="3",
+                        color="#2C3639",
+                        font_weight="medium",
+                        text_align="center",
+                        max_width="650px",
+                        margin_bottom="35px"
+                    ),
+                    
+                    # Formulario de Integración Terapéutica
+                    rx.vstack(
+                        rx.flex(
+                            rx.input(
+                                placeholder="Nombre completo *",
+                                value=State.diario_nombre,
+                                on_change=State.set_diario_nombre,
+                                size="3",
+                                flex="1",
+                                color="#1A1A1A",
+                                background_color="#FFFFFF",
+                                border="1px solid #C8C2BC",
+                                border_radius="8px",
+                                style={
+                                    "&::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"},
+                                    "& input::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"}
+                                },
+                                width="100%"
+                            ),
+                            rx.input(
+                                placeholder="Correo electrónico *",
+                                value=State.diario_correo,
+                                on_change=State.set_diario_correo,
+                                size="3",
+                                flex="1",
+                                color="#1A1A1A",
+                                background_color="#FFFFFF",
+                                border="1px solid #C8C2BC",
+                                border_radius="8px",
+                                style={
+                                    "&::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"},
+                                    "& input::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"}
+                                },
+                                width="100%"
+                            ),
+                            width="100%",
+                            gap="4",
+                            flex_direction=rx.breakpoints(initial="column", sm="row"),
+                        ),
+                        rx.flex(
+                            rx.input(
+                                placeholder="Número de WhatsApp",
+                                value=State.diario_telefono,
+                                on_change=State.set_diario_telefono,
+                                size="3",
+                                flex="1",
+                                color="#1A1A1A",
+                                background_color="#FFFFFF",
+                                border="1px solid #C8C2BC",
+                                border_radius="8px",
+                                style={
+                                    "&::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"},
+                                    "& input::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"}
+                                },
+                                width="100%"
+                            ),
+                            rx.input(
+                                placeholder="Sesión a la que asististe",
+                                value=State.diario_sesion,
+                                on_change=State.set_diario_sesion,
+                                size="3",
+                                flex="1",
+                                color="#1A1A1A",
+                                background_color="#FFFFFF",
+                                border="1px solid #C8C2BC",
+                                border_radius="8px",
+                                style={
+                                    "&::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"},
+                                    "& input::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"}
+                                },
+                                width="100%"
+                            ),
+                            width="100%",
+                            gap="4",
+                            margin_y="10px",
+                            flex_direction=rx.breakpoints(initial="column", sm="row"),
+                        ),
+                        rx.text_area(
+                            placeholder="Describe tu proceso: sensaciones físicas, emociones, visiones o dudas que hayan surgido durante o después del viaje sonoro...",
+                            value=State.diario_mensaje,
+                            on_change=State.set_diario_mensaje,
+                            size="3",
+                            width="100%",
+                            height="140px",
+                            color="#1A1A1A",
+                            background_color="#FFFFFF",
+                            border="1px solid #C8C2BC",
+                            border_radius="8px",
+                            style={
+                                "&::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"},
+                                "& textarea::placeholder": {"color": "#4A5568 !important", "opacity": "1 !important"}
+                            }
+                        ),
+                        rx.hstack(
+                            rx.checkbox(
+                                checked=State.diario_privado,
+                                on_change=State.set_diario_privado,
+                                color_scheme="bronze"
+                            ),
+                            rx.text(
+                                "Mantener esta consulta 100% privada entre los terapeutas y yo",
+                                color="#2C3639",
+                                font_weight="medium",
+                                size="2"
+                            ),
+                            margin_top="10px",
+                            align="center",
+                            spacing="2"
+                        ),
+                        rx.button(
+                            "Enviar Consulta de Integración",
+                            background_color="#8E6F54",
+                            color="#FFFFFF",
+                            size="3",
+                            padding_x="40px",
+                            margin_top="20px",
+                            cursor="pointer",
+                            border_radius="8px",
+                            width=rx.breakpoints(initial="100%", sm="auto"),
+                            _hover={"background_color": "#73573F"},
+                            on_click=State.enviar_consulta_diario
+                        ),
+                        width="100%",
+                        max_width="750px",
+                        align="center"
+                    ),
+                    width="100%",
+                    max_width="950px",
+                    align="center",
+                    padding_x=rx.breakpoints(initial="16px", sm="24px")
                 ),
                 id="diario",
-                width="100%", padding_y="80px", background_color="#FAF6F0",
+                width="100%",
+                padding_y=rx.breakpoints(initial="50px", sm="80px"),
+                background_color="#FAF6F0",
             ),
 
             spacing="0", width="100%",

@@ -199,3 +199,16 @@ class TribuClientNote(sqlmodel.SQLModel, table=True):
     whatsapp_cliente: str = sqlmodel.Field(unique=True, index=True)
     etiqueta: str = sqlmodel.Field(default="NUEVO")
     notas_internas: str | None = None
+
+
+class TribuJournalEntry(sqlmodel.SQLModel, table=True):
+    """Consultas de integración y vivencias del Diario/Bitácora."""
+    __tablename__ = "tribu_journal_entries"
+    id: int | None = sqlmodel.Field(default=None, primary_key=True)
+    nombre: str
+    correo: str
+    telefono: str | None = None
+    sesion_asistida: str | None = None
+    mensaje: str
+    es_privado: bool = sqlmodel.Field(default=True)
+    atendido: bool = sqlmodel.Field(default=False)

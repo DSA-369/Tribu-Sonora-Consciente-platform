@@ -25,6 +25,7 @@ from sound_healing_platform.models import (
     TribuNotification,
     TribuCoupon,
     TribuClientNote,
+    TribuJournalEntry,
 )
 
 # ==================================================================
@@ -973,13 +974,21 @@ class State(rx.State):
         self.show_sub_categoria = not self.show_sub_categoria
 
     # ==================================================================
-    # 3. VARIABLES Y MÉTODOS DEL FORMULARIO DE CONTACTO
+    # 3. VARIABLES Y MÉTODOS DEL FORMULARIO DE CONTACTO Y BITÁCORA
     # ==================================================================
     nombre: str = ""
     correo: str = ""
     telefono: str = ""
     comentario: str = ""
     
+    # Variables de la Bitácora / Diario de Integración
+    diario_nombre: str = ""
+    diario_correo: str = ""
+    diario_telefono: str = ""
+    diario_sesion: str = ""
+    diario_mensaje: str = ""
+    diario_privado: bool = True
+
     def asignar_nombre(self, valor: str):
         self.nombre = valor
 
@@ -992,6 +1001,13 @@ class State(rx.State):
     def asignar_comentario(self, valor: str):
         self.comentario = valor
 
+    def set_diario_nombre(self, val: str): self.diario_nombre = val
+    def set_diario_correo(self, val: str): self.diario_correo = val
+    def set_diario_telefono(self, val: str): self.diario_telefono = val
+    def set_diario_sesion(self, val: str): self.diario_sesion = val
+    def set_diario_mensaje(self, val: str): self.diario_mensaje = val
+    def set_diario_privado(self, val: bool): self.diario_privado = val
+
     def enviar_formulario(self):
         if self.nombre.strip() == "" or self.correo.strip() == "":
             return rx.toast.error("Por favor, completa los campos requeridos (*)")
@@ -1000,6 +1016,43 @@ class State(rx.State):
         self.telefono = ""
         self.comentario = ""
         return rx.toast.success("¡Mensaje enviado con éxito! Nos comunicaremos pronto.")
+
+    def enviar_consulta_diario(self):
+        if not self.diario_nombre.strip() or not self.diario_correo.strip() or not self.diario_mensaje.strip():
+            return rx.toast.error("Por favor completa tu Nombre, Correo y la Descripción de tu vivencia.")
+
+        try:
+            with rx.session() as session:
+                nueva_entrada = TribuJournalEntry(
+                    nombre=self.diario_nombre.strip(),
+                    correo=self.diario_correo.strip().lower(),
+                    telefono=self.diario_telefono.strip() if self.diario_telefono else None,
+                    sesion_asistida=self.diario_sesion.strip() if self.diario_sesion else None,
+                    mensaje=self.diario_mensaje.strip(),
+                    es_privado=self.diario_privado,
+                    atendido=False
+                )
+                session.add(nueva_entrada)
+                session.commit()
+
+            self.crear_notificacion_db(
+                titulo="🌿 Nueva Consulta de Integración",
+                mensaje=f"Consulta de {self.diario_nombre} sobre su vivencia en la sesión.",
+                target_url="admin_tab_diario",
+                es_admin=True
+            )
+
+            self.diario_nombre = ""
+            self.diario_correo = ""
+            self.diario_telefono = ""
+            self.diario_sesion = ""
+            self.diario_mensaje = ""
+            self.diario_privado = True
+
+            return rx.toast.success("¡Gracias por compartir tu experiencia! Un terapeuta de la Tribu te contactará pronto.")
+        except Exception as e:
+            print(f"Error guardando consulta en el Diario: {e}")
+            return rx.toast.error("Ocurrió un error al enviar tu consulta. Por favor reintenta.")
 
     # ==================================================================
     # 4. HIDRATACIÓN DINÁMICA DESDE SUPABASE (DATA FETCHING)
@@ -2868,6 +2921,23 @@ class State(rx.State):
     ordenes_admin_list: list[dict[str, Any]] = []
     sesiones_admin_list: list[dict[str, Any]] = []
     clientes_crm_list: list[dict[str, Any]] = []
+    diario_admin_list: list[dict[str, Any]] = []
+
+    def marcar_diario_atendido(self, entrada_id: int):
+        """Marca o desmarca una consulta de la Bitácora como atendida por el terapeuta."""
+        try:
+            with rx.session() as session:
+                entry = session.get(TribuJournalEntry, entrada_id)
+                if entry:
+                    entry.atendido = not entry.atendido
+                    session.add(entry)
+                    session.commit()
+                    self.cargar_datos_admin()
+                    estado_txt = "atendida" if entry.atendido else "pendiente"
+                    return rx.toast.info(f"Consulta de {entry.nombre} marcada como {estado_txt}.")
+        except Exception as e:
+            print(f"Error actualizando estado de Bitácora: {e}")
+            return rx.toast.error("Error al actualizar la consulta.")
 
     busqueda_cliente_crm: str = ""
     filtro_etiqueta_crm: str = "TODOS"
@@ -3217,6 +3287,24 @@ class State(rx.State):
                     })
 
                 self.clientes_crm_list = crm_consolidado
+
+                # 6. Cargar Consultas del Diario / Bitácora
+                db_journal = session.exec(
+                    sqlmodel.select(TribuJournalEntry).order_by(TribuJournalEntry.id.desc())
+                ).all()
+                self.diario_admin_list = [
+                    {
+                        "id": j.id,
+                        "nombre": j.nombre,
+                        "correo": j.correo,
+                        "telefono": j.telefono or "",
+                        "sesion_asistida": j.sesion_asistida or "",
+                        "mensaje": j.mensaje,
+                        "es_privado": j.es_privado,
+                        "atendido": j.atendido
+                    }
+                    for j in db_journal
+                ]
         except Exception as e:
             print(f"Error cargando datos admin: {e}")
 
