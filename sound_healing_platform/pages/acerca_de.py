@@ -8,60 +8,115 @@ from sound_healing_platform.state import State
 def acerca_de_page() -> rx.Component:
     return plantilla_tribu(
         rx.vstack(
-            # SECCIÓN 1: NUESTRA FILOSOFÍA (id="filosofia")
+            # CABECERA PRINCIPAL Y QUIÉNES SOMOS
             rx.center(
                 rx.vstack(
-                    rx.heading("NUESTRA FILOSOFÍA", size="8", color="#2C3639", font_weight="light", letter_spacing="0.15em", style={"font-family": "Georgia, serif"}),
+                    rx.heading(
+                        
+                    ),
                     rx.text(
                         '"El Sonido como Puente hacia la Armonía. En Tribu Sonora Consciente entendemos la relajación profunda no como un lujo, sino como la base fundamental de la salud y el bienestar integral"',
-                        size="4", color="#A27B5C", text_align="center", italic=True, max_width="700px", margin_top="25px", style={"font-family": "Georgia, serif"}
+                        size="4", 
+                        color="#8E6F54", 
+                        text_align="center", 
+                        italic=True, 
+                        max_width="750px", 
+                        margin_top="15px", 
+                        style={"font-family": "Georgia, serif"}
+                    ),
+                    rx.box(
+                        rx.heading(
+                            "QUIÉNES SOMOS", 
+                            size="5", 
+                            color="#2C3639", 
+                            font_weight="normal", 
+                            letter_spacing="0.1em", 
+                            style={"font-family": "Georgia, serif"}, 
+                            margin_y="25px",
+                            text_align="center"
+                        ),
+                        rx.flex(
+                            rx.vstack(
+                                rx.text(
+                                    "Nacemos de la convicción profunda de que la psique y el cuerpo humano poseen una capacidad innata para autorregularse, integrarse y reconstruirse. Somos Tribu Sonora Consciente, un equipo integrado por Danibeth, Jarold y Jesús, unidos por la vocación de facilitar espacios de presencia, contención y restauración somática a través del poder de la medicina sonora.",
+                                    size="3", color="#4B5563", line_height="1.8"
+                                ),
+                                width=rx.breakpoints(initial="100%", md="48%"), align="start"
+                            ),
+                            rx.vstack(
+                                rx.text(
+                                    "Nuestra propuesta no nace únicamente del estudio técnico de la acústica, la neurobiología y la música; nace de la experiencia de vida. Entendemos la resiliencia porque hemos transitado nuestros propios fuegos, duelos y transformaciones. Conocemos de primera mano lo que significa convertir el cambio en presencia y la pérdida en un renovado propósito de servicio. Por ello, cada encuentro que facilitamos es sostenido con empatía real, sobriedad ética y una profunda humanidad.",
+                                    size="3", color="#4B5563", line_height="1.8"
+                                ),
+                                width=rx.breakpoints(initial="100%", md="48%"), align="start"
+                            ),
+                            width="100%",
+                            flex_direction=rx.breakpoints(initial="column", md="row"),
+                            justify="between",
+                            gap="6"
+                        ),
+                        width="100%",
+                        margin_top="30px"
                     ),
                     width="100%", max_width="950px", align="center", padding_x="20px"
                 ),
-                id="filosofia",
-                width="100%", padding_y="80px", background_color="#FAF6F0",
+                width="100%", padding_y="70px", background_color="#FAF6F0"
             ),
 
             # Separación sutil
             rx.center(rx.box(width="85%", height="1px", background_color="#EAE5DF"), width="100%", background_color="#FAF6F0"),
 
-            # SECCIÓN 2: HISTORIA (id="historia")
+            # SECCIÓN: NUESTRA FILOSOFÍA (id="filosofia")
             rx.center(
                 rx.vstack(
-                    rx.heading("NUESTRA HISTORIA", size="7", color="#2C3639", font_weight="normal", letter_spacing="0.1em", style={"font-family": "Georgia, serif"}, margin_bottom="30px"),
-                    
-                    # Estructura de dos columnas tipo revista
+                    rx.heading(
+                        "NUESTRA FILOSOFÍA: EL SONIDO COMO MEDICINA", 
+                        size="7", 
+                        color="#2C3639", 
+                        font_weight="normal", 
+                        letter_spacing="0.08em", 
+                        style={"font-family": "Georgia, serif"}, 
+                        margin_bottom="15px",
+                        text_align="center"
+                    ),
+                    rx.text(
+                        "Entendemos la vibración como una herramienta de precisión para la salud integral del ser humano.",
+                        size="3", color="#8E6F54", text_align="center", font_weight="medium", margin_bottom="40px"
+                    ),
                     rx.flex(
                         rx.vstack(
+                            rx.heading("La Lente Neurosomática", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_bottom="10px"),
                             rx.text(
-                                "El Origen de la Tribu. Antes de cruzar nuestras vidas, cada uno de nosotros transitó un camino individual de exploración holística. Jarold profundizó en la sanación a través del Reiki y la construcción artesanal del tambor chamánico; Danibeth se dedicó al estudio de las frecuencias de los cuencos de cuarzo, la lectura de oráculos e instrumentos ancestrales; y Jesús se sumergió en la cosmovisión, la medicina natural y las raíces de las culturas originarias de Suramérica.",
+                                "Las frecuencias armónicas de los cuencos de cuarzo, el soplo ancestral del didgeridoo y el pulso rítmico del tambor actúan directamente sobre el sistema nervioso autónomo. Al acallar la hiperactividad de la mente cotidiana, el sonido ayuda a reducir el estrés, liberar cargas atrapadas en el cuerpo y restaurar la coherencia cardíaca y cerebral.",
                                 size="3", color="#4B5563", line_height="1.7"
                             ),
-                            rx.text(
-                                "En 2019, la ciudad de Caracas fue el punto de convergencia. Al reunirmos para facilitar una primera presentación colectiva, surgió la necesidad de definir nuestra identidad. En ese compartir comprendimos que habíamos conformado una familia unida por el propósito de ser canales conscientes para elevar la vibración del entorno. De esa certeza nació nuestro nombre: Tribu Sonora Consciente.",
-                                size="3", color="#4B5563", line_height="1.7"
-                            ),
-                            width=rx.breakpoints(initial="100%", md="48%"), align="start", spacing="4"
+                            width=rx.breakpoints(initial="100%", md="48%"),
+                            padding="25px",
+                            background_color="#FFFFFF",
+                            border_radius="8px",
+                            border="1px solid #EAE5DF",
+                            align="start"
                         ),
                         rx.vstack(
+                            rx.heading("La Lente Ancestral y Ceremonial", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_bottom="10px"),
                             rx.text(
-                                "Desde entonces, Jarold, Danibeth y Jesús nos consolidamos como los pilares fundamentales de este espacio. A lo largo de los años, hemos guiado innumerables sesiones individuales y grupales, talleres, inauguraciones, círculos de bienestar, voluntariados y ceremonias, posicionándonos como un referente de la sonoterapia en Venezuela.",
+                                "Honramos la memoria del sonido como un lenguaje universal que trasciende las palabras. La resonancia actúa como un espejo del alma, abriendo un espacio sagrado donde es posible soltar el peso del pasado, sintonizar con la calma interior y reencontrar el sentido de pertenencia con la totalidad.",
                                 size="3", color="#4B5563", line_height="1.7"
                             ),
-                            rx.text(
-                                "Hoy estrenamos nuestra plataforma web como un santuario digital para acortar distancias con nuestra comunidad: un canal donde podrás explorar el universo del sound healing, reservar tus cupos, adquirir instrumentos y seguir transformando la vida a través de la frecuencia.",
-                                size="3", color="#4B5563", line_height="1.7"
-                            ),
-                            width=rx.breakpoints(initial="100%", md="48%"), align="start", spacing="4"
+                            width=rx.breakpoints(initial="100%", md="48%"),
+                            padding="25px",
+                            background_color="#FFFFFF",
+                            border_radius="8px",
+                            border="1px solid #EAE5DF",
+                            align="start"
                         ),
                         width="100%",
                         flex_direction=rx.breakpoints(initial="column", md="row"),
                         justify="between",
-                        gap="6",
-                        margin_bottom="60px"
+                        gap="6"
                     ),
 
-                    # Galería de hitos / Línea de tiempo (Imágenes locales desde assets)
+                    # GALERÍA DE 4 PILARES / HITOS VISUALES
                     rx.flex(
                         rx.vstack(
                             rx.image(src="/hito_raiz01.png", width="100%", height="140px", object_fit="cover"),
@@ -91,12 +146,90 @@ def acerca_de_page() -> rx.Component:
                         flex_direction=rx.breakpoints(initial="column", sm="row"),
                         flex_wrap="wrap",
                         justify="between",
-                        gap="6"
+                        gap="6",
+                        margin_top="50px"
                     ),
                     width="100%", max_width="950px", align="center", padding_x="20px"
                 ),
-                id="historia",
-                width="100%", padding_y="80px", background_color="#FAF6F0",
+                id="filosofia",
+                width="100%", padding_y="80px", background_color="#FAF6F0"
+            ),
+
+            # Separación sutil
+            rx.center(rx.box(width="85%", height="1px", background_color="#EAE5DF"), width="100%", background_color="#FAF6F0"),
+
+            # SECCIÓN: NUESTRO PROPÓSITO
+            rx.center(
+                rx.vstack(
+                    rx.heading(
+                        "NUESTRO PROPÓSITO", 
+                        size="7", 
+                        color="#2C3639", 
+                        font_weight="normal", 
+                        letter_spacing="0.1em", 
+                        style={"font-family": "Georgia, serif"}, 
+                        margin_bottom="15px",
+                        text_align="center"
+                    ),
+                    rx.text(
+                        "Existimos para ofrecer un refugio acústico seguro donde las personas puedan hacer una pausa, respirar y retornar a su centro.",
+                        size="3", color="#8E6F54", text_align="center", font_weight="medium", max_width="750px", margin_bottom="45px"
+                    ),
+                    rx.flex(
+                        rx.vstack(
+                            rx.heading("Crear Comunidad", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_bottom="8px"),
+                            rx.text(
+                                "Establecer espacios continuos de encuentro donde la salud mental, emocional y espiritual sea accesible y cultivada de manera colectiva.",
+                                size="2", color="#4B5563", line_height="1.6"
+                            ),
+                            width=rx.breakpoints(initial="100%", sm="48%", md="31%"),
+                            align="start"
+                        ),
+                        rx.vstack(
+                            rx.heading("Servicio y Contención", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_bottom="8px"),
+                            rx.text(
+                                "Acompañar tanto en momentos de celebración de la vida como en etapas de vulnerabilidad y reconstrucción social, llevando la vibración allí donde se necesite calma y firmeza.",
+                                size="2", color="#4B5563", line_height="1.6"
+                            ),
+                            width=rx.breakpoints(initial="100%", sm="48%", md="31%"),
+                            align="start"
+                        ),
+                        rx.vstack(
+                            rx.heading("Facilitación Impecable", size="4", color="#2C3639", font_weight="semibold", style={"font-family": "Georgia, serif"}, margin_bottom="8px"),
+                            rx.text(
+                                "Sostener cada sesión con respeto absoluto por el proceso individual de cada participante, sin dogmatismos ni imposiciones, permitiendo que sea la propia sabiduría del cuerpo la que guíe la integración.",
+                                size="2", color="#4B5563", line_height="1.6"
+                            ),
+                            width=rx.breakpoints(initial="100%", sm="48%", md="31%"),
+                            align="start"
+                        ),
+                        width="100%",
+                        flex_direction=rx.breakpoints(initial="column", sm="row"),
+                        flex_wrap="wrap",
+                        justify="between",
+                        gap="6",
+                        margin_bottom="50px"
+                    ),
+
+                    # BLOQUE DESTACADO DE MENSAJE DE CIERRE
+                    rx.box(
+                        rx.text(
+                            '"No venimos a entregarte nada que no poseas ya. Venimos a tejer la atmósfera sonora para que recuerdes cómo escucharte, soltar lo que ya cumplió su ciclo y resurgir con solidez en tu vida cotidiana."',
+                            size="4", 
+                            color="#2C3639", 
+                            italic=True, 
+                            text_align="center", 
+                            line_height="1.8",
+                            style={"font-family": "Georgia, serif"}
+                        ),
+                        width="100%",
+                        padding="35px 25px",
+                        background_color="#EAE5DF",
+                        border_radius="8px"
+                    ),
+                    width="100%", max_width="950px", align="center", padding_x="20px"
+                ),
+                width="100%", padding_y="80px", background_color="#FAF6F0"
             ),
 
             # Separación sutil
