@@ -1125,6 +1125,7 @@ class State(rx.State):
                         "titulo": w.titulo,
                         "tipo": w.tipo,
                         "foto": w.foto,
+                        "fotos": w.fotos or [],
                         "facilitador": w.facilitador,
                         "descripcion": w.descripcion,
                         "fecha_texto": w.fecha_texto,
@@ -2845,6 +2846,7 @@ class State(rx.State):
     edit_taller_titulo: str = ""
     edit_taller_tipo: str = "Taller"
     edit_taller_foto: str = ""
+    edit_taller_fotos: list[str] = []
     edit_taller_facilitador: str = "Tribu Sonora Consciente"
     edit_taller_descripcion: str = ""
     edit_taller_fecha_texto: str = ""
@@ -2873,6 +2875,54 @@ class State(rx.State):
     def set_edit_taller_moneda(self, val: str): self.edit_taller_moneda = val
     def set_edit_taller_fecha_evento(self, val: str): self.edit_taller_fecha_evento = val
     def set_edit_taller_whatsapp(self, val: str): self.edit_taller_whatsapp = val
+
+    def agregar_url_foto_taller_manual(self):
+        """Añade una URL introducida manualmente a la lista de fotos del taller."""
+        if self.edit_taller_foto and self.edit_taller_foto not in self.edit_taller_fotos:
+            self.edit_taller_fotos.append(self.edit_taller_foto)
+            self.edit_taller_foto = ""
+
+    def eliminar_foto_taller(self, url: str):
+        """Elimina una foto de la galería del taller."""
+        if url in self.edit_taller_fotos:
+            self.edit_taller_fotos.remove(url)
+            if self.edit_taller_foto == url:
+                self.edit_taller_foto = self.edit_taller_fotos[0] if self.edit_taller_fotos else ""
+
+    async def subir_foto_taller(self, files: list[rx.UploadFile]):
+        """Sube imágenes directamente al Bucket 'guias' de Supabase Storage."""
+        if files:
+            client = self.get_supabase_client()
+            if not client:
+                yield rx.toast.error("Error conectando con Supabase Storage.")
+                return
+
+            subidas = 0
+            import uuid
+            for file in files:
+                file_bytes = await file.read()
+                ext = file.filename.split(".")[-1].lower() if "." in file.filename else "jpg"
+                storage_filename = f"taller_{uuid.uuid4().hex[:8]}.{ext}"
+                mime_type = f"image/{'jpeg' if ext in ['jpg', 'jpeg'] else ext}"
+                try:
+                    client.storage.from_("guias").upload(
+                        path=storage_filename,
+                        file=file_bytes,
+                        file_options={"upsert": "true", "content-type": mime_type}
+                    )
+                    public_url = client.storage.from_("guias").get_public_url(storage_filename)
+                    if public_url not in self.edit_taller_fotos:
+                        self.edit_taller_fotos.append(public_url)
+                    if not self.edit_taller_foto:
+                        self.edit_taller_foto = public_url
+                    subidas += 1
+                except Exception as e:
+                    print(f"Error subiendo foto de taller: {e}")
+
+            if subidas > 0:
+                yield rx.toast.success(f"{subidas} foto(s) subida(s) al bucket 'guias' con éxito.")
+            else:
+                yield rx.toast.error("Error al subir las imágenes a Supabase.")
     # Variables de Formulario CRUD para Servicios
     modal_editor_servicio_abierto: bool = False
     servicio_id_edicion: int | None = None
@@ -3964,6 +4014,7 @@ class State(rx.State):
         self.edit_taller_titulo = ""
         self.edit_taller_tipo = "Taller"
         self.edit_taller_foto = "/Galeria_foto2d.jpg"
+        self.edit_taller_fotos = ["/Galeria_foto2d.jpg"]
         self.edit_taller_facilitador = "Tribu Sonora Consciente"
         self.edit_taller_descripcion = ""
         self.edit_taller_fecha_texto = ""
@@ -3982,6 +4033,7 @@ class State(rx.State):
         self.edit_taller_titulo = taller.get("titulo", "")
         self.edit_taller_tipo = taller.get("tipo", "Taller")
         self.edit_taller_foto = taller.get("foto", "")
+        self.edit_taller_fotos = list(taller.get("fotos", [])) if taller.get("fotos") else ([taller.get("foto")] if taller.get("foto") else [])
         self.edit_taller_facilitador = taller.get("facilitador", "")
         self.edit_taller_descripcion = taller.get("descripcion", "")
         self.edit_taller_fecha_texto = taller.get("fecha_texto", "")
@@ -4002,6 +4054,17 @@ class State(rx.State):
         if not self.edit_taller_titulo.strip() or not self.edit_taller_ubicacion.strip():
             return rx.toast.error("Por favor completa el Título y la Ubicación del taller.")
 
+        fotos_finales = [f for f in self.edit_taller_fotos if f.strip()]
+        if not fotos_finales and self.edit_taller_foto.strip():
+            fotos_finales = [self.edit_taller_foto.strip()]
+        if not fotos_finales:
+            fotos_finales = ["/Galeria_foto2d.jpg"]
+
+        foto_portada = self.edit_taller_foto.strip() or fotos_finales[0]
+        
+        # Validar y convertir fecha_evento a None si viene vacía para evitar error DATE en Postgres
+        fecha_ev = self.edit_taller_fecha_evento.strip() if self.edit_taller_fecha_evento.strip() else None
+
         try:
             with rx.session() as session:
                 if self.taller_id_edicion:
@@ -4009,7 +4072,8 @@ class State(rx.State):
                     if db_w:
                         db_w.titulo = self.edit_taller_titulo.strip()
                         db_w.tipo = self.edit_taller_tipo.strip()
-                        db_w.foto = self.edit_taller_foto.strip()
+                        db_w.foto = foto_portada
+                        db_w.fotos = fotos_finales
                         db_w.facilitador = self.edit_taller_facilitador.strip()
                         db_w.descripcion = self.edit_taller_descripcion.strip()
                         db_w.fecha_texto = self.edit_taller_fecha_texto.strip()
@@ -4018,7 +4082,7 @@ class State(rx.State):
                         db_w.ubicacion = self.edit_taller_ubicacion.strip()
                         db_w.precio = self.edit_taller_precio
                         db_w.moneda = self.edit_taller_moneda.strip()
-                        db_w.fecha_evento = self.edit_taller_fecha_evento.strip()
+                        db_w.fecha_evento = fecha_ev
                         db_w.whatsapp_contacto = self.edit_taller_whatsapp.strip()
                         session.add(db_w)
                         rx.toast.success("Taller actualizado exitosamente.")
@@ -4026,7 +4090,8 @@ class State(rx.State):
                     nuevo_w = TribuWorkshop(
                         titulo=self.edit_taller_titulo.strip(),
                         tipo=self.edit_taller_tipo.strip() or "Taller",
-                        foto=self.edit_taller_foto.strip() or "/Galeria_foto2d.jpg",
+                        foto=foto_portada,
+                        fotos=fotos_finales,
                         facilitador=self.edit_taller_facilitador.strip() or "Tribu Sonora Consciente",
                         descripcion=self.edit_taller_descripcion.strip(),
                         fecha_texto=self.edit_taller_fecha_texto.strip(),
@@ -4035,7 +4100,7 @@ class State(rx.State):
                         ubicacion=self.edit_taller_ubicacion.strip(),
                         precio=self.edit_taller_precio,
                         moneda=self.edit_taller_moneda.strip() or "USD",
-                        fecha_evento=self.edit_taller_fecha_evento.strip(),
+                        fecha_evento=fecha_ev,
                         whatsapp_contacto=self.edit_taller_whatsapp.strip(),
                         is_active=True
                     )

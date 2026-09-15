@@ -1152,7 +1152,7 @@ def modal_editor_taller() -> rx.Component:
                                 size="2",
                                 color="#1A1A1A"
                             ),
-                            width="50%"
+                            width="33%"
                         ),
                         rx.vstack(
                             rx.text("Hora Texto", size="1", font_weight="bold", color="#2C3639"),
@@ -1164,7 +1164,19 @@ def modal_editor_taller() -> rx.Component:
                                 size="2",
                                 color="#1A1A1A"
                             ),
-                            width="50%"
+                            width="33%"
+                        ),
+                        rx.vstack(
+                            rx.text("Fecha Calendario (Filtro)", size="1", font_weight="bold", color="#2C3639"),
+                            rx.input(
+                                type="date",
+                                value=State.edit_taller_fecha_evento,
+                                on_change=State.set_edit_taller_fecha_evento,
+                                width="100%",
+                                size="2",
+                                color="#1A1A1A"
+                            ),
+                            width="34%"
                         ),
                         width="100%"
                     ),
@@ -1197,14 +1209,93 @@ def modal_editor_taller() -> rx.Component:
                         width="100%"
                     ),
 
-                    rx.text("URL Foto / Portada", size="1", font_weight="bold", color="#2C3639"),
-                    rx.input(
-                        placeholder="/Galeria_foto2d.jpg o https://...",
-                        value=State.edit_taller_foto,
-                        on_change=State.set_edit_taller_foto,
+                    # 🖼️ GALERÍA DE MÚLTIPLES FOTOS Y SUBIDA DIRECTA A SUPABASE (BUCKET: guias)
+                    rx.text("Galería de Fotos del Taller (Bucket: guias)", size="1", font_weight="bold", color="#2C3639"),
+                    rx.cond(
+                        State.edit_taller_fotos.length() > 0,
+                        rx.flex(
+                            rx.foreach(
+                                State.edit_taller_fotos,
+                                lambda url: rx.box(
+                                    rx.image(
+                                        src=url,
+                                        width="65px",
+                                        height="65px",
+                                        object_fit="cover",
+                                        border_radius="6px",
+                                        border="1px solid #EAE5DF"
+                                    ),
+                                    rx.button(
+                                        "❌",
+                                        size="1",
+                                        variant="solid",
+                                        color_scheme="red",
+                                        position="absolute",
+                                        top="-6px",
+                                        right="-6px",
+                                        border_radius="50%",
+                                        width="18px",
+                                        height="18px",
+                                        padding="0",
+                                        font_size="9px",
+                                        cursor="pointer",
+                                        on_click=lambda: State.eliminar_foto_taller(url)
+                                    ),
+                                    position="relative",
+                                    margin_right="8px",
+                                    margin_bottom="8px"
+                                )
+                            ),
+                            flex_wrap="wrap",
+                            padding_y="4px"
+                        ),
+                        rx.text("Sin fotos agregadas aún.", size="1", color="#7F7F7F")
+                    ),
+
+                    rx.hstack(
+                        rx.input(
+                            placeholder="Añadir URL manual (/foto.jpg o https://...)",
+                            value=State.edit_taller_foto,
+                            on_change=State.set_edit_taller_foto,
+                            width="70%",
+                            size="2",
+                            color="#1A1A1A"
+                        ),
+                        rx.button(
+                            "➕ Añadir",
+                            size="2",
+                            variant="soft",
+                            color_scheme="bronze",
+                            width="30%",
+                            on_click=State.agregar_url_foto_taller_manual
+                        ),
+                        width="100%"
+                    ),
+
+                    rx.upload(
+                        rx.vstack(
+                            rx.button("📁 Seleccionar Fotos del Taller (Múltiples)", size="1", variant="soft", color_scheme="bronze", type="button"),
+                            rx.text("Selecciona o arrastra una o varias imágenes", size="1", color="#7F7F7F"),
+                            align="center",
+                            spacing="1"
+                        ),
+                        id="upload_taller_foto",
+                        multiple=True,
+                        border="1px dashed #EAE5DF",
+                        padding="8px",
+                        border_radius="6px",
                         width="100%",
-                        size="2",
-                        color="#1A1A1A"
+                        accept={"image/*": [".png", ".jpg", ".jpeg", ".webp"]}
+                    ),
+                    rx.cond(
+                        rx.selected_files("upload_taller_foto").length() > 0,
+                        rx.button(
+                            "☁️ Subir Imágenes a Supabase (Bucket guias)",
+                            size="2",
+                            color_scheme="green",
+                            width="100%",
+                            on_click=State.subir_foto_taller(rx.upload_files(upload_id="upload_taller_foto"))
+                        )
                     ),
 
                     rx.text("Descripción Corta", size="1", font_weight="bold", color="#2C3639"),
