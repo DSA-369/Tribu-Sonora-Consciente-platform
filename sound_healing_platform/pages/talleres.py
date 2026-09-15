@@ -9,18 +9,68 @@ def tarjeta_taller(taller: rx.Var) -> rx.Component:
     """Tarjeta de taller/evento estilo editorial alineada con la referencia visual."""
     return rx.box(
         rx.flex(
-            # 🖼️ COLUMNA IZQUIERDA: IMAGEN DEL EVENTO
-            rx.box(
-                rx.image(
-                    src=taller["foto"],
+            # 🖼️ COLUMNA IZQUIERDA: GALERÍA E IMAGEN DEL EVENTO CON LIGHTBOX
+            rx.vstack(
+                rx.box(
+                    rx.image(
+                        src=taller["foto"],
+                        width="100%",
+                        height="180px",
+                        object_fit="cover",
+                        border_radius="8px",
+                        transition="transform 0.3s ease",
+                        _hover={"transform": "scale(1.03)"}
+                    ),
+                    rx.box(
+                        rx.hstack(
+                            rx.icon(tag="search", size=12, color="#FFFFFF"),
+                            rx.text("Ampliar fotos", size="1", color="#FFFFFF", font_weight="bold"),
+                            spacing="1",
+                            align="center"
+                        ),
+                        position="absolute",
+                        bottom="8px",
+                        left="8px",
+                        background_color="rgba(44, 54, 57, 0.8)",
+                        padding="4px 8px",
+                        border_radius="4px",
+                        pointer_events="none"
+                    ),
+                    position="relative",
+                    overflow="hidden",
+                    border_radius="8px",
+                    cursor="pointer",
                     width="100%",
-                    height="180px",
-                    object_fit="cover",
-                    border_radius="8px"
+                    on_click=lambda: State.abrir_lightbox_galeria(taller["fotos"], taller["foto"])
                 ),
-                width=rx.breakpoints(initial="100%", md="180px"),
-                min_width="180px",
-                overflow="hidden"
+                # Carrusel horizontal de miniaturas (Móviles y Pantallas)
+                rx.cond(
+                    taller["fotos"],
+                    rx.hstack(
+                        rx.foreach(
+                            taller["fotos"].to(list),
+                            lambda img_url: rx.image(
+                                src=img_url,
+                                width="45px",
+                                height="45px",
+                                object_fit="cover",
+                                border_radius="4px",
+                                cursor="pointer",
+                                border="1px solid #EAE5DF",
+                                _hover={"border": "2px solid #8E6F54", "transform": "scale(1.05)"},
+                                on_click=lambda: State.abrir_lightbox_galeria(taller["fotos"], img_url)
+                            )
+                        ),
+                        spacing="2",
+                        overflow_x="auto",
+                        width="100%",
+                        padding_y="4px"
+                    )
+                ),
+                width=rx.breakpoints(initial="100%", md="220px"),
+                min_width="220px",
+                align="start",
+                spacing="2"
             ),
             
             # 📝 COLUMNA CENTRAL & DERECHA: INFORMACIÓN Y PRECIO (RESPONSIVO MÓVIL)
@@ -156,7 +206,71 @@ def tarjeta_taller(taller: rx.Var) -> rx.Component:
         margin_bottom="20px",
         width="100%"
     )
-
+def modal_lightbox_talleres() -> rx.Component:
+    """Modal flotante de pantalla completa para explorar la galería de fotos del taller."""
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.hstack(
+                    rx.hstack(
+                        rx.icon(tag="image", size=18, color="#FFFFFF"),
+                        rx.text("Galería del Taller", size="2", color="#FFFFFF", font_weight="bold"),
+                        spacing="2",
+                        align="center"
+                    ),
+                    rx.icon(tag="x", size=22, color="#FFFFFF", cursor="pointer", on_click=State.cerrar_lightbox),
+                    justify="between",
+                    align="center",
+                    width="100%",
+                    margin_bottom="10px"
+                ),
+                rx.hstack(
+                    rx.cond(
+                        State.fotos_lightbox,
+                        rx.button(
+                            rx.icon(tag="chevron-left", size=24, color="#FFFFFF"),
+                            variant="soft",
+                            color_scheme="gray",
+                            on_click=State.foto_anterior_lightbox,
+                            cursor="pointer",
+                            padding="8px"
+                        )
+                    ),
+                    rx.image(
+                        src=State.foto_lightbox_actual,
+                        max_width=rx.breakpoints(initial="55vw", sm="75vw"),
+                        max_height="70vh",
+                        object_fit="contain",
+                        border_radius="8px"
+                    ),
+                    rx.cond(
+                        State.fotos_lightbox,
+                        rx.button(
+                            rx.icon(tag="chevron-right", size=24, color="#FFFFFF"),
+                            variant="soft",
+                            color_scheme="gray",
+                            on_click=State.foto_siguiente_lightbox,
+                            cursor="pointer",
+                            padding="8px"
+                        )
+                    ),
+                    justify="center",
+                    align="center",
+                    width="100%",
+                    gap="3"
+                ),
+                align="center",
+                width="100%"
+            ),
+            background_color="rgba(20, 20, 20, 0.95)",
+            padding=rx.breakpoints(initial="14px", sm="20px"),
+            border_radius="12px",
+            border="1px solid rgba(255, 255, 255, 0.1)",
+            width=rx.breakpoints(initial="92vw", sm="auto"),
+            max_width="90vw"
+        ),
+        open=State.modal_lightbox_abierto
+    )
 def talleres_page() -> rx.Component:
     """Vista Principal del Módulo 'Talleres y Eventos' con Vista de Semanas y Meses."""
     contenido = rx.center(
@@ -482,6 +596,7 @@ def talleres_page() -> rx.Component:
                             spacing="3"
                         )
                     ),
+                    modal_lightbox_talleres(),
                     width="100%"
                 ),
                 background_color="#FFFFFF",

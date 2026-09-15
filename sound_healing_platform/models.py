@@ -43,6 +43,7 @@ class TribuWorkshop(sqlmodel.SQLModel, table=True):
     titulo: str
     tipo: str
     foto: str
+    fotos: Any = sqlmodel.Field(default=[], sa_column=sa.Column(sa.JSON))
     facilitador: str
     descripcion: str
     fecha_texto: str
